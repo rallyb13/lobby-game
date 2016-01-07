@@ -1,4 +1,5 @@
 import React from 'react';
+import GridSquare from './GridSquare';
 
 class Grid extends React.Component{
   render(){
@@ -11,7 +12,9 @@ class Grid extends React.Component{
     }
 
     return (
-      <div style={styles.mainGrid} ></div>
+      <div style={styles.mainGrid} >
+        <GridSquare />
+      </div>
     );
   }
 
