@@ -1,18 +1,11 @@
 import React from 'react';
 import GridSquare from './GridSquare';
 
-class Grid extends React.Component{
-  render(){
-    var styles = {
-        mainGrid: {
-            backgroundColor: "limegreen",
-            height: "900px",
-            width: "900px"
-        }
-    };
+var Grid = React.createClass({
+  render: function(){
 
     return (
-      <div style={styles.mainGrid} >
+      <div style={this.styles.mainGrid} >
           <GridSquare />
           <GridSquare />
           <GridSquare />
@@ -22,8 +15,16 @@ class Grid extends React.Component{
           <GridSquare />
       </div>
     );
+  },
+
+  styles: {
+      mainGrid: {
+          backgroundColor: "limegreen",
+          height: "900px",
+          width: "900px"
+      }
   }
 
-}
+});
 
 export default Grid

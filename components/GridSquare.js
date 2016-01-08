@@ -1,23 +1,24 @@
 import React from 'react';
 
-class GridSquare extends React.Component{
-  render(){
-    var styles = {
-       gridSquare: {
-        border: '1px solid #000',
-        height: '16.4%',
-        width: '16.4%',
-        color: 'white',
-        margin: 0,
-        display: 'inline-block'
-       }
-    }
+var GridSquare = React.createClass({
+  render: function(){
 
     return (
-      <div style={styles.gridSquare} >Look at me! Eep Eep Eeep Eeeeep</div>
+      <div style={this.styles.gridSquare} >Look at me! Eep Eep Eeep Eeeeep</div>
     );
+  },
+
+  styles: {
+     gridSquare: {
+      border: '1px solid #000',
+      height: '16.4%',
+      width: '16.4%',
+      color: 'white',
+      margin: 0,
+      display: 'inline-block'
+     }
   }
 
-}
+});
 
 export default GridSquare
