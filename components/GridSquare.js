@@ -1,10 +1,11 @@
 import React from 'react';
+import Token from './Token';
 
 var GridSquare = React.createClass({
   render: function(){
 
     return (
-      <div style={this.styles.gridSquare} >[{this.props.x}, {this.props.y}]</div>
+      <div style={this.styles.gridSquare} ><Token /></div>
     );
   },
 

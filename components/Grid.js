@@ -10,10 +10,10 @@ var Grid = React.createClass({
         i,
         j;
 
-    for (i=0; i < rowNum; i++) {
+    for (i=rowNum; i > 0; i--) {
       for (j=0; j < colNum; j++) {
         count++;
-        squares.push(<GridSquare x={j+1} y={i+1} id={count}/>);
+        squares.push(<GridSquare x={j+1} y={i} id={count}/>);
       }
     }
 
