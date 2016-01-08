@@ -6,9 +6,15 @@ var Score = React.createClass({
 
     return (
       <div>
-        <h5> Score: {points} </h5>
+        <h5 style={this.styles.score}> Score: {points} </h5>
       </div>
     );
+  },
+
+  styles: {
+    score: {
+      paddingLeft: '10px'
+    }
   }
 });
 
