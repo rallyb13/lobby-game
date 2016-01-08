@@ -1,5 +1,5 @@
 import React from 'react';
-import Token from './Token'
+import Token from './Token';
 
 var StagedToken = React.createClass({
 	getInitialState: function(){
