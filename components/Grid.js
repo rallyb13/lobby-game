@@ -10,10 +10,10 @@ var Grid = React.createClass({
         i,
         j;
 
-    for (i=0; i < rowNum; i++) {
+    for (i=rowNum; i > 0; i--) {
       for (j=0; j < colNum; j++) {
         count++;
-        squares.push(<GridSquare x={j+1} y={i+1} id={count}/>);
+        squares.push(<GridSquare x={j+1} y={i} id={count}/>);
       }
     }
 
@@ -27,8 +27,9 @@ var Grid = React.createClass({
   styles: {
       mainGrid: {
           backgroundColor: "limegreen",
-          height: "900px",
-          width: "900px"
+          height: "100%",
+          width: "69%",
+          display: 'inline-block'
       }
   }
 
