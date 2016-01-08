@@ -1,7 +1,7 @@
 import React from 'react';
 
-class GridSquare extends React.Component{
-  render(){
+var GridSquare = React.createClass ({
+  render: function(){
     var styles = {
        gridSquare: {
         border: '1px solid #000',
@@ -18,6 +18,6 @@ class GridSquare extends React.Component{
     );
   }
 
-}
+});
 
 export default GridSquare

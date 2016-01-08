@@ -1,8 +1,8 @@
 import React from 'react';
 import GridSquare from './GridSquare';
 
-class Grid extends React.Component{
-  render(){
+var Grid = React.createClass ({
+  render: function(){
     var styles = {
         mainGrid: {
             backgroundColor: "limegreen",
@@ -11,19 +11,19 @@ class Grid extends React.Component{
         }
     };
 
+     var squares = [];
+          var num = 36;
+          for (var i=0; i < num; i++) {
+              squares.push(<GridSquare />);
+          }
+
     return (
       <div style={styles.mainGrid} >
-          <GridSquare />
-          <GridSquare />
-          <GridSquare />
-          <GridSquare />
-          <GridSquare />
-          <GridSquare />
-          <GridSquare />
+        { squares }
       </div>
     );
   }
 
-}
+});
 
 export default Grid
