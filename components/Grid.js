@@ -3,11 +3,19 @@ import GridSquare from './GridSquare';
 
 var Grid = React.createClass({
   render: function(){
-     var squares = [];
-          var num = 36;
-          for (var i=0; i < num; i++) {
-              squares.push(<GridSquare />);
-          }
+    var squares = [],
+        rowNum = 6,
+        colNum = 6,
+        count = 0,
+        i,
+        j;
+
+    for (i=0; i < rowNum; i++) {
+      for (j=0; j < colNum; j++) {
+        count++;
+        squares.push(<GridSquare x={j+1} y={i+1} id={count}/>);
+      }
+    }
 
     return (
       <div style={this.styles.mainGrid} >
