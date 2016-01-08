@@ -11,12 +11,14 @@ var GridSquare = React.createClass({
 
   styles: {
      gridSquare: {
-      border: '1px solid #000',
       height: '105px',
-      width: '16.3%',
+      width: '16.66%',
+      outline: '1px solid #000',
       color: 'white',
+      backgroundColor: 'limegreen',
       margin: 0,
-      display: 'inline-block'
+      display: 'inline-block',
+      position: 'relative'
      }
   }
 
