@@ -1,10 +1,14 @@
 import React from 'react';
+import Staging from './Staging';
 
 var Scoreboard = React.createClass({
   render: function(){
 
     return (
-      <div style={this.styles.scoreboard} >Scoreboard</div>
+        <div style={this.styles.scoreboard} >
+          Scoreboard
+          <div><Staging /></div>
+        </div>
     );
   },
 
