@@ -2,7 +2,7 @@ import React from 'react';
 
 var Token = React.createClass({
   render: function(){
-    var symbol = this.props.symbol || ['a'];
+    var symbol = this.props.symbol || [''];
 
     return (
       <div style={this.styles.token}>{symbol}</div>
