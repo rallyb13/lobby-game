@@ -27,7 +27,7 @@ var Grid = React.createClass({
   styles: {
       mainGrid: {
           backgroundColor: "limegreen",
-          height: "100%",
+          height: "900px",
           width: "69%",
           display: 'inline-block'
       }
