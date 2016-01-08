@@ -6,7 +6,7 @@ var Scoreboard = React.createClass({
   render: function(){
 
     return (
-      <div style={this.styles.scoreboard} />
+      <div style={this.styles.scoreboard}>
         <h3 style={this.styles.heading}>Scoreboard</h3>
         <Score />
         <div><Staging /></div>
