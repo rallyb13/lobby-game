@@ -2,7 +2,7 @@ import React from 'react';
 
 var Token = React.createClass({
   render: function(){
-    var symbol = ['a'];
+    var symbol = this.props.symbol || ['a'];
 
     return (
       <div style={this.styles.token}>{symbol}</div>
@@ -11,7 +11,10 @@ var Token = React.createClass({
 
   styles: {
      token: {
-
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)'
      }
   }
 

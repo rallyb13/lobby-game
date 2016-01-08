@@ -1,5 +1,6 @@
 import React from 'react';
 import Score from './Score';
+import Staging from './Staging';
 
 var Scoreboard = React.createClass({
   render: function(){
@@ -8,6 +9,7 @@ var Scoreboard = React.createClass({
       <div style={this.styles.scoreboard} />
         <h3 style={this.styles.heading}>Scoreboard</h3>
         <Score />
+        <div><Staging /></div>
       </div>
     );
   },

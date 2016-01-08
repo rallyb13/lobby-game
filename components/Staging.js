@@ -1,20 +1,16 @@
 import React from 'react';
-import Token from './Token'
+import Token from './Token';
 
-var StagedToken = React.createClass({
+var Staging = React.createClass({
 	getInitialState: function(){
 		return ({
-			tokens: [a, a, b, c];   
+			tokens: ['a', 'a', 'b', 'c']   
 		});
-	},
-
-	componentWillMount: function(){
-		this.props.tokenSymbol = this.getSymbol();
 	},
 
 	render: function(){
 		return (
-			<div><Token symbol={this.props.tokenSymbol}></div>
+			<div><Token symbol={this.getSymbol()}/></div>
 		);
 	},
 
