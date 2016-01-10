@@ -1,5 +1,6 @@
 import React from 'react';
 import Score from './Score';
+import MoveCounter from './MoveCounter';
 
 var Scoreboard = React.createClass({
   render: function(){
@@ -8,6 +9,7 @@ var Scoreboard = React.createClass({
       <div style={this.styles.scoreboard}>
         <h3 style={this.styles.heading}>White Paper</h3>
         <Score />
+        <MoveCounter />
       </div>
     );
   },
@@ -20,7 +22,7 @@ var Scoreboard = React.createClass({
       backgroundSize: '100%',
       height: '50%',
       display: 'block',
-      position: 'relative',
+      position: 'relative'
     },
     heading: {
       borderBottom: '1px solid black',
