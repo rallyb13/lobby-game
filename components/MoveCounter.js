@@ -2,7 +2,7 @@ import React from 'react';
 
 var MoveCounter = React.createClass({
   render: function(){
-    var moves = 730, //once level concept is implimented, this will be reset
+    var moves = 730; //once level concept is implimented, this will be reset
 
     return (
       <div>

@@ -13,7 +13,7 @@ var GridSquare = React.createClass({
      gridSquare: {
       height: '16.29%',
       width: '16.66%',
-      outline: '1px solid #000',
+      outline: '1px solid #141414',
       color: 'white',
       display: 'inline-block',
       position: 'relative',
