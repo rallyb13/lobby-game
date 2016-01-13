@@ -6,7 +6,6 @@ import NextGoal from './NextGoal';
 
 var Scoreboard = React.createClass({
   render: function(){
-    console.log(this.props);
     return (
       <div style={this.styles.scoreboard}>
         <h3 style={this.styles.heading}>White Paper</h3>
