@@ -20,7 +20,8 @@ var currentState = {
 
 QuidStore.setupBoard = function () {
   var rows = currentState.board.rows,
-    columns = currentState.board.columns;
+    columns = currentState.board.columns,
+    startingTokens = ['a', 'a', 'a', 'a', 'a', 'b', 'b', 'c'];
 
     for (var i=0; i < rows; i++) {
       var row = [];
@@ -28,6 +29,13 @@ QuidStore.setupBoard = function () {
         row.push('');
       }
       currentState.board.grid.push(row);
+    }
+
+    // go though starting tokens and put the values on the board
+    for (var i=0; i < startingTokens.length; i++) {
+      var x = Math.floor(Math.random() * 5),
+        y = Math.floor(Math.random() * 5);
+        currentState.board.grid[x][y] = startingTokens[i];
     }
 };
 
