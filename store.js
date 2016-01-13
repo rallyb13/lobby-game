@@ -47,7 +47,8 @@ QuidStore.getCurrentState = function(){
   return currentState;
 };
 
-QuidStore.nextMove = function(tokenType){
+QuidStore.nextMove = function(rowPos, colPos){
+  currentState.board.grid[rowPos][colPos] = currentState.stagedToken;
   this.setNextToken();
   this.emitChange();
 };

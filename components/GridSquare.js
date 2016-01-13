@@ -10,9 +10,7 @@ var GridSquare = React.createClass({
   },
 
   placeToken: function(){
-    var tokenType = QuidStore.getCurrentState().stagedToken;
-    this.setState({token: tokenType});
-    QuidStore.nextMove(tokenType);
+    QuidStore.nextMove(this.props.rowPos, this.props.colPos);
   },
 
   styles: {
