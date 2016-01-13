@@ -4,7 +4,7 @@ var Bank = React.createClass({
   render: function(){
     return (
       <div style={this.styles.bank}>
-        <h5>Current Finances: ${this.props.money}</h5>
+        <h5>Current Bank Balance: ${this.props.bankBalance}</h5>
       </div>
     );
   },

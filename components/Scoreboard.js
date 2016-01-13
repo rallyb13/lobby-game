@@ -6,14 +6,14 @@ import NextGoal from './NextGoal';
 
 var Scoreboard = React.createClass({
   render: function(){
-
+    console.log(this.props);
     return (
       <div style={this.styles.scoreboard}>
         <h3 style={this.styles.heading}>White Paper</h3>
-        <Score />
-        <Bank money={'355'} />
-        <MoveCounter />
-        <NextGoal nextGoal={500} />
+        <Score score={this.props.state.score} />
+        <Bank bankBalance={this.props.state.bankBalance} />
+        <MoveCounter movesRemaining={this.props.state.movesRemaining} />
+        <NextGoal nextGoal={this.props.state.nextGoal} />
       </div>
     );
   },

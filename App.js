@@ -6,6 +6,10 @@ import Staging from './components/Staging';
 
 var App = React.createClass ({
 
+  componentWillMount: function () {
+    this.setState(QuidStore.getCurrentState());
+  },
+
   componentDidMount: function(){
     QuidStore.addChangeListener(this.onChange);
   },
@@ -21,8 +25,8 @@ var App = React.createClass ({
           <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
           <Grid />
           <div style={this.styles.panel}>
-            <Scoreboard />
-            <div><Staging /></div>
+            <Scoreboard state={this.state} />
+            <div><Staging stagedToken={this.state.stagedToken} /></div>
           </div>
         </div>
       </div>
