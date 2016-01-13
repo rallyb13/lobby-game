@@ -3,13 +3,9 @@ import QuidStore from '../store';
 import Token from './Token';
 
 var GridSquare = React.createClass({
-  getInitialState: function(){
-    return {token: ''};
-  },
-
   render: function(){
     return (
-      <div onClick={this.placeToken} style={this.styles.gridSquare} ><Token symbol={this.state.token} /></div>
+      <div onClick={this.placeToken} style={this.styles.gridSquare} ><Token symbol={this.props.token} /></div>
     );
   },
 
