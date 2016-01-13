@@ -2,6 +2,7 @@ import React from 'react';
 import Score from './Score';
 import MoveCounter from './MoveCounter';
 import Bank from './Bank';
+import NextGoal from './NextGoal';
 
 var Scoreboard = React.createClass({
   render: function(){
@@ -12,6 +13,7 @@ var Scoreboard = React.createClass({
         <Score />
         <Bank money={'355'} />
         <MoveCounter />
+        <NextGoal nextGoal={500} />
       </div>
     );
   },
