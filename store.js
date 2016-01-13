@@ -3,14 +3,14 @@ var QuidStore = new EventEmitter();
 var CHANGE_EVENT = 'change';
 var currentState = {
   tokensArray: ['a', 'a', 'b', 'c'],
-  stagedToken: Math.floor(Math.random() * tokensArray.length),
+  stagedToken: 'a',
   movesRemaining: 730,
   score: 0,
   bankBalance:  0,
   gamePhase: 1,
-  nextGoal: QuidStore.getNextGoal(this.gamePhase),
-  message: QuidStore.getMessage(this.gamePhase, this.nextGoal, this.movesRemaining),
-  electedOffice: QuidStore.getElectedOffice(this.gamePhase)
+  nextGoal: 0,
+  message: '',
+  electedOffice: ''
 };
 
 QuidStore.emitChange = function() {
@@ -29,29 +29,39 @@ QuidStore.getCurrentState = function(){
   return currentState;
 };
 
-QuidStore.getNextGoal = function(gamePhase) {
+QuidStore.setNextToken = function(){
+  currentState.stagedToken = Math.floor(Math.random() * currentState.tokensArray.length);
+};
+
+QuidStore.setNextGoal = function() {
   var goalMap = {
-    1: 125000,
-    2: 75000,
-    3: 100000
-  }
-  return goalMap[gamePhase];
+        1: 125000,
+        2: 75000,
+        3: 100000
+      };
+  currentState.nextGoal = goalMap[currentState.gamePhase];
 };
 
-QuidStore.getMessage = function(gamePhase, nextGoal, movesRemaining) {
-  var messageMap = {
-    1: 'You need to raise $' + nextGoal + ' in ' + movesRemaining 'days in order to win re-election!',
-    2: 'Primary challenger! You need $' + nextGoal + ' in only ' + movesRemaining + ' days.',
-    3: 'You survived your primary. Hope you can still raise $' + nextGoal + ' in the ' + movesRemaining + 'days.'
-  }
-  return messageMap[gamePhase];
+QuidStore.setMessage = function() {
+  var gamePhase = currentState.gamePhase,
+      nextGoal = currentState.nextGoal,
+      movesRemaining = currentState.movesRemaining,
+      messageMap = {
+        1: 'you bastard'
+        // 1: 'You need to raise $' + nextGoal + ' in ' + movesRemaining 'days in order to win re-election!',
+        // 2: 'Primary challenger! You need $' + nextGoal + ' in only ' + movesRemaining + ' days.',
+        // 3: 'You survived your primary. Hope you can still raise $' + nextGoal + ' in the ' + movesRemaining + 'days.'
+      };
+  currentState.message = messageMap[gamePhase];
 };
 
-QuidStore.getElectedOffice = function(gamePhase) {
+QuidStore.setElectedOffice = function() {
   var electedOfficeMap = {
-    1: 'State Delegate',
-    2: 'State Delegate',
-    3: 'State Delegate'
-  }
-  return electedOfficeMap[gamePhase];
+        1: 'State Delegate',
+        2: 'State Delegate',
+        3: 'State Delegate'
+      };
+  currentState.electedOffice = electedOfficeMap[currentState.gamePhase];
 };
+
+export default QuidStore;

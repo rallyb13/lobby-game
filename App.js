@@ -1,9 +1,19 @@
 import React from 'react';
+import QuidStore from './store';
 import Grid from './components/Grid';
 import Scoreboard from './components/Scoreboard';
 import Staging from './components/Staging';
 
 var App = React.createClass ({
+
+  componentDidMount: function(){
+    QuidStore.addChangeListener(this.onChange);
+  },
+
+  componentWillUnmount: function(){
+    QuidStore.removeChangeListener(this.onChange);
+  },
+
   render(){
     return (
       <div style={this.styles.mainPage}>
@@ -17,6 +27,10 @@ var App = React.createClass ({
         </div>
       </div>
     );
+  },
+
+  onChange: function() {
+    this.setState(QuidStore.getCurrentState());
   },
 
   styles: {
