@@ -5,7 +5,6 @@ import Scoreboard from './components/Scoreboard';
 import Staging from './components/Staging';
 
 var App = React.createClass ({
-
   componentWillMount: function () {
     QuidStore.setupBoard();
     this.setState(QuidStore.getCurrentState());
