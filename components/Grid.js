@@ -4,8 +4,8 @@ import GridSquare from './GridSquare';
 var Grid = React.createClass({
   render: function(){
     var squares = [],
-        rowNum = 6,
-        colNum = 6,
+        rowNum = this.props.board.rows,
+        colNum = this.props.board.columns,
         count = 0,
         i,
         j;
@@ -13,7 +13,7 @@ var Grid = React.createClass({
     for (i=rowNum; i > 0; i--) {
       for (j=0; j < colNum; j++) {
         count++;
-        squares.push(<GridSquare x={j+1} y={i} id={count}/>);
+        squares.push(<GridSquare x={j+1} y={i} token={''} id={count}/>);
       }
     }
 

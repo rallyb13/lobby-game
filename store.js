@@ -2,6 +2,11 @@ var EventEmitter = require('events').EventEmitter;
 var QuidStore = new EventEmitter();
 var CHANGE_EVENT = 'change';
 var currentState = {
+  board: {
+    rows: 6,
+    columns: 6,
+    grid: []
+  },
   tokensArray: ['a', 'a', 'b', 'c'],
   stagedToken: 'a',
   movesRemaining: 730,
@@ -11,6 +16,19 @@ var currentState = {
   nextGoal: 0,
   message: '',
   electedOffice: ''
+};
+
+QuidStore.setupBoard = function () {
+  var rows = currentState.board.rows,
+    columns = currentState.board.columns;
+
+    for (var i=0; i < rows; i++) {
+      var row = [];
+      for (var j=0; j < columns; j++) {
+        row.push('');
+      }
+      currentState.board.grid.push(row);
+    }
 };
 
 QuidStore.emitChange = function() {
