@@ -1,12 +1,22 @@
 import React from 'react';
+import QuidStore from '../store';
 import Token from './Token';
 
 var GridSquare = React.createClass({
-  render: function(){
+  getInitialState: function(){
+    return {token: ''};
+  },
 
+  render: function(){
     return (
-      <div style={this.styles.gridSquare} ><Token /></div>
+      <div onClick={this.placeToken} style={this.styles.gridSquare} ><Token symbol={this.state.token} /></div>
     );
+  },
+
+  placeToken: function(){
+    console.log(this.props.x);
+    console.log(QuidStore.getCurrentState().stagedToken);
+    this.setState({token: QuidStore.getCurrentState().stagedToken});
   },
 
   styles: {
