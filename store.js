@@ -47,6 +47,10 @@ QuidStore.getCurrentState = function(){
   return currentState;
 };
 
+QuidStore.checkEmpty = function(rowPos, colPos){
+  return currentState.board.grid[rowPos][colPos] === '';
+};
+
 QuidStore.nextMove = function(rowPos, colPos){
   currentState.board.grid[rowPos][colPos] = currentState.stagedToken;
   this.setNextToken();

@@ -10,7 +10,12 @@ var GridSquare = React.createClass({
   },
 
   placeToken: function(){
-    QuidStore.nextMove(this.props.rowPos, this.props.colPos);
+    var rowPos = this.props.rowPos,
+        colPos = this.props.colPos;
+
+    if (QuidStore.checkEmpty(rowPos, colPos) === true) {
+      QuidStore.nextMove(rowPos, colPos);
+    }
   },
 
   styles: {
