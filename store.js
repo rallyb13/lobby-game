@@ -29,8 +29,14 @@ QuidStore.getCurrentState = function(){
   return currentState;
 };
 
+QuidStore.nextMove = function(tokenType){
+  this.setNextToken();
+  this.emitChange();
+};
+
 QuidStore.setNextToken = function(){
-  currentState.stagedToken = Math.floor(Math.random() * currentState.tokensArray.length);
+  var tokens = currentState.tokensArray;
+  currentState.stagedToken = tokens[Math.floor(Math.random() * tokens.length)];
 };
 
 QuidStore.setNextGoal = function() {
@@ -47,7 +53,7 @@ QuidStore.setMessage = function() {
       nextGoal = currentState.nextGoal,
       movesRemaining = currentState.movesRemaining,
       messageMap = {
-        1: 'you bastard'
+        1: 'Congrats on your election. Now raise some money.'
         // 1: 'You need to raise $' + nextGoal + ' in ' + movesRemaining 'days in order to win re-election!',
         // 2: 'Primary challenger! You need $' + nextGoal + ' in only ' + movesRemaining + ' days.',
         // 3: 'You survived your primary. Hope you can still raise $' + nextGoal + ' in the ' + movesRemaining + 'days.'
