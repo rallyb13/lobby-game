@@ -85,9 +85,13 @@ QuidStore.handleMatches = function(token, rowPos, colPos){
       }
     }
   }
-
   if (toAddCoords.length > 0){
     matchCoords = matchCoords.concat(toAddCoords);
+  }
+
+  if (matchCoords.length >= 2){
+    this.clearMatches(matchCoords);
+    token = this.promoteToken(token);
   }
 
   return token;
@@ -113,6 +117,21 @@ QuidStore.cardinalCheck = function(token, rowPos, colPos){
     }
   }
   return matchCoords;
+};
+
+QuidStore.clearMatches = function(matches){
+  for (var i = 0; i < matches.length; i++){
+    currentState.board.grid[matches[i][0]][matches[i][1]] = '';
+  }
+}
+
+QuidStore.promoteToken = function(token){
+  var tokenMap = {
+    'a': 'b',
+    'b': 'c',
+    'c': 'final'
+  }
+  return tokenMap[token];
 };
 
 QuidStore.setNextGoal = function() {
