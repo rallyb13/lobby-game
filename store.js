@@ -61,9 +61,11 @@ QuidStore.checkEmpty = function(rowPos, colPos){
 
 QuidStore.completeMove = function(rowPos, colPos){
   var playedToken = currentState.stagedToken;
+
   playedToken = this.handleMatches(playedToken, rowPos, colPos);
   currentState.board.grid[rowPos][colPos] = playedToken;
   this.setNextToken();
+  currentState.movesRemaining--;
   this.emitChange();
 };
 
