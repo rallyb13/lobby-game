@@ -22,7 +22,8 @@ var currentState = {
 QuidStore.setupBoard = function () {
   var rows = currentState.board.rows,
     columns = currentState.board.columns,
-    startingTokens = ['a', 'a', 'a', 'a', 'a', 'b', 'b', 'c'];
+    startingTokens = ['a', 'a', 'a', 'a', 'a', 'b', 'b', 'c', 'a', 'a', 'b'],
+    token;
 
     for (var i=0; i < rows; i++) {
       var row = [];
@@ -37,6 +38,16 @@ QuidStore.setupBoard = function () {
       var x = Math.floor(Math.random() * 5),
         y = Math.floor(Math.random() * 5);
         currentState.board.grid[x][y] = startingTokens[i];
+    }
+
+    //eliminate pre-matched tokens
+    for (var i=0; i < rows; i++){
+      for (var j = 0; j < columns; j++){
+        token = currentState.board.grid[i][j];
+        if (token !== '' && this.cardinalCheck(token, i, j).length >= 2){
+          currentState.board.grid[i][j] = '';
+        }
+      }
     }
 };
 
