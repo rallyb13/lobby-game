@@ -14,7 +14,7 @@ var GridSquare = React.createClass({
         colPos = this.props.colPos;
 
     if (QuidStore.checkEmpty(rowPos, colPos) === true) {
-      QuidStore.nextMove(rowPos, colPos);
+      QuidStore.completeMove(rowPos, colPos);
     }
   },
 

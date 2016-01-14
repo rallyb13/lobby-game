@@ -59,8 +59,10 @@ QuidStore.checkEmpty = function(rowPos, colPos){
   return currentState.board.grid[rowPos][colPos] === '';
 };
 
-QuidStore.nextMove = function(rowPos, colPos){
-  currentState.board.grid[rowPos][colPos] = currentState.stagedToken;
+QuidStore.completeMove = function(rowPos, colPos){
+  var playedToken = currentState.stagedToken;
+  playedToken = this.handleMatches(playedToken, rowPos, colPos);
+  currentState.board.grid[rowPos][colPos] = playedToken;
   this.setNextToken();
   this.emitChange();
 };
@@ -68,6 +70,49 @@ QuidStore.nextMove = function(rowPos, colPos){
 QuidStore.setNextToken = function(){
   var tokens = currentState.tokensArray;
   currentState.stagedToken = tokens[Math.floor(Math.random() * tokens.length)];
+};
+
+QuidStore.handleMatches = function(token, rowPos, colPos){
+  var matchCoords = this.cardinalCheck(token, rowPos, colPos),
+    moreCoords = [],
+    toAddCoords = [];
+
+  if (matchCoords.length > 0){
+    for (var i = 0; i < matchCoords.length; i++){
+      moreCoords = this.cardinalCheck(token, matchCoords[i][0], matchCoords[i][1]);
+      if (moreCoords.length > 0){
+        toAddCoords = toAddCoords.concat(moreCoords);
+      }
+    }
+  }
+
+  if (toAddCoords.length > 0){
+    matchCoords = matchCoords.concat(toAddCoords);
+  }
+
+  return token;
+};
+
+QuidStore.cardinalCheck = function(token, rowPos, colPos){
+  var possibleMatches = [ [rowPos, colPos+1], [rowPos, colPos-1], [rowPos+1, colPos], [rowPos-1, colPos]],
+    board = currentState.board,
+    matchCoords = [],
+    checkRow,
+    checkCol,
+    squareToken,
+    i;
+
+  for (i = 0; i < possibleMatches.length; i++){
+    checkRow = possibleMatches[i][0];
+    checkCol = possibleMatches[i][1];
+
+    if (checkRow >= 0 && checkRow < board.rows && checkCol >= 0 && checkCol < board.columns ) {
+      if (currentState.board.grid[checkRow][checkCol] === token) {
+        matchCoords.push([checkRow, checkCol]);
+      }
+    }
+  }
+  return matchCoords;
 };
 
 QuidStore.setNextGoal = function() {
