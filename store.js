@@ -92,8 +92,11 @@ QuidStore.handleMatches = function(token, rowPos, colPos){
   if (matchCoords.length >= 2){
     this.clearMatches(matchCoords);
     token = this.promoteToken(token);
+    if (token !== 'final') {
+      token = this.handleMatches(token, rowPos, colPos);
+      return token;
+    }
   }
-
   return token;
 };
 
