@@ -1,3 +1,4 @@
+import Utils from './utils';
 var EventEmitter = require('events').EventEmitter;
 var QuidStore = new EventEmitter();
 var CHANGE_EVENT = 'change';
@@ -93,7 +94,7 @@ QuidStore.handleMatches = function(token, rowPos, colPos){
 
   if (matchCoords.length >= 2){
     this.clearMatches(matchCoords);
-    token = this.promoteToken(token);
+    token = Utils.promoteToken(token);
     if (token !== 'final') {
       token = this.handleMatches(token, rowPos, colPos);
       return token;
@@ -128,46 +129,6 @@ QuidStore.clearMatches = function(matches){
   for (var i = 0; i < matches.length; i++){
     currentState.board.grid[matches[i][0]][matches[i][1]] = '';
   }
-}
-
-QuidStore.promoteToken = function(token){
-  var tokenMap = {
-    'a': 'b',
-    'b': 'c',
-    'c': 'final'
-  }
-  return tokenMap[token];
-};
-
-QuidStore.setNextGoal = function() {
-  var goalMap = {
-        1: 125000,
-        2: 75000,
-        3: 100000
-      };
-  currentState.nextGoal = goalMap[currentState.gamePhase];
-};
-
-QuidStore.setMessage = function() {
-  var gamePhase = currentState.gamePhase,
-      nextGoal = currentState.nextGoal,
-      movesRemaining = currentState.movesRemaining,
-      messageMap = {
-        1: 'Congrats on your election. Now raise some money.'
-        // 1: 'You need to raise $' + nextGoal + ' in ' + movesRemaining 'days in order to win re-election!',
-        // 2: 'Primary challenger! You need $' + nextGoal + ' in only ' + movesRemaining + ' days.',
-        // 3: 'You survived your primary. Hope you can still raise $' + nextGoal + ' in the ' + movesRemaining + 'days.'
-      };
-  currentState.message = messageMap[gamePhase];
-};
-
-QuidStore.setElectedOffice = function() {
-  var electedOfficeMap = {
-        1: 'State Delegate',
-        2: 'State Delegate',
-        3: 'State Delegate'
-      };
-  currentState.electedOffice = electedOfficeMap[currentState.gamePhase];
 };
 
 export default QuidStore;
