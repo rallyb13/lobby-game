@@ -12,8 +12,33 @@ var Utils = {
       'a': 'b',
       'b': 'c',
       'c': 'final'
-    }
+    };
     return tokenMap[token];
+  },
+
+  scoreToken: function(token){
+    var tokenValueMap = {
+      'a': 5,
+      'b': 10,
+      'c': 25
+    };
+    return tokenValueMap[token];
+  },
+
+  //TODO: add idea of mutliplier at certain phases of gameplay, earning bonus for reason
+  scoreMatch: function(count, token){
+    var bigMatchFactor = 1,
+      matchValueMap = {
+        'a': 20,
+        'b': 45,
+        'c': 95
+      };
+    if (count === 3){
+      bigMatchFactor = 1.1;
+    } else if (count > 3){
+      bigMatchFactor = (count-1)*1.142
+    }
+    return Math.round(bigMatchFactor * matchValueMap[token]);
   },
 
   setNextGoal: function(currentState) {

@@ -86,7 +86,7 @@ QuidStore.setNextToken = function(){
   currentState.stagedToken = tokens[Math.floor(Math.random() * tokens.length)];
 };
 
-QuidStore.handleMatches = function(token, rowPos, colPos){
+QuidStore.handleMatches = function(token, rowPos, colPos, isRecursive){
   var matchCoords = this.cardinalCheck(token, rowPos, colPos),
     moreCoords = [],
     toAddCoords = [];
@@ -103,11 +103,13 @@ QuidStore.handleMatches = function(token, rowPos, colPos){
     matchCoords = matchCoords.concat(toAddCoords);
   }
 
+  this.handleScoreboard(matchCoords.length, token, isRecursive);
+
   if (matchCoords.length >= 2){
     this.clearMatches(matchCoords);
     token = Utils.promoteToken(token);
     if (token !== 'final') {
-      token = this.handleMatches(token, rowPos, colPos);
+      token = this.handleMatches(token, rowPos, colPos, true);
       return token;
     }
   }
@@ -140,6 +142,24 @@ QuidStore.clearMatches = function(matches){
   for (var i = 0; i < matches.length; i++){
     currentState.board.grid[matches[i][0]][matches[i][1]] = '';
   }
+};
+
+QuidStore.handleScoreboard = function(count, token, isRecursive) {
+  var points = 0,
+    money = 0;
+  if (count < 2 && isRecursive !== true) {
+    points =  Utils.scoreToken(token);
+    //fn for money
+  } else if (count >= 2){
+    points = Utils.scoreMatch(count, token);
+    //fn for money
+    if (isRecursive){
+      points = Math.round(points * 1.3);
+      //change for money
+    }
+  }
+  currentState.score = currentState.score + points;
+  currentState.bankBalance = currentState.bankBalance + money;
 };
 
 export default QuidStore;
