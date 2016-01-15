@@ -20540,7 +20540,7 @@
 	  styles: {
 	    scoreboard: {
 	      border: '1px solid #000',
-	      background: 'url(../images/crumpled_looseleaf.jpg)',
+	      background: 'url(images/crumpled_looseleaf.jpg)',
 	      backgroundPosition: 'center',
 	      backgroundSize: '100%',
 	      height: '50%',
