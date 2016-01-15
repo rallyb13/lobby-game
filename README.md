@@ -6,6 +6,10 @@ There are a few dependencies. Please run the following commands in the project f
 Then run it using:
 * npm start
 
+To deploy with FTP:
+* npm run build
+* move index.html, index.js, and images dir to server
+
 
 The logic of the lobbying game (Quid) is as follows (most of this is not yet built out):
 
