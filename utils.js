@@ -25,6 +25,15 @@ var Utils = {
     return tokenValueMap[token];
   },
 
+  earnFromToken: function(token){
+    var tokenPayoutMap = {
+      'a': 100,
+      'b': 200,
+      'c': 300
+    }
+    return tokenPayoutMap[token];
+  },
+
   //TODO: add idea of mutliplier at certain phases of gameplay, earning bonus for reason
   scoreMatch: function(count, token){
     var bigMatchFactor = 1,
@@ -39,6 +48,23 @@ var Utils = {
       bigMatchFactor = (count-1)*1.142
     }
     return Math.round(bigMatchFactor * matchValueMap[token]);
+  },
+
+  earnFromMatch: function(count, token){
+    var bigMatchFactor = 1,
+      matchPayoutMap = {
+        'a': 250,
+        'b': 500,
+        'c': 1000
+      }
+    if (count === 3){
+      bigMatchFactor = 1.1;
+    } else if (count > 3 && count < 7){
+      bigMatchFactor = 1.2;
+    } else if (count >= 7){
+      bigMatchFactor = 1.3
+    }
+    return Math.round(bigMatchFactor * matchPayoutMap[token]);
   },
 
   setNextGoal: function(currentState) {

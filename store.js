@@ -148,14 +148,14 @@ QuidStore.handleScoreboard = function(count, token, isRecursive) {
   var points = 0,
     money = 0;
   if (count < 2 && isRecursive !== true) {
-    points =  Utils.scoreToken(token);
-    //fn for money
+    points = Utils.scoreToken(token);
+    money = Utils.earnFromToken(token);
   } else if (count >= 2){
     points = Utils.scoreMatch(count, token);
-    //fn for money
+    money = Utils.earnFromMatch(count, token);
     if (isRecursive){
       points = Math.round(points * 1.3);
-      //change for money
+      money = Math.round(money * 1.25);
     }
   }
   currentState.score = currentState.score + points;
