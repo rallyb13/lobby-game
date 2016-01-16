@@ -1,0 +1,8 @@
+body {
+  background-image: url(images/DC-Night-Tour.jpg);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  height: 100%;
+}

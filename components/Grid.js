@@ -29,8 +29,8 @@ var Grid = React.createClass({
           backgroundColor: "forestgreen",
           height: "900px",
           width: "69%",
-          display: 'inline-block',
-          borderRadius: '10%'
+          display: 'inline-block'
+          // borderRadius: '10%'
       }
   }
 
