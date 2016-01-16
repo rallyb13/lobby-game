@@ -96,6 +96,33 @@ var Utils = {
           3: 'State Delegate'
         };
     return electedOfficeMap[currentState.gamePhase];
+  },
+
+  formatNum: function(num){
+    var numString = num.toString(),
+      charCount = numString.length,
+      leftSideCount = charCount % 3,
+      segmentCount = segmentCount = charCount/3,
+      formatted = '',
+      i;
+
+    if (charCount > 3){
+      if (leftSideCount !== 0){
+        formatted = numString.slice(0, leftSideCount) + ',';
+        numString = numString.slice(leftSideCount - charCount);
+        charCount = charCount - leftSideCount;
+        segmentCount = charCount/3;
+      }
+      for (i = 0; i < segmentCount; i++){
+        formatted = formatted + numString.slice(i*3, (i+1)*3);
+        if (i+1 < segmentCount){
+          formatted = formatted + ',';
+        }
+      }
+      return formatted;
+    } else {
+      return numString;
+    }
   }
 
 };

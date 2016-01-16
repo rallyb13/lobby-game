@@ -14,7 +14,7 @@ var currentState = {
   score: 0,
   bankBalance:  0,
   gamePhase: 1,
-  nextGoal: 0,
+  nextGoal: 125000,
   message: '',
   electedOffice: ''
 };
