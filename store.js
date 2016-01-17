@@ -94,7 +94,8 @@ QuidStore.setNextToken = function(){
 QuidStore.handleMatches = function(token, rowPos, colPos, isRecursive){
   var matchCoords = this.cardinalCheck(token, rowPos, colPos),
     moreCoords = [],
-    toAddCoords = [];
+    toAddCoords = [],
+    newToken;
 
   if (matchCoords.length > 0){
     for (var i = 0; i < matchCoords.length; i++){
@@ -111,14 +112,17 @@ QuidStore.handleMatches = function(token, rowPos, colPos, isRecursive){
   this.handleScoreboard(matchCoords.length, token, isRecursive);
 
   if (matchCoords.length >= 2){
-    this.clearMatches(matchCoords);
-    token = Utils.promoteToken(token);
-    if (token !== 'final') {
-      token = this.handleMatches(token, rowPos, colPos, true);
+    newToken = Utils.promoteToken(token);
+    if (newToken !== 'final') {
+      this.clearMatches(matchCoords);
+      newToken = this.handleMatches(newToken, rowPos, colPos, true);
+      return newToken;
+    } else {
       return token;
     }
+  } else {
+    return token;
   }
-  return token;
 };
 
 QuidStore.cardinalCheck = function(token, rowPos, colPos){

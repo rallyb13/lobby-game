@@ -11,7 +11,9 @@ var Utils = {
     var tokenMap = {
       'a': 'b',
       'b': 'c',
-      'c': 'final'
+      'c': 'd',
+      'd': 'e',
+      'e': 'final'
     };
     return tokenMap[token];
   },
@@ -20,7 +22,9 @@ var Utils = {
     var tokenValueMap = {
       'a': 5,
       'b': 10,
-      'c': 25
+      'c': 25,
+      'd': 50,
+      'e': 100
     };
     return tokenValueMap[token];
   },
@@ -29,7 +33,9 @@ var Utils = {
     var tokenPayoutMap = {
       'a': 100,
       'b': 200,
-      'c': 300
+      'c': 300,
+      'd': 400,
+      'e': 500
     }
     return tokenPayoutMap[token];
   },
@@ -40,7 +46,9 @@ var Utils = {
       matchValueMap = {
         'a': 20,
         'b': 45,
-        'c': 95
+        'c': 95,
+        'd': 195,
+        'e': 500
       };
     if (count === 3){
       bigMatchFactor = 1.1;
@@ -55,7 +63,9 @@ var Utils = {
       matchPayoutMap = {
         'a': 250,
         'b': 500,
-        'c': 1000
+        'c': 1000,
+        'd': 2500,
+        'e': 5000
       }
     if (count === 3){
       bigMatchFactor = 1.1;
