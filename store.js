@@ -76,8 +76,13 @@ QuidStore.completeMove = function(rowPos, colPos){
 
   playedToken = this.handleMatches(playedToken, rowPos, colPos);
   currentState.board.grid[rowPos][colPos] = playedToken;
-  this.setNextToken();
   currentState.movesRemaining--;
+
+  if (this.isGameOver()){
+    this.endGame('board');
+  } else {
+    this.setNextToken();
+  }
   this.emitChange();
 };
 
@@ -160,6 +165,30 @@ QuidStore.handleScoreboard = function(count, token, isRecursive) {
   }
   currentState.score = currentState.score + points;
   currentState.bankBalance = currentState.bankBalance + money;
+};
+
+QuidStore.isGameOver = function(){
+  var board = currentState.board,
+    gameOver = true;
+
+  for (var i=0; i < board.rows; i++) {
+    for (var j = 0; j < board.columns; j++){
+      if (board.grid[i][j] === ''){
+        gameOver = false;
+        return gameOver;
+      }
+    }
+  }
+  return gameOver;
+};
+
+QuidStore.endGame = function(failType){
+  var reason = 'Game Over.';
+  if (failType === 'board'){
+    reason = reason + ' Talk about gridlock!'
+  }
+  currentState.stagedToken = '';
+  currentState.message = reason;
 };
 
 export default QuidStore;
