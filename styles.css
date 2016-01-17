@@ -1,8 +1,17 @@
-body {
-  background-image: url(images/DC-Night-Tour.jpg);
-  background-position: center;
+html {
+  background: url(images/DC-Night-Tour.jpg) no-repeat center center fixed;
   background-size: cover;
-  background-repeat: no-repeat;
+  background-color: #0c0c0c;
   overflow: hidden;
-  height: 100%;
+  padding:0px;
+  margin:0px;
+  width:100%;
+  height:100%;
+}
+body {
+  overflow: auto;
+  padding:0px;
+  margin:0px;
+  width:100%;
+  height:100%;
 }

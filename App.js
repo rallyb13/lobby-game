@@ -21,7 +21,7 @@ var App = React.createClass ({
   render(){
     return (
       <div>
-        <div style={{width:'900px', margin: '0 auto'}}>
+        <div style={{maxWidth:'900px', margin: '0 auto'}}>
           <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
           <Grid board={this.state.board}/>
           <div style={this.styles.panel}>
@@ -39,7 +39,8 @@ var App = React.createClass ({
 
   styles: {
     gameTitle: {
-        color: 'white'
+        color: 'white',
+        padding: '25px'
     },
     panel: {
       width: '30%',

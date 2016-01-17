@@ -23,6 +23,7 @@ var Scoreboard = React.createClass({
       background: 'url(images/crumpled_looseleaf.jpg)',
       backgroundPosition: 'center',
       backgroundSize: '100%',
+      backgroundColor: '#DFDFDB',
       height: '50%',
       display: 'block',
       position: 'relative'

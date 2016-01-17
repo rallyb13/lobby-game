@@ -26,11 +26,14 @@ var Grid = React.createClass({
 
   styles: {
       mainGrid: {
-          backgroundColor: "forestgreen",
-          height: "900px",
+          backgroundColor: '#A4BD99',
+          height: "100%",
           width: "69%",
-          display: 'inline-block'
-          // borderRadius: '10%'
+          display: 'inline-block',
+          marginTop: '20px',
+          marginBottom: '20px',
+          //Set min-width so always have 6 columns
+          minWidth: '550px'
       }
   }
 
