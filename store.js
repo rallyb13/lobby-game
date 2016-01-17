@@ -77,6 +77,9 @@ QuidStore.completeMove = function(rowPos, colPos){
   playedToken = this.handleMatches(playedToken, rowPos, colPos);
   currentState.board.grid[rowPos][colPos] = playedToken;
   currentState.movesRemaining--;
+  if (currentState.movesRemaining === 0){
+    this.handleElection();
+  }
 
   if (this.isGameOver()){
     this.endGame('board');
@@ -171,6 +174,30 @@ QuidStore.handleScoreboard = function(count, token, isRecursive) {
   currentState.bankBalance = currentState.bankBalance + money;
 };
 
+QuidStore.handleElection(){
+  currentState.bankBalance = currentState.bankBalance - currentState.nextGoal;
+  if (currentState.bankBalance < 0){
+    this.endGame('election');
+  } else {
+    currentState.phase++;
+    this.changePhase(currentState.phase);
+    //TODO: final tokens-->lobbyist bench conversion???
+  }
+};
+
+//TODO: all of these Utils maps need to be filled out for whole game
+QuidStore.changePhase(phase){
+  //change every election
+  currentState.movesRemaining = Utils.resetMovesCounter(phase);
+  currentState.nextGoal = Utils.setNextGoal(phase);
+
+  //change more often
+  // currentState.tokensArray = Utils.changePossibleTokens(phase, currentState.movesRemaining);
+  currentState.message = Utils.changeMessage(phase, currentState.movesRemaining);
+  //changes less often
+  currentState.electedOffice = Utils.setElectedOffice(phase);
+};
+
 QuidStore.isGameOver = function(){
   var board = currentState.board,
     gameOver = true;
@@ -186,10 +213,13 @@ QuidStore.isGameOver = function(){
   return gameOver;
 };
 
+//TODO: Button to restart game needs to replace stagedToken?
 QuidStore.endGame = function(failType){
   var reason = 'Game Over.';
   if (failType === 'board'){
     reason = reason + ' Talk about gridlock!'
+  } else if (failType === 'election'){
+    reason = reason + ' People can be bought, just not always by you.'
   }
   currentState.stagedToken = '';
   currentState.message = reason;

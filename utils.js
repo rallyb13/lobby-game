@@ -77,16 +77,25 @@ var Utils = {
     return Math.round(bigMatchFactor * matchPayoutMap[token]);
   },
 
-  setNextGoal: function(currentState) {
-    var goalMap = {
-          1: 125000,
-          2: 75000,
-          3: 100000
-        };
-    return goalMap[currentState.gamePhase];
+  resetMovesCounter: function(phase){
+    var MovesCountMap = {
+      1: 730,
+      2: 610,
+      3: 120
+    }
+    return MovesCountMap[phase];
   },
 
-  setMessage: function(currentState) {
+  setNextGoal: function(phase) {
+    var goalMap = {
+      1: 125000,
+      2: 75000,
+      3: 100000
+    };
+    return goalMap[phase];
+  },
+
+  changeMessage: function(currentState) {
     var gamePhase = currentState.gamePhase,
         nextGoal = currentState.nextGoal,
         movesRemaining = currentState.movesRemaining,
