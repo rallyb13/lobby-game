@@ -19708,10 +19708,10 @@
 	  render: function render() {
 	    return _react2.default.createElement(
 	      'div',
-	      { style: this.styles.mainPage },
+	      null,
 	      _react2.default.createElement(
 	        'div',
-	        { style: { width: '900px', margin: '0 auto' } },
+	        { style: { maxWidth: '900px', margin: '0 auto' } },
 	        _react2.default.createElement(
 	          'h1',
 	          { style: this.styles.gameTitle },
@@ -19721,12 +19721,12 @@
 	        _react2.default.createElement(
 	          'div',
 	          { style: this.styles.panel },
-	          _react2.default.createElement(_Scoreboard2.default, { state: this.state }),
 	          _react2.default.createElement(
 	            'div',
 	            null,
 	            _react2.default.createElement(_Staging2.default, { stagedToken: this.state.stagedToken })
-	          )
+	          ),
+	          _react2.default.createElement(_Scoreboard2.default, { state: this.state })
 	        )
 	      )
 	    );
@@ -19737,14 +19737,9 @@
 	  },
 
 	  styles: {
-	    mainPage: {
-	      background: 'url(images/DC-Night-Tour.jpg)',
-	      backgroundPosition: 'center',
-	      backgroundSize: 'cover',
-	      backgroundRepeat: 'no-repeat'
-	    },
 	    gameTitle: {
-	      color: 'white'
+	      color: 'white',
+	      padding: '25px'
 	    },
 	    panel: {
 	      width: '30%',
@@ -19785,7 +19780,7 @@
 	  score: 0,
 	  bankBalance: 0,
 	  gamePhase: 1,
-	  nextGoal: 0,
+	  nextGoal: 125000,
 	  message: '',
 	  electedOffice: ''
 	};
@@ -19847,8 +19842,16 @@
 
 	  playedToken = this.handleMatches(playedToken, rowPos, colPos);
 	  currentState.board.grid[rowPos][colPos] = playedToken;
-	  this.setNextToken();
 	  currentState.movesRemaining--;
+	  if (currentState.movesRemaining === 0) {
+	    this.handleElection();
+	  }
+
+	  if (this.isGameOver()) {
+	    this.endGame('board');
+	  } else {
+	    this.setNextToken();
+	  }
 	  this.emitChange();
 	};
 
@@ -19860,7 +19863,8 @@
 	QuidStore.handleMatches = function (token, rowPos, colPos, isRecursive) {
 	  var matchCoords = this.cardinalCheck(token, rowPos, colPos),
 	      moreCoords = [],
-	      toAddCoords = [];
+	      toAddCoords = [],
+	      newToken;
 
 	  if (matchCoords.length > 0) {
 	    for (var i = 0; i < matchCoords.length; i++) {
@@ -19877,14 +19881,17 @@
 	  this.handleScoreboard(matchCoords.length, token, isRecursive);
 
 	  if (matchCoords.length >= 2) {
-	    this.clearMatches(matchCoords);
-	    token = _utils2.default.promoteToken(token);
-	    if (token !== 'final') {
-	      token = this.handleMatches(token, rowPos, colPos, true);
+	    newToken = _utils2.default.promoteToken(token);
+	    if (newToken !== 'final') {
+	      this.clearMatches(matchCoords);
+	      newToken = this.handleMatches(newToken, rowPos, colPos, true);
+	      return newToken;
+	    } else {
 	      return token;
 	    }
+	  } else {
+	    return token;
 	  }
-	  return token;
 	};
 
 	QuidStore.cardinalCheck = function (token, rowPos, colPos) {
@@ -19920,17 +19927,68 @@
 	      money = 0;
 	  if (count < 2 && isRecursive !== true) {
 	    points = _utils2.default.scoreToken(token);
-	    //fn for money
+	    money = _utils2.default.earnFromToken(token);
 	  } else if (count >= 2) {
-	      points = _utils2.default.scoreMatch(count, token);
-	      //fn for money
-	      if (isRecursive) {
-	        points = Math.round(points * 1.3);
-	        //change for money
-	      }
+	    points = _utils2.default.scoreMatch(count, token);
+	    money = _utils2.default.earnFromMatch(count, token);
+	    if (isRecursive) {
+	      points = Math.round(points * 1.3);
+	      money = Math.round(money * 1.25);
 	    }
+	  }
 	  currentState.score = currentState.score + points;
 	  currentState.bankBalance = currentState.bankBalance + money;
+	};
+
+	QuidStore.handleElection = function () {
+	  currentState.bankBalance = currentState.bankBalance - currentState.nextGoal;
+	  if (currentState.bankBalance < 0) {
+	    this.endGame('election');
+	  } else {
+	    currentState.phase++;
+	    this.changePhase(currentState.phase);
+	    //TODO: final tokens-->lobbyist bench conversion???
+	  }
+	};
+
+	//TODO: all of these Utils maps need to be filled out for whole game
+	QuidStore.changePhase = function (phase) {
+	  //change every election
+	  currentState.movesRemaining = _utils2.default.resetMovesCounter(phase);
+	  currentState.nextGoal = _utils2.default.setNextGoal(phase);
+
+	  //change more often
+	  // currentState.tokensArray = Utils.changePossibleTokens(phase, currentState.movesRemaining);
+	  currentState.message = _utils2.default.changeMessage(phase, currentState.movesRemaining);
+	  //changes less often
+	  currentState.electedOffice = _utils2.default.setElectedOffice(phase);
+	};
+
+	QuidStore.isGameOver = function () {
+	  var board = currentState.board,
+	      gameOver = true;
+
+	  for (var i = 0; i < board.rows; i++) {
+	    for (var j = 0; j < board.columns; j++) {
+	      if (board.grid[i][j] === '') {
+	        gameOver = false;
+	        return gameOver;
+	      }
+	    }
+	  }
+	  return gameOver;
+	};
+
+	//TODO: Button to restart game needs to replace stagedToken?
+	QuidStore.endGame = function (failType) {
+	  var reason = 'Game Over.';
+	  if (failType === 'board') {
+	    reason = reason + ' Talk about gridlock!';
+	  } else if (failType === 'election') {
+	    reason = reason + ' People can be bought, just not always by you.';
+	  }
+	  currentState.stagedToken = '';
+	  currentState.message = reason;
 	};
 
 	exports.default = QuidStore;
@@ -19957,7 +20015,9 @@
 	    var tokenMap = {
 	      'a': 'b',
 	      'b': 'c',
-	      'c': 'final'
+	      'c': 'd',
+	      'd': 'e',
+	      'e': 'final'
 	    };
 	    return tokenMap[token];
 	  },
@@ -19966,9 +20026,22 @@
 	    var tokenValueMap = {
 	      'a': 5,
 	      'b': 10,
-	      'c': 25
+	      'c': 25,
+	      'd': 50,
+	      'e': 100
 	    };
 	    return tokenValueMap[token];
+	  },
+
+	  earnFromToken: function earnFromToken(token) {
+	    var tokenPayoutMap = {
+	      'a': 100,
+	      'b': 200,
+	      'c': 300,
+	      'd': 400,
+	      'e': 500
+	    };
+	    return tokenPayoutMap[token];
 	  },
 
 	  //TODO: add idea of mutliplier at certain phases of gameplay, earning bonus for reason
@@ -19977,7 +20050,9 @@
 	        matchValueMap = {
 	      'a': 20,
 	      'b': 45,
-	      'c': 95
+	      'c': 95,
+	      'd': 195,
+	      'e': 500
 	    };
 	    if (count === 3) {
 	      bigMatchFactor = 1.1;
@@ -19987,16 +20062,44 @@
 	    return Math.round(bigMatchFactor * matchValueMap[token]);
 	  },
 
-	  setNextGoal: function setNextGoal(currentState) {
+	  earnFromMatch: function earnFromMatch(count, token) {
+	    var bigMatchFactor = 1,
+	        matchPayoutMap = {
+	      'a': 250,
+	      'b': 500,
+	      'c': 1000,
+	      'd': 2500,
+	      'e': 5000
+	    };
+	    if (count === 3) {
+	      bigMatchFactor = 1.1;
+	    } else if (count > 3 && count < 7) {
+	      bigMatchFactor = 1.2;
+	    } else if (count >= 7) {
+	      bigMatchFactor = 1.3;
+	    }
+	    return Math.round(bigMatchFactor * matchPayoutMap[token]);
+	  },
+
+	  resetMovesCounter: function resetMovesCounter(phase) {
+	    var MovesCountMap = {
+	      1: 730,
+	      2: 610,
+	      3: 120
+	    };
+	    return MovesCountMap[phase];
+	  },
+
+	  setNextGoal: function setNextGoal(phase) {
 	    var goalMap = {
 	      1: 125000,
 	      2: 75000,
 	      3: 100000
 	    };
-	    return goalMap[currentState.gamePhase];
+	    return goalMap[phase];
 	  },
 
-	  setMessage: function setMessage(currentState) {
+	  changeMessage: function changeMessage(currentState) {
 	    var gamePhase = currentState.gamePhase,
 	        nextGoal = currentState.nextGoal,
 	        movesRemaining = currentState.movesRemaining,
@@ -20016,6 +20119,33 @@
 	      3: 'State Delegate'
 	    };
 	    return electedOfficeMap[currentState.gamePhase];
+	  },
+
+	  formatNum: function formatNum(num) {
+	    var numString = num.toString(),
+	        charCount = numString.length,
+	        leftSideCount = charCount % 3,
+	        segmentCount = segmentCount = charCount / 3,
+	        formatted = '',
+	        i;
+
+	    if (charCount > 3) {
+	      if (leftSideCount !== 0) {
+	        formatted = numString.slice(0, leftSideCount) + ',';
+	        numString = numString.slice(leftSideCount - charCount);
+	        charCount = charCount - leftSideCount;
+	        segmentCount = charCount / 3;
+	      }
+	      for (i = 0; i < segmentCount; i++) {
+	        formatted = formatted + numString.slice(i * 3, (i + 1) * 3);
+	        if (i + 1 < segmentCount) {
+	          formatted = formatted + ',';
+	        }
+	      }
+	      return formatted;
+	    } else {
+	      return numString;
+	    }
 	  }
 
 	};
@@ -20373,11 +20503,14 @@
 
 	  styles: {
 	    mainGrid: {
-	      backgroundColor: "forestgreen",
-	      height: "900px",
+	      backgroundColor: '#A4BD99',
+	      height: "100%",
 	      width: "69%",
 	      display: 'inline-block',
-	      borderRadius: '10%'
+	      marginTop: '20px',
+	      marginBottom: '20px',
+	      //Set min-width so always have 6 columns
+	      minWidth: '550px'
 	    }
 	  }
 
@@ -20434,9 +20567,11 @@
 	      height: '16.29%',
 	      width: '16.66%',
 	      outline: '1px solid #141414',
-	      color: 'white',
+	      color: '#4B5043',
 	      display: 'inline-block',
-	      position: 'relative'
+	      position: 'relative',
+	      minHeight: '90px',
+	      minWidth: '90px'
 	    }
 	  }
 
@@ -20543,6 +20678,7 @@
 	      background: 'url(images/crumpled_looseleaf.jpg)',
 	      backgroundPosition: 'center',
 	      backgroundSize: '100%',
+	      backgroundColor: '#DFDFDB',
 	      height: '50%',
 	      display: 'block',
 	      position: 'relative'
@@ -20571,6 +20707,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _utils = __webpack_require__(161);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Score = _react2.default.createClass({
@@ -20584,7 +20724,7 @@
 	        'h5',
 	        { style: this.styles.score },
 	        ' Score: ',
-	        this.props.score,
+	        _utils2.default.formatNum(this.props.score),
 	        ' '
 	      )
 	    );
@@ -20648,6 +20788,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _utils = __webpack_require__(161);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Bank = _react2.default.createClass({
@@ -20661,7 +20805,7 @@
 	        'h5',
 	        null,
 	        'Current Bank Balance: $',
-	        this.props.bankBalance
+	        _utils2.default.formatNum(this.props.bankBalance)
 	      )
 	    );
 	  },
@@ -20690,6 +20834,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _utils = __webpack_require__(161);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var NextGoal = _react2.default.createClass({
@@ -20703,7 +20851,7 @@
 	        'h5',
 	        null,
 	        'Next Goal: $',
-	        this.props.nextGoal
+	        _utils2.default.formatNum(this.props.nextGoal)
 	      )
 	    );
 	  },
@@ -20754,8 +20902,8 @@
 				color: 'white',
 				margin: '15px',
 				padding: '5px',
-				backgroundColor: '#043cb3',
-				border: '5px double #02246c',
+				backgroundColor: '#065C27',
+				border: '5px double #000',
 				borderRadius: '100%',
 				height: '150px',
 				display: 'block',
