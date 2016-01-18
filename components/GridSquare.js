@@ -5,7 +5,8 @@ import Token from './Token';
 var GridSquare = React.createClass({
   render: function(){
     return (
-      <div onClick={this.placeToken} style={this.styles.gridSquare} ><Token symbol={this.props.token} /></div>
+      <div onClick={this.placeToken} style={this.styles.gridSquare} >
+        <Token symbol={this.props.token} /></div>
     );
   },
 
