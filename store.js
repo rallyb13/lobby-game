@@ -174,7 +174,7 @@ QuidStore.handleScoreboard = function(count, token, isRecursive) {
   currentState.bankBalance = currentState.bankBalance + money;
 };
 
-QuidStore.handleElection(){
+QuidStore.handleElection = function(){
   currentState.bankBalance = currentState.bankBalance - currentState.nextGoal;
   if (currentState.bankBalance < 0){
     this.endGame('election');
@@ -186,7 +186,7 @@ QuidStore.handleElection(){
 };
 
 //TODO: all of these Utils maps need to be filled out for whole game
-QuidStore.changePhase(phase){
+QuidStore.changePhase = function(phase){
   //change every election
   currentState.movesRemaining = Utils.resetMovesCounter(phase);
   currentState.nextGoal = Utils.setNextGoal(phase);
