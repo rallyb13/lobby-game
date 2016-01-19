@@ -1,11 +1,16 @@
 import React from 'react';
+var classNames = require('classnames');
 
 var Token = React.createClass({
   render: function(){
     var symbol = this.props.symbol || [''];
+    var symbolClass = classNames({
+      'icon-seed': this.props.symbol === 'a',
+      'icon-corn': this.props.symbol === 'b'
+    });
 
     return (
-      <div style={this.styles.token}>{symbol}</div>
+      <div style={this.styles.token}><span className={symbolClass}></span></div>
     );
   },
 
@@ -14,7 +19,8 @@ var Token = React.createClass({
       position: 'absolute',
       top: '50%',
       left: '50%',
-      transform: 'translate(-50%, -50%)'
+      transform: 'translate(-50%, -50%)',
+      fontSize: '50px'
      }
   }
 
