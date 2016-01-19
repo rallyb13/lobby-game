@@ -1,6 +1,5 @@
-//Many elements of game play involve built-in changes,
-//triggered at certain points. All of the internal progression lists
-//(including how the tokens relate to one another) can be accessed here.
+//Many elements of game play involve built-in changes, triggered at certain points.
+//All of the internal progression lists can be accessed here.
 
 var Utils = {
 
