@@ -5,8 +5,12 @@ var Token = React.createClass({
   render: function(){
     var symbol = this.props.symbol || [''];
     var symbolClass = classNames({
-      'icon-seed': this.props.symbol === 'a',
-      'icon-corn': this.props.symbol === 'b'
+      'icon-oil-drop': this.props.symbol === 'a',
+      'icon-oil-can': this.props.symbol === 'b',
+      'icon-derrick': this.props.symbol === 'c',
+      'icon-refinery': this.props.symbol === 'd',
+      'icon-pipeline': this.props.symbol === 'e',
+      'icon-vote': this.props.symbol === 'con'
     });
 
     return (
