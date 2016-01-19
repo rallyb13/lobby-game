@@ -13,7 +13,7 @@ var currentState = {
   movesRemaining: 730,
   score: 0,
   bankBalance:  0,
-  gamePhase: 1,
+  phase: 1,
   nextGoal: 125000,
   message: '',
   electedOffice: ''
@@ -187,6 +187,7 @@ QuidStore.handleElection = function(){
 
 //TODO: all of these Utils maps need to be filled out for whole game
 QuidStore.changePhase = function(phase){
+  var coords;
   //change every election
   currentState.movesRemaining = Utils.resetMovesCounter(phase);
   currentState.nextGoal = Utils.setNextGoal(phase);
@@ -194,8 +195,12 @@ QuidStore.changePhase = function(phase){
   //change more often
   // currentState.tokensArray = Utils.changePossibleTokens(phase, currentState.movesRemaining);
   currentState.message = Utils.changeMessage(phase, currentState.movesRemaining);
+
   //changes less often
   currentState.electedOffice = Utils.setElectedOffice(phase);
+  coords = Utils.handleBoardChange(currentState.electedOffice);
+  currentState.board.rows = coords[0];
+  currentState.board.columns = coords[1];
 };
 
 QuidStore.isGameOver = function(){

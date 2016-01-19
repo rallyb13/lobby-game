@@ -4,9 +4,6 @@
 
 var Utils = {
 
-//TODO: tokensArray, board rows/columns, & movesRemaining also change with phase
-//TODO: phase change MAY simply be a map with each new phase offering a list of callbacks!
-
   promoteToken: function(token){
     var tokenMap = {
       'a': 'b',
@@ -108,13 +105,27 @@ var Utils = {
     return messageMap[gamePhase];
   },
 
-  setElectedOffice: function(currentState) {
+  setElectedOffice: function(phase) {
     var electedOfficeMap = {
           1: 'State Delegate',
           2: 'State Delegate',
           3: 'State Delegate'
         };
-    return electedOfficeMap[currentState.gamePhase];
+    return electedOfficeMap[phase];
+  },
+
+  handleBoardChange: function(electedOffice) {
+    var dimensions = [],
+      boardMap = {
+        'State Delegate': {rows: 6, columns: 6},
+        'State Senator': {rows: 6, columns: 7},
+        'Congressperson': {rows: 7, columns: 7},
+        'Junior Senator': {rows: 7, columns: 8},
+        'Senior Senator': {rows: 8, columns: 8}
+      };
+    dimensions.push(boardMap[electedOffice].rows);
+    dimensions.push(boardMap[electedOffice].columns);
+    return dimensions;
   },
 
   formatNum: function(num){
