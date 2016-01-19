@@ -105,13 +105,21 @@ var Utils = {
     return messageMap[gamePhase];
   },
 
-  setElectedOffice: function(phase) {
+  setElectedOffice: function(phase, currentOffice) {
+    console.log(currentOffice);
     var electedOfficeMap = {
           1: 'State Delegate',
-          2: 'State Delegate',
-          3: 'State Delegate'
+          5: 'State Senator',
+          9: 'Congressperson',
+          15: 'Junior Senator',
+          21: 'Senior Senator'
         };
-    return electedOfficeMap[phase];
+    if (typeof electedOfficeMap[phase] === 'undefined'){
+      return currentOffice;
+    } else {
+      console.log('It would be weird to see this console message.');
+      return electedOfficeMap[phase];
+    }
   },
 
   handleBoardChange: function(electedOffice) {

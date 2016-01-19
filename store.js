@@ -16,7 +16,7 @@ var currentState = {
   phase: 1,
   nextGoal: 125000,
   message: '',
-  electedOffice: ''
+  electedOffice: 'State Delegate'
 };
 
 QuidStore.setupBoard = function () {
@@ -197,7 +197,7 @@ QuidStore.changePhase = function(phase){
   currentState.message = Utils.changeMessage(phase, currentState.movesRemaining);
 
   //changes less often
-  currentState.electedOffice = Utils.setElectedOffice(phase);
+  currentState.electedOffice = Utils.setElectedOffice(phase, currentState.electedOffice);
   coords = Utils.handleBoardChange(currentState.electedOffice);
   currentState.board.rows = coords[0];
   currentState.board.columns = coords[1];
