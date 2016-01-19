@@ -8,7 +8,7 @@ var currentState = {
     columns: 6,
     grid: []
   },
-  tokensArray: ['a', 'a', 'b', 'c'],
+  tokensArray: ['a', 'a', 'b', 'c', 'con'],
   stagedToken: 'a',
   movesRemaining: 730,
   score: 0,
@@ -71,6 +71,64 @@ QuidStore.checkEmpty = function(rowPos, colPos){
   return currentState.board.grid[rowPos][colPos] === '';
 };
 
+QuidStore.cardinalCheck = function(token, rowPos, colPos){
+  var possibleMatches = [ [rowPos, colPos+1], [rowPos, colPos-1], [rowPos+1, colPos], [rowPos-1, colPos]],
+    board = currentState.board,
+    matchCoords = [],
+    checkRow,
+    checkCol,
+    squareToken,
+    i;
+
+  for (i = 0; i < possibleMatches.length; i++){
+    checkRow = possibleMatches[i][0];
+    checkCol = possibleMatches[i][1];
+
+    if (checkRow >= 0 && checkRow < board.rows && checkCol >= 0 && checkCol < board.columns ) {
+      if (currentState.board.grid[checkRow][checkCol] === token) {
+        matchCoords.push([checkRow, checkCol]);
+      }
+    }
+  }
+  return matchCoords;
+};
+
+QuidStore.moveConstituents = function() {
+  var board = currentState.board,
+    newRowPos = '',
+    newColPos = '',
+    newCoords = '',
+    emptyCoords = [],
+    array = [],
+    currentConsCoords = [];
+
+  for (var i=0; i < board.rows; i++) {
+    for (var j = 0; j < board.columns; j++){
+      if (board.grid[i][j] === 'con'){
+        array.push(i)
+        array.push(j)
+        currentConsCoords.push(array)
+      }
+      array = []
+    }
+  }
+
+  for (var i = 0; i < currentConsCoords.length; i++) {
+    var coords = currentConsCoords[i]
+    var x = coords[0]
+    var y = coords[1]
+    emptyCoords = this.cardinalCheck('', x, y)
+      if (emptyCoords.length > 0) {
+        newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
+        newRowPos = newCoords[0];
+        newColPos = newCoords[1];
+        currentState.board.grid[newRowPos][newColPos] = 'con';
+        currentState.board.grid[x][y] = ''; 
+      }
+  }
+  this.emitChange();  
+};
+
 QuidStore.completeMove = function(rowPos, colPos){
   var playedToken = currentState.stagedToken;
 
@@ -86,6 +144,7 @@ QuidStore.completeMove = function(rowPos, colPos){
   } else {
     this.setNextToken();
   }
+  this.moveConstituents();
   this.emitChange();
 };
 
@@ -126,28 +185,6 @@ QuidStore.handleMatches = function(token, rowPos, colPos, isRecursive){
   } else {
     return token;
   }
-};
-
-QuidStore.cardinalCheck = function(token, rowPos, colPos){
-  var possibleMatches = [ [rowPos, colPos+1], [rowPos, colPos-1], [rowPos+1, colPos], [rowPos-1, colPos]],
-    board = currentState.board,
-    matchCoords = [],
-    checkRow,
-    checkCol,
-    squareToken,
-    i;
-
-  for (i = 0; i < possibleMatches.length; i++){
-    checkRow = possibleMatches[i][0];
-    checkCol = possibleMatches[i][1];
-
-    if (checkRow >= 0 && checkRow < board.rows && checkCol >= 0 && checkCol < board.columns ) {
-      if (currentState.board.grid[checkRow][checkCol] === token) {
-        matchCoords.push([checkRow, checkCol]);
-      }
-    }
-  }
-  return matchCoords;
 };
 
 QuidStore.clearMatches = function(matches){
