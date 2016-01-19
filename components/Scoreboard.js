@@ -1,7 +1,9 @@
 import React from 'react';
+import Message from './Message';
 import Score from './Score';
-import MoveCounter from './MoveCounter';
 import Bank from './Bank';
+import Office from './Office';
+import MoveCounter from './MoveCounter';
 import NextGoal from './NextGoal';
 
 var Scoreboard = React.createClass({
@@ -10,8 +12,10 @@ var Scoreboard = React.createClass({
       <div style={this.styles.scoreboard}>
         <h3 style={this.styles.heading}>White Paper</h3>
         <div style={this.styles.bodyBoard}>
+          <Message message={this.props.state.message} />
           <Score score={this.props.state.score} />
           <Bank bankBalance={this.props.state.bankBalance} />
+          <Office electedOffice={this.props.state.electedOffice} />
           <MoveCounter movesRemaining={this.props.state.movesRemaining} />
           <NextGoal nextGoal={this.props.state.nextGoal} />
         </div>

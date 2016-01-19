@@ -15,7 +15,7 @@ var currentState = {
   bankBalance:  0,
   phase: 1,
   nextGoal: 125000,
-  message: '',
+  message: 'Click any unoccupied square in the grid to place the next item. Try to match 3 to build up to better items.',
   electedOffice: 'State Delegate'
 };
 

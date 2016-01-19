@@ -5,7 +5,7 @@ var Bank = React.createClass({
   render: function(){
     return (
       <div>
-        <h5>Current Bank Balance: ${Utils.formatNum(this.props.bankBalance)}</h5>
+        <h5>Bank Balance: ${Utils.formatNum(this.props.bankBalance)}</h5>
       </div>
     );
   },
