@@ -19679,11 +19679,11 @@
 
 	var _Grid2 = _interopRequireDefault(_Grid);
 
-	var _Scoreboard = __webpack_require__(166);
+	var _Scoreboard = __webpack_require__(167);
 
 	var _Scoreboard2 = _interopRequireDefault(_Scoreboard);
 
-	var _Staging = __webpack_require__(171);
+	var _Staging = __webpack_require__(174);
 
 	var _Staging2 = _interopRequireDefault(_Staging);
 
@@ -19774,21 +19774,21 @@
 	    columns: 6,
 	    grid: []
 	  },
-	  tokensArray: ['a', 'a', 'b', 'c'],
-	  stagedToken: 'a',
+	  tokensArray: ['oil1', 'oil1', 'oil2', 'oil3', 'con'],
+	  stagedToken: 'oil1',
 	  movesRemaining: 730,
 	  score: 0,
 	  bankBalance: 0,
-	  gamePhase: 1,
+	  phase: 1,
 	  nextGoal: 125000,
-	  message: '',
-	  electedOffice: ''
+	  message: 'Click any unoccupied square in the grid to place the next item. Try to match 3 to build up to better items.',
+	  electedOffice: 'State Delegate'
 	};
 
 	QuidStore.setupBoard = function () {
 	  var rows = currentState.board.rows,
 	      columns = currentState.board.columns,
-	      startingTokens = ['a', 'a', 'a', 'a', 'a', 'b', 'b', 'c', 'a', 'a', 'b'],
+	      startingTokens = ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'con', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
 	      token;
 
 	  for (var i = 0; i < rows; i++) {
@@ -19837,6 +19837,64 @@
 	  return currentState.board.grid[rowPos][colPos] === '';
 	};
 
+	QuidStore.cardinalCheck = function (token, rowPos, colPos) {
+	  var possibleMatches = [[rowPos, colPos + 1], [rowPos, colPos - 1], [rowPos + 1, colPos], [rowPos - 1, colPos]],
+	      board = currentState.board,
+	      matchCoords = [],
+	      checkRow,
+	      checkCol,
+	      squareToken,
+	      i;
+
+	  for (i = 0; i < possibleMatches.length; i++) {
+	    checkRow = possibleMatches[i][0];
+	    checkCol = possibleMatches[i][1];
+
+	    if (checkRow >= 0 && checkRow < board.rows && checkCol >= 0 && checkCol < board.columns) {
+	      if (currentState.board.grid[checkRow][checkCol] === token) {
+	        matchCoords.push([checkRow, checkCol]);
+	      }
+	    }
+	  }
+	  return matchCoords;
+	};
+
+	QuidStore.moveConstituents = function () {
+	  var board = currentState.board,
+	      newRowPos = '',
+	      newColPos = '',
+	      newCoords = '',
+	      emptyCoords = [],
+	      array = [],
+	      currentConsCoords = [];
+
+	  for (var i = 0; i < board.rows; i++) {
+	    for (var j = 0; j < board.columns; j++) {
+	      if (board.grid[i][j] === 'con') {
+	        array.push(i);
+	        array.push(j);
+	        currentConsCoords.push(array);
+	      }
+	      array = [];
+	    }
+	  }
+
+	  for (var i = 0; i < currentConsCoords.length; i++) {
+	    var coords = currentConsCoords[i];
+	    var x = coords[0];
+	    var y = coords[1];
+	    emptyCoords = this.cardinalCheck('', x, y);
+	    if (emptyCoords.length > 0) {
+	      newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
+	      newRowPos = newCoords[0];
+	      newColPos = newCoords[1];
+	      currentState.board.grid[newRowPos][newColPos] = 'con';
+	      currentState.board.grid[x][y] = '';
+	    }
+	  }
+	  this.emitChange();
+	};
+
 	QuidStore.completeMove = function (rowPos, colPos) {
 	  var playedToken = currentState.stagedToken;
 
@@ -19852,6 +19910,7 @@
 	  } else {
 	    this.setNextToken();
 	  }
+	  this.moveConstituents();
 	  this.emitChange();
 	};
 
@@ -19881,7 +19940,7 @@
 	  this.handleScoreboard(matchCoords.length, token, isRecursive);
 
 	  if (matchCoords.length >= 2) {
-	    newToken = _utils2.default.promoteToken(token);
+	    newToken = _utils2.default.getTokenData(token, 'nextUp');
 	    if (newToken !== 'final') {
 	      this.clearMatches(matchCoords);
 	      newToken = this.handleMatches(newToken, rowPos, colPos, true);
@@ -19894,28 +19953,6 @@
 	  }
 	};
 
-	QuidStore.cardinalCheck = function (token, rowPos, colPos) {
-	  var possibleMatches = [[rowPos, colPos + 1], [rowPos, colPos - 1], [rowPos + 1, colPos], [rowPos - 1, colPos]],
-	      board = currentState.board,
-	      matchCoords = [],
-	      checkRow,
-	      checkCol,
-	      squareToken,
-	      i;
-
-	  for (i = 0; i < possibleMatches.length; i++) {
-	    checkRow = possibleMatches[i][0];
-	    checkCol = possibleMatches[i][1];
-
-	    if (checkRow >= 0 && checkRow < board.rows && checkCol >= 0 && checkCol < board.columns) {
-	      if (currentState.board.grid[checkRow][checkCol] === token) {
-	        matchCoords.push([checkRow, checkCol]);
-	      }
-	    }
-	  }
-	  return matchCoords;
-	};
-
 	QuidStore.clearMatches = function (matches) {
 	  for (var i = 0; i < matches.length; i++) {
 	    currentState.board.grid[matches[i][0]][matches[i][1]] = '';
@@ -19924,13 +19961,17 @@
 
 	QuidStore.handleScoreboard = function (count, token, isRecursive) {
 	  var points = 0,
-	      money = 0;
+	      money = 0,
+	      bigMatchFactor = 1;
 	  if (count < 2 && isRecursive !== true) {
-	    points = _utils2.default.scoreToken(token);
-	    money = _utils2.default.earnFromToken(token);
+	    points = _utils2.default.getTokenData(token, 'pts');
+	    money = _utils2.default.getTokenData(token, 'val');
 	  } else if (count >= 2) {
-	    points = _utils2.default.scoreMatch(count, token);
-	    money = _utils2.default.earnFromMatch(count, token);
+	    bigMatchFactor = bigMatchFactor + count * 0.75;
+	    points = _utils2.default.getTokenData(token, 'mPts');
+	    points = Math.round(points * bigMatchFactor);
+	    money = _utils2.default.getTokenData(token, 'mVal');
+	    money = Math.round(money * bigMatchFactor);
 	    if (isRecursive) {
 	      points = Math.round(points * 1.3);
 	      money = Math.round(money * 1.25);
@@ -19953,6 +19994,7 @@
 
 	//TODO: all of these Utils maps need to be filled out for whole game
 	QuidStore.changePhase = function (phase) {
+	  var coords;
 	  //change every election
 	  currentState.movesRemaining = _utils2.default.resetMovesCounter(phase);
 	  currentState.nextGoal = _utils2.default.setNextGoal(phase);
@@ -19960,8 +20002,12 @@
 	  //change more often
 	  // currentState.tokensArray = Utils.changePossibleTokens(phase, currentState.movesRemaining);
 	  currentState.message = _utils2.default.changeMessage(phase, currentState.movesRemaining);
+
 	  //changes less often
-	  currentState.electedOffice = _utils2.default.setElectedOffice(phase);
+	  currentState.electedOffice = _utils2.default.setElectedOffice(phase, currentState.electedOffice);
+	  coords = _utils2.default.handleBoardChange(currentState.electedOffice);
+	  currentState.board.rows = coords[0];
+	  currentState.board.columns = coords[1];
 	};
 
 	QuidStore.isGameOver = function () {
@@ -20002,83 +20048,41 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	//Many elements of game play involve built-in changes,
-	//triggered at certain points. All of the internal progression lists
-	//(including how the tokens relate to one another) can be accessed here.
+	//Many elements of game play involve built-in changes, triggered at certain points.
+	//All of the internal progression lists can be accessed here.
 
 	var Utils = {
 
-	  //TODO: tokensArray, board rows/columns, & movesRemaining also change with phase
-	  //TODO: phase change MAY simply be a map with each new phase offering a list of callbacks!
-
-	  promoteToken: function promoteToken(token) {
+	  getTokenData: function getTokenData(token, attribute) {
 	    var tokenMap = {
-	      'a': 'b',
-	      'b': 'c',
-	      'c': 'd',
-	      'd': 'e',
-	      'e': 'final'
-	    };
-	    return tokenMap[token];
-	  },
+	      'oil1': { nextUp: 'oil2', pts: 5, mPts: 20, val: 100, mVal: 250 },
+	      'oil2': { nextUp: 'oil3', pts: 10, mPts: 45, val: 200, mVal: 500 },
+	      'oil3': { nextUp: 'oil4', pts: 25, mPts: 95, val: 300, mVal: 1000 },
+	      'oil4': { nextUp: 'oil5', pts: 50, mPts: 195, val: 400, mVal: 2500 },
+	      'oil5': { nextUp: 'final', pts: 100, mPts: 0, val: 500, mVal: 0 },
 
-	  scoreToken: function scoreToken(token) {
-	    var tokenValueMap = {
-	      'a': 5,
-	      'b': 10,
-	      'c': 25,
-	      'd': 50,
-	      'e': 100
-	    };
-	    return tokenValueMap[token];
-	  },
+	      'agr1': { nextUp: 'agr2', pts: 50, mPts: 205, val: 600, mVal: 2000 },
+	      'agr2': { nextUp: 'agr3', pts: 100, mPts: 500, val: 700, mVal: 2500 },
+	      'agr3': { nextUp: 'agr4', pts: 150, mPts: 750, val: 800, mVal: 3000 },
+	      'agr4': { nextUp: 'agr5', pts: 200, mPts: 1000, val: 900, mVal: 4321 },
+	      'agr5': { nextUp: 'final', pts: 250, mPts: 0, val: 1000, mVal: 0 },
 
-	  earnFromToken: function earnFromToken(token) {
-	    var tokenPayoutMap = {
-	      'a': 100,
-	      'b': 200,
-	      'c': 300,
-	      'd': 400,
-	      'e': 500
-	    };
-	    return tokenPayoutMap[token];
-	  },
+	      'mil1': { nextUp: 'mil2', pts: 200, mPts: 500, val: 1100, mVal: 4400 },
+	      'mil2': { nextUp: 'mil3', pts: 400, mPts: 1000, val: 1200, mVal: 4995 },
+	      'mil3': { nextUp: 'mil4', pts: 600, mPts: 1500, val: 1300, mVal: 5555 },
+	      'mil4': { nextUp: 'mil5', pts: 800, mPts: 2000, val: 1400, mVal: 7500 },
+	      'mil5': { nextUp: 'final', pts: 1000, mPts: 0, val: 1500, mVal: 0 },
 
-	  //TODO: add idea of mutliplier at certain phases of gameplay, earning bonus for reason
-	  scoreMatch: function scoreMatch(count, token) {
-	    var bigMatchFactor = 1,
-	        matchValueMap = {
-	      'a': 20,
-	      'b': 45,
-	      'c': 95,
-	      'd': 195,
-	      'e': 500
-	    };
-	    if (count === 3) {
-	      bigMatchFactor = 1.1;
-	    } else if (count > 3) {
-	      bigMatchFactor = (count - 1) * 1.142;
-	    }
-	    return Math.round(bigMatchFactor * matchValueMap[token]);
-	  },
+	      'fin1': { nextUp: 'fin2', pts: 1111, mPts: 2222, val: 1600, mVal: 7500 },
+	      'fin2': { nextUp: 'fin3', pts: 1333, mPts: 2995, val: 1700, mVal: 8500 },
+	      'fin3': { nextUp: 'fin4', pts: 1555, mPts: 3500, val: 1800, mVal: 9500 },
+	      'fin4': { nextUp: 'fin5', pts: 1777, mPts: 5000, val: 1900, mVal: 10001 },
+	      'fin5': { nextUp: 'final', pts: 1999, mPts: 0, val: 2000, mVal: 0 },
 
-	  earnFromMatch: function earnFromMatch(count, token) {
-	    var bigMatchFactor = 1,
-	        matchPayoutMap = {
-	      'a': 250,
-	      'b': 500,
-	      'c': 1000,
-	      'd': 2500,
-	      'e': 5000
+	      'con': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
+	      'mega': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 }
 	    };
-	    if (count === 3) {
-	      bigMatchFactor = 1.1;
-	    } else if (count > 3 && count < 7) {
-	      bigMatchFactor = 1.2;
-	    } else if (count >= 7) {
-	      bigMatchFactor = 1.3;
-	    }
-	    return Math.round(bigMatchFactor * matchPayoutMap[token]);
+	    return tokenMap[token][attribute];
 	  },
 
 	  resetMovesCounter: function resetMovesCounter(phase) {
@@ -20112,13 +20116,34 @@
 	    return messageMap[gamePhase];
 	  },
 
-	  setElectedOffice: function setElectedOffice(currentState) {
+	  setElectedOffice: function setElectedOffice(phase, currentOffice) {
+	    console.log(currentOffice);
 	    var electedOfficeMap = {
 	      1: 'State Delegate',
-	      2: 'State Delegate',
-	      3: 'State Delegate'
+	      5: 'State Senator',
+	      9: 'Congressperson',
+	      15: 'Junior Senator',
+	      21: 'Senior Senator'
 	    };
-	    return electedOfficeMap[currentState.gamePhase];
+	    if (typeof electedOfficeMap[phase] === 'undefined') {
+	      return currentOffice;
+	    } else {
+	      return electedOfficeMap[phase];
+	    }
+	  },
+
+	  handleBoardChange: function handleBoardChange(electedOffice) {
+	    var dimensions = [],
+	        boardMap = {
+	      'State Delegate': { rows: 6, columns: 6 },
+	      'State Senator': { rows: 6, columns: 7 },
+	      'Congressperson': { rows: 7, columns: 7 },
+	      'Junior Senator': { rows: 7, columns: 8 },
+	      'Senior Senator': { rows: 8, columns: 8 }
+	    };
+	    dimensions.push(boardMap[electedOffice].rows);
+	    dimensions.push(boardMap[electedOffice].columns);
+	    return dimensions;
 	  },
 
 	  formatNum: function formatNum(num) {
@@ -20595,16 +20620,46 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	var classNames = __webpack_require__(166);
+
 	var Token = _react2.default.createClass({
 	  displayName: 'Token',
 
 	  render: function render() {
 	    var symbol = this.props.symbol || [''];
+	    var symbolClass = classNames({
+	      'icon-oil-drop': this.props.symbol === 'oil1',
+	      'icon-oil-can': this.props.symbol === 'oil2',
+	      'icon-derrick': this.props.symbol === 'oil3',
+	      'icon-refinery': this.props.symbol === 'oil4',
+	      'icon-pipeline': this.props.symbol === 'oil5',
+
+	      'icon-seed': this.props.symbol === 'agr1',
+	      'icon-corn': this.props.symbol === 'agr2',
+	      'icon-cow': this.props.symbol === 'agr3',
+	      // 'icon-': this.props.symbol === 'agr4',
+	      'icon-fast-food': this.props.symbol === 'agr5',
+
+	      'icon-bullet': this.props.symbol === 'mil1',
+	      'icon-gun': this.props.symbol === 'mil2',
+	      'icon-assult-rifle': this.props.symbol === 'mil3',
+	      'icon-missle': this.props.symbol === 'mil4',
+	      'icon-tank': this.props.symbol === 'mil5',
+
+	      'icon-coin': this.props.symbol === 'fin1',
+	      'icon-dollar': this.props.symbol === 'fin2',
+	      'icon-money-bag': this.props.symbol === 'fin3',
+	      'icon-bank': this.props.symbol === 'fin4',
+	      'icon-tower': this.props.symbol === 'fin5',
+
+	      'icon-vote': this.props.symbol === 'con',
+	      'icon-megaphone': this.props.symbol === 'mega'
+	    });
 
 	    return _react2.default.createElement(
 	      'div',
 	      { style: this.styles.token },
-	      symbol
+	      _react2.default.createElement('span', { className: symbolClass })
 	    );
 	  },
 
@@ -20613,7 +20668,8 @@
 	      position: 'absolute',
 	      top: '50%',
 	      left: '50%',
-	      transform: 'translate(-50%, -50%)'
+	      transform: 'translate(-50%, -50%)',
+	      fontSize: '50px'
 	    }
 	  }
 
@@ -20623,6 +20679,60 @@
 
 /***/ },
 /* 166 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	  Copyright (c) 2016 Jed Watson.
+	  Licensed under the MIT License (MIT), see
+	  http://jedwatson.github.io/classnames
+	*/
+	/* global define */
+
+	(function () {
+		'use strict';
+
+		var hasOwn = {}.hasOwnProperty;
+
+		function classNames () {
+			var classes = [];
+
+			for (var i = 0; i < arguments.length; i++) {
+				var arg = arguments[i];
+				if (!arg) continue;
+
+				var argType = typeof arg;
+
+				if (argType === 'string' || argType === 'number') {
+					classes.push(arg);
+				} else if (Array.isArray(arg)) {
+					classes.push(classNames.apply(null, arg));
+				} else if (argType === 'object') {
+					for (var key in arg) {
+						if (hasOwn.call(arg, key) && arg[key]) {
+							classes.push(key);
+						}
+					}
+				}
+			}
+
+			return classes.join(' ');
+		}
+
+		if (typeof module !== 'undefined' && module.exports) {
+			module.exports = classNames;
+		} else if (true) {
+			// register as 'classnames', consistent with npm package name
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+				return classNames;
+			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+		} else {
+			window.classNames = classNames;
+		}
+	}());
+
+
+/***/ },
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20635,19 +20745,27 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Score = __webpack_require__(167);
+	var _Message = __webpack_require__(168);
+
+	var _Message2 = _interopRequireDefault(_Message);
+
+	var _Score = __webpack_require__(169);
 
 	var _Score2 = _interopRequireDefault(_Score);
 
-	var _MoveCounter = __webpack_require__(168);
-
-	var _MoveCounter2 = _interopRequireDefault(_MoveCounter);
-
-	var _Bank = __webpack_require__(169);
+	var _Bank = __webpack_require__(170);
 
 	var _Bank2 = _interopRequireDefault(_Bank);
 
-	var _NextGoal = __webpack_require__(170);
+	var _Office = __webpack_require__(171);
+
+	var _Office2 = _interopRequireDefault(_Office);
+
+	var _MoveCounter = __webpack_require__(172);
+
+	var _MoveCounter2 = _interopRequireDefault(_MoveCounter);
+
+	var _NextGoal = __webpack_require__(173);
 
 	var _NextGoal2 = _interopRequireDefault(_NextGoal);
 
@@ -20665,17 +20783,23 @@
 	        { style: this.styles.heading },
 	        'White Paper'
 	      ),
-	      _react2.default.createElement(_Score2.default, { score: this.props.state.score }),
-	      _react2.default.createElement(_Bank2.default, { bankBalance: this.props.state.bankBalance }),
-	      _react2.default.createElement(_MoveCounter2.default, { movesRemaining: this.props.state.movesRemaining }),
-	      _react2.default.createElement(_NextGoal2.default, { nextGoal: this.props.state.nextGoal })
+	      _react2.default.createElement(
+	        'div',
+	        { style: this.styles.bodyBoard },
+	        _react2.default.createElement(_Message2.default, { message: this.props.state.message }),
+	        _react2.default.createElement(_Score2.default, { score: this.props.state.score }),
+	        _react2.default.createElement(_Bank2.default, { bankBalance: this.props.state.bankBalance }),
+	        _react2.default.createElement(_Office2.default, { electedOffice: this.props.state.electedOffice }),
+	        _react2.default.createElement(_MoveCounter2.default, { movesRemaining: this.props.state.movesRemaining }),
+	        _react2.default.createElement(_NextGoal2.default, { nextGoal: this.props.state.nextGoal })
+	      )
 	    );
 	  },
 
 	  styles: {
 	    scoreboard: {
 	      border: '1px solid #000',
-	      background: 'url(images/crumpled_looseleaf.jpg)',
+	      background: 'url(assets/crumpled_looseleaf.jpg)',
 	      backgroundPosition: 'center',
 	      backgroundSize: '100%',
 	      backgroundColor: '#DFDFDB',
@@ -20686,6 +20810,9 @@
 	    heading: {
 	      borderBottom: '1px solid black',
 	      textAlign: 'center'
+	    },
+	    bodyBoard: {
+	      padding: '0 10px'
 	    }
 	  }
 
@@ -20694,7 +20821,41 @@
 	exports.default = Scoreboard;
 
 /***/ },
-/* 167 */
+/* 168 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Message = _react2.default.createClass({
+	  displayName: 'Message',
+
+	  render: function render() {
+	    return _react2.default.createElement(
+	      'div',
+	      null,
+	      _react2.default.createElement(
+	        'p',
+	        null,
+	        this.props.message
+	      )
+	    );
+	  }
+	});
+
+	exports.default = Message;
+
+/***/ },
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20722,25 +20883,93 @@
 	      null,
 	      _react2.default.createElement(
 	        'h5',
-	        { style: this.styles.score },
+	        null,
 	        ' Score: ',
 	        _utils2.default.formatNum(this.props.score),
 	        ' '
 	      )
 	    );
-	  },
-
-	  styles: {
-	    score: {
-	      paddingLeft: '10px'
-	    }
 	  }
 	});
 
 	exports.default = Score;
 
 /***/ },
-/* 168 */
+/* 170 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _utils = __webpack_require__(161);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Bank = _react2.default.createClass({
+	  displayName: 'Bank',
+
+	  render: function render() {
+	    return _react2.default.createElement(
+	      'div',
+	      null,
+	      _react2.default.createElement(
+	        'h5',
+	        null,
+	        'Bank Balance: $',
+	        _utils2.default.formatNum(this.props.bankBalance)
+	      )
+	    );
+	  }
+	});
+
+	exports.default = Bank;
+
+/***/ },
+/* 171 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Office = _react2.default.createClass({
+	  displayName: 'Office',
+
+	  render: function render() {
+	    return _react2.default.createElement(
+	      'div',
+	      null,
+	      _react2.default.createElement(
+	        'h5',
+	        null,
+	        'Elected Office: ',
+	        this.props.electedOffice
+	      )
+	    );
+	  }
+	});
+
+	exports.default = Office;
+
+/***/ },
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20775,53 +21004,7 @@
 	exports.default = MoveCounter;
 
 /***/ },
-/* 169 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _utils = __webpack_require__(161);
-
-	var _utils2 = _interopRequireDefault(_utils);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var Bank = _react2.default.createClass({
-	  displayName: 'Bank',
-
-	  render: function render() {
-	    return _react2.default.createElement(
-	      'div',
-	      { style: this.styles.bank },
-	      _react2.default.createElement(
-	        'h5',
-	        null,
-	        'Current Bank Balance: $',
-	        _utils2.default.formatNum(this.props.bankBalance)
-	      )
-	    );
-	  },
-
-	  styles: {
-	    bank: {
-	      padding: 10
-	    }
-	  }
-
-	});
-
-	exports.default = Bank;
-
-/***/ },
-/* 170 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20846,7 +21029,7 @@
 	  render: function render() {
 	    return _react2.default.createElement(
 	      'div',
-	      { style: this.styles.nextGoal },
+	      null,
 	      _react2.default.createElement(
 	        'h5',
 	        null,
@@ -20854,20 +21037,13 @@
 	        _utils2.default.formatNum(this.props.nextGoal)
 	      )
 	    );
-	  },
-
-	  styles: {
-	    nextGoal: {
-	      padding: 10
-	    }
 	  }
-
 	});
 
 	exports.default = NextGoal;
 
 /***/ },
-/* 171 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
