@@ -57,9 +57,9 @@
 .icon-dollar:before {
     content: "\b2";
 }
-.icon-dollars:before {
+/*.icon-dollars:before {
     content: "\b25";
-}
+}*/
 .icon-oil-drop:before {
     content: "\e1";
 }
@@ -90,4 +90,3 @@
 .icon-oil-can:before {
     content: "\e2";
 }
-

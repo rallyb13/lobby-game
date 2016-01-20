@@ -8,8 +8,8 @@ var currentState = {
     columns: 6,
     grid: []
   },
-  tokensArray: ['a', 'a', 'b', 'c', 'con'],
-  stagedToken: 'a',
+  tokensArray: ['oil1', 'oil1', 'oil2', 'oil3', 'con'],
+  stagedToken: 'oil1',
   movesRemaining: 730,
   score: 0,
   bankBalance:  0,
@@ -22,7 +22,7 @@ var currentState = {
 QuidStore.setupBoard = function () {
   var rows = currentState.board.rows,
     columns = currentState.board.columns,
-    startingTokens = ['a', 'a', 'a', 'a', 'a', 'b', 'b', 'c', 'a', 'a', 'b'],
+    startingTokens = ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'con', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
     token;
 
     for (var i=0; i < rows; i++) {
@@ -123,10 +123,10 @@ QuidStore.moveConstituents = function() {
         newRowPos = newCoords[0];
         newColPos = newCoords[1];
         currentState.board.grid[newRowPos][newColPos] = 'con';
-        currentState.board.grid[x][y] = ''; 
+        currentState.board.grid[x][y] = '';
       }
   }
-  this.emitChange();  
+  this.emitChange();
 };
 
 QuidStore.completeMove = function(rowPos, colPos){

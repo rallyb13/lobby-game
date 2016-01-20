@@ -5,11 +5,11 @@ var Utils = {
 
   promoteToken: function(token){
     var tokenMap = {
-      'a': 'b',
-      'b': 'c',
-      'c': 'd',
-      'd': 'e',
-      'e': 'final',
+      'oil1': 'oil2', 'oil2': 'oil3', 'oil3': 'oil4', 'oil4': 'oil5', 'oil5': 'final',
+      'agr1': 'agr2', 'agr2': 'agr3', 'agr3': 'agr4', 'agr4': 'agr5', 'agr5': 'final',
+      'mil1': 'mil2', 'mil2': 'mil3', 'mil3': 'mil4', 'mil4': 'mil5', 'mil5': 'final',
+      'fin1': 'fin2', 'fin2': 'fin3', 'fin3': 'fin4', 'fin4': 'fin5', 'fin5': 'final',
+
       'con': 'final'
     };
     return tokenMap[token];
@@ -17,37 +17,35 @@ var Utils = {
 
   scoreToken: function(token){
     var tokenValueMap = {
-      'a': 5,
-      'b': 10,
-      'c': 25,
-      'd': 50,
-      'e': 100,
+      'oil1': 5, 'oil2': 10, 'oil3': 25, 'oil4': 50, 'oil5': 100,
+      'agr1': 50, 'agr2': 100, 'agr3': 150, 'agr4': 200, 'agr5': 250,
+      'mil1': 200, 'mil2': 300, 'mil3': 400, 'mil4': 500, 'mil5': 750,
+      'fin1': 250, 'fin2': 500, 'fin3': 1000, 'fin4': 1500, 'fin5': 2000,
       'con': 0
     };
     return tokenValueMap[token];
   },
 
+  //token here is what there are 3 of--not what they're combined into
   earnFromToken: function(token){
     var tokenPayoutMap = {
-      'a': 100,
-      'b': 200,
-      'c': 300,
-      'd': 400,
-      'e': 500,
+      'oil1': 100, 'oil2': 200, 'oil3': 300, 'oil4': 400, 'oil5': 500,
+      // 'agr1': 100, 'agr2': 200, 'agr3': 300, 'agr4': 400, 'agr5': 500,
+      // 'mil1': 100, 'mil2': 200, 'mil3': 300, 'mil4': 400, 'mil5': 500,
+      // 'fin1': 100, 'fin2': 200, 'fin3': 300, 'fin4': 400, 'fin5': 500,
       'con': 0
     }
     return tokenPayoutMap[token];
   },
 
-  //TODO: add idea of mutliplier at certain phases of gameplay, earning bonus for reason
+  //token here is what there are 3 of--not what they're combined into
   scoreMatch: function(count, token){
     var bigMatchFactor = 1,
       matchValueMap = {
-        'a': 20,
-        'b': 45,
-        'c': 95,
-        'd': 195,
-        'e': 0,
+        'oil1': 20, 'oil2': 45, 'oil3': 95, 'oil4': 195, 'oil5': 0,
+        // 'agr1': 20, 'agr2': 45, 'agr3': 95, 'agr4': 195, 'agr5': 0,
+        // 'mil1': 20, 'mil2': 45, 'mil3': 95, 'mil4': 195, 'mil5': 0,
+        // 'fin1': 20, 'fin2': 45, 'fin3': 95, 'fin4': 195, 'fin5': 0,
         'con': 0
       };
     if (count === 3){
@@ -61,11 +59,10 @@ var Utils = {
   earnFromMatch: function(count, token){
     var bigMatchFactor = 1,
       matchPayoutMap = {
-        'a': 250,
-        'b': 500,
-        'c': 1000,
-        'd': 2500,
-        'e': 0,
+        'oil1': 250, 'oil2': 500, 'oil3': 1000, 'oil4': 2500, 'oil5': 0,
+        // 'agr1': 20, 'agr2': 45, 'agr3': 95, 'agr4': 195, 'agr5': 0,
+        // 'mil1': 20, 'mil2': 45, 'mil3': 95, 'mil4': 195, 'mil5': 0,
+        // 'fin1': 20, 'fin2': 45, 'fin3': 95, 'fin4': 195, 'fin5': 0,
         'con': 0
       }
     if (count === 3){
@@ -121,7 +118,6 @@ var Utils = {
     if (typeof electedOfficeMap[phase] === 'undefined'){
       return currentOffice;
     } else {
-      console.log('It would be weird to see this console message.');
       return electedOfficeMap[phase];
     }
   },
