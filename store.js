@@ -174,7 +174,7 @@ QuidStore.handleMatches = function(token, rowPos, colPos, isRecursive){
   this.handleScoreboard(matchCoords.length, token, isRecursive);
 
   if (matchCoords.length >= 2){
-    newToken = Utils.promoteToken(token);
+    newToken = Utils.getTokenData(token, 'nextUp');
     if (newToken !== 'final') {
       this.clearMatches(matchCoords);
       newToken = this.handleMatches(newToken, rowPos, colPos, true);
@@ -195,13 +195,17 @@ QuidStore.clearMatches = function(matches){
 
 QuidStore.handleScoreboard = function(count, token, isRecursive) {
   var points = 0,
-    money = 0;
+    money = 0,
+    bigMatchFactor = 1;
   if (count < 2 && isRecursive !== true) {
-    points = Utils.scoreToken(token);
-    money = Utils.earnFromToken(token);
+    points = Utils.getTokenData(token, 'pts');
+    money = Utils.getTokenData(token, 'val');
   } else if (count >= 2){
-    points = Utils.scoreMatch(count, token);
-    money = Utils.earnFromMatch(count, token);
+    bigMatchFactor = bigMatchFactor + (count * 0.75);
+    points = Utils.getTokenData(token, 'mPts');
+    points = Math.round(points * bigMatchFactor);
+    money = Utils.getTokenData(token, 'mVal');
+    money = Math.round(money * bigMatchFactor);
     if (isRecursive){
       points = Math.round(points * 1.3);
       money = Math.round(money * 1.25);

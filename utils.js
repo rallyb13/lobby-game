@@ -3,76 +3,36 @@
 
 var Utils = {
 
-  promoteToken: function(token){
+  getTokenData: function(token, attribute){
     var tokenMap = {
-      'oil1': 'oil2', 'oil2': 'oil3', 'oil3': 'oil4', 'oil4': 'oil5', 'oil5': 'final',
-      'agr1': 'agr2', 'agr2': 'agr3', 'agr3': 'agr4', 'agr4': 'agr5', 'agr5': 'final',
-      'mil1': 'mil2', 'mil2': 'mil3', 'mil3': 'mil4', 'mil4': 'mil5', 'mil5': 'final',
-      'fin1': 'fin2', 'fin2': 'fin3', 'fin3': 'fin4', 'fin4': 'fin5', 'fin5': 'final',
+      'oil1': {nextUp: 'oil2', pts: 5, mPts: 20, val: 100, mVal: 250 },
+      'oil2': {nextUp: 'oil3', pts: 10, mPts: 45, val: 200, mVal: 500 },
+      'oil3': {nextUp: 'oil4', pts: 25, mPts: 95, val: 300, mVal: 1000 },
+      'oil4': {nextUp: 'oil5', pts: 50, mPts: 195, val: 400, mVal: 2500 },
+      'oil5': {nextUp: 'final', pts: 100, mPts: 0, val: 500, mVal: 0 },
 
-      'con': 'final'
-    };
-    return tokenMap[token];
-  },
+      'agr1': {nextUp: 'agr2', pts: 50, mPts: 205, val: 600, mVal: 2000 },
+      'agr2': {nextUp: 'agr3', pts: 100, mPts: 500, val: 700, mVal: 2500 },
+      'agr3': {nextUp: 'agr4', pts: 150, mPts: 750, val: 800, mVal: 3000 },
+      'agr4': {nextUp: 'agr5', pts: 200, mPts: 1000, val: 900, mVal: 4321 },
+      'agr5': {nextUp: 'final', pts: 250, mPts: 0, val: 1000, mVal: 0 },
 
-  scoreToken: function(token){
-    var tokenValueMap = {
-      'oil1': 5, 'oil2': 10, 'oil3': 25, 'oil4': 50, 'oil5': 100,
-      'agr1': 50, 'agr2': 100, 'agr3': 150, 'agr4': 200, 'agr5': 250,
-      'mil1': 200, 'mil2': 300, 'mil3': 400, 'mil4': 500, 'mil5': 750,
-      'fin1': 250, 'fin2': 500, 'fin3': 1000, 'fin4': 1500, 'fin5': 2000,
-      'con': 0
-    };
-    return tokenValueMap[token];
-  },
+      'mil1': {nextUp: 'mil2', pts: 200, mPts: 500, val: 1100, mVal: 4400 },
+      'mil2': {nextUp: 'mil3', pts: 400, mPts: 1000, val: 1200, mVal: 4995 },
+      'mil3': {nextUp: 'mil4', pts: 600, mPts: 1500, val: 1300, mVal: 5555 },
+      'mil4': {nextUp: 'mil5', pts: 800, mPts: 2000, val: 1400, mVal: 7500 },
+      'mil5': {nextUp: 'final', pts: 1000, mPts: 0, val: 1500, mVal: 0 },
 
-  //token here is what there are 3 of--not what they're combined into
-  earnFromToken: function(token){
-    var tokenPayoutMap = {
-      'oil1': 100, 'oil2': 200, 'oil3': 300, 'oil4': 400, 'oil5': 500,
-      // 'agr1': 100, 'agr2': 200, 'agr3': 300, 'agr4': 400, 'agr5': 500,
-      // 'mil1': 100, 'mil2': 200, 'mil3': 300, 'mil4': 400, 'mil5': 500,
-      // 'fin1': 100, 'fin2': 200, 'fin3': 300, 'fin4': 400, 'fin5': 500,
-      'con': 0
+      'fin1': {nextUp: 'fin2', pts: 1111, mPts: 2222, val: 1600, mVal: 7500 },
+      'fin2': {nextUp: 'fin3', pts: 1333, mPts: 2995, val: 1700, mVal: 8500 },
+      'fin3': {nextUp: 'fin4', pts: 1555, mPts: 3500, val: 1800, mVal: 9500 },
+      'fin4': {nextUp: 'fin5', pts: 1777, mPts: 5000, val: 1900, mVal: 10001 },
+      'fin5': {nextUp: 'final', pts: 1999, mPts: 0, val: 2000, mVal: 0 },
+
+      'con': {nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
+      'mega': {nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
     }
-    return tokenPayoutMap[token];
-  },
-
-  //token here is what there are 3 of--not what they're combined into
-  scoreMatch: function(count, token){
-    var bigMatchFactor = 1,
-      matchValueMap = {
-        'oil1': 20, 'oil2': 45, 'oil3': 95, 'oil4': 195, 'oil5': 0,
-        // 'agr1': 20, 'agr2': 45, 'agr3': 95, 'agr4': 195, 'agr5': 0,
-        // 'mil1': 20, 'mil2': 45, 'mil3': 95, 'mil4': 195, 'mil5': 0,
-        // 'fin1': 20, 'fin2': 45, 'fin3': 95, 'fin4': 195, 'fin5': 0,
-        'con': 0
-      };
-    if (count === 3){
-      bigMatchFactor = 1.1;
-    } else if (count > 3){
-      bigMatchFactor = (count-1)*1.142
-    }
-    return Math.round(bigMatchFactor * matchValueMap[token]);
-  },
-
-  earnFromMatch: function(count, token){
-    var bigMatchFactor = 1,
-      matchPayoutMap = {
-        'oil1': 250, 'oil2': 500, 'oil3': 1000, 'oil4': 2500, 'oil5': 0,
-        // 'agr1': 20, 'agr2': 45, 'agr3': 95, 'agr4': 195, 'agr5': 0,
-        // 'mil1': 20, 'mil2': 45, 'mil3': 95, 'mil4': 195, 'mil5': 0,
-        // 'fin1': 20, 'fin2': 45, 'fin3': 95, 'fin4': 195, 'fin5': 0,
-        'con': 0
-      }
-    if (count === 3){
-      bigMatchFactor = 1.1;
-    } else if (count > 3 && count < 7){
-      bigMatchFactor = 1.2;
-    } else if (count >= 7){
-      bigMatchFactor = 1.3
-    }
-    return Math.round(bigMatchFactor * matchPayoutMap[token]);
+    return tokenMap[token][attribute];
   },
 
   resetMovesCounter: function(phase){
