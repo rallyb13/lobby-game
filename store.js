@@ -35,8 +35,8 @@ QuidStore.setupBoard = function () {
 
     // go though starting tokens and put the values on the board
     for (var i=0; i < startingTokens.length; i++) {
-      var x = Math.floor(Math.random() * 5),
-        y = Math.floor(Math.random() * 5);
+      var x = Math.floor(Math.random() * rows),
+        y = Math.floor(Math.random() * columns);
         currentState.board.grid[x][y] = startingTokens[i];
     }
 
@@ -105,28 +105,28 @@ QuidStore.moveConstituents = function() {
   for (var i=0; i < board.rows; i++) {
     for (var j = 0; j < board.columns; j++){
       if (board.grid[i][j] === 'con'){
-        array.push(i)
-        array.push(j)
-        currentConsCoords.push(array)
+        array.push(i);
+        array.push(j);
+        currentConsCoords.push(array);
       }
-      array = []
+      array = [];
     }
   }
 
   for (var i = 0; i < currentConsCoords.length; i++) {
-    var coords = currentConsCoords[i]
-    var x = coords[0]
-    var y = coords[1]
-    emptyCoords = this.cardinalCheck('', x, y)
-      if (emptyCoords.length > 0) {
-        newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
-        newRowPos = newCoords[0];
-        newColPos = newCoords[1];
-        currentState.board.grid[newRowPos][newColPos] = 'con';
-        currentState.board.grid[x][y] = '';
-      }
+    var coords = currentConsCoords[i],
+      x = coords[0],
+      y = coords[1];
+
+    emptyCoords = this.cardinalCheck('', x, y);
+    if (emptyCoords.length > 0) {
+      newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
+      newRowPos = newCoords[0];
+      newColPos = newCoords[1];
+      currentState.board.grid[newRowPos][newColPos] = 'con';
+      currentState.board.grid[x][y] = '';
+    }
   }
-  this.emitChange();
 };
 
 QuidStore.completeMove = function(rowPos, colPos){
