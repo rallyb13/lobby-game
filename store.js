@@ -8,7 +8,7 @@ var currentState = {
     columns: 6,
     grid: []
   },
-  tokensArray: ['oil1', 'oil1', 'oil2', 'oil3', 'con'],
+  tokensArray: ['oil1', 'mil1', 'fin1', 'agr1', 'con'],
   stagedToken: 'oil1',
   movesRemaining: 730,
   score: 0,
@@ -22,7 +22,7 @@ var currentState = {
 QuidStore.setupBoard = function () {
   var rows = currentState.board.rows,
     columns = currentState.board.columns,
-    startingTokens = ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'con', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
+    startingTokens = ['mil1', 'agr1', 'fin1', 'oil1', 'oil1', 'oil2', 'con', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
     token;
 
     for (var i=0; i < rows; i++) {

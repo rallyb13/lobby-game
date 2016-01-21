@@ -35,6 +35,19 @@ var Utils = {
     return tokenMap[token][attribute];
   },
 
+  handleColors: function(tokenGroup, attribute){
+    var colorMap = {
+      'oil': {color: 'gray', bColor: 'black'},
+      'agr': {color: 'green', bColor: 'yellow'},
+      'mil': {color: 'black', bColor: 'red'},
+      'fin': {color: 'yellow', bColor: 'green'},
+      '': {color: '#4B5043', bColor: '#A4BD99'},
+      'con': {color: 'red', bColor: 'blue'},
+      'por': {color: 'red', bColor: 'pink'},
+    }
+    return colorMap[tokenGroup][attribute];
+  },
+
   resetMovesCounter: function(phase){
     var MovesCountMap = {
       1: 730,

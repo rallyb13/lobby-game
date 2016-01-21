@@ -1,11 +1,17 @@
 import React from 'react';
 import QuidStore from '../store';
+import Utils from '../utils';
 import Token from './Token';
 
 var GridSquare = React.createClass({
+  componentWillMount: function(){
+    this.setState({tokenGroup: this.props.token.slice(0,3)});
+  },
+
   render: function(){
+    this.setColors(this.state.tokenGroup);
     return (
-      <div onClick={this.placeToken} style={this.styles.gridSquare} >
+      <div ref={this.refs.square} onClick={this.placeToken} style={this.styles.gridSquare} >
         <Token symbol={this.props.token} /></div>
     );
   },
@@ -16,7 +22,13 @@ var GridSquare = React.createClass({
 
     if (QuidStore.checkEmpty(rowPos, colPos) === true) {
       QuidStore.completeMove(rowPos, colPos);
+      // this.setState({tokenGroup: this.props.token.slice(0,3)});
     }
+  },
+
+  setColors: function(tokenGroup){
+    this.styles.gridSquare.color = Utils.handleColors(tokenGroup, 'color');
+    this.styles.gridSquare.backgroundColor = Utils.handleColors(tokenGroup, 'bColor');
   },
 
   styles: {
