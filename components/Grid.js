@@ -13,7 +13,7 @@ var Grid = React.createClass({
     for (i=0; i < rowNum; i++) {
       for (j=0; j < colNum; j++) {
         count++;
-        squares.push(<GridSquare rowPos={i} colPos={j} token={this.props.board.grid[i][j]} id={count}/>);
+        squares.push(<GridSquare rowPos={i} colPos={j} token={this.props.board.grid[i][j]} key={count}/>);
       }
     }
 
