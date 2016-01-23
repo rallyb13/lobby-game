@@ -26,11 +26,9 @@ var GridSquare = React.createClass({
   },
 
   placeToken: function(){
-    var rowPos = this.props.rowPos,
-        colPos = this.props.colPos;
-
-    if (QuidStore.checkEmpty(rowPos, colPos) === true) {
-      QuidStore.completeMove(rowPos, colPos);
+    console.log(this.props.eligible);
+    if (this.props.eligible) {
+      QuidStore.completeMove(this.props.rowPos, this.props.colPos);
     }
   }
 });

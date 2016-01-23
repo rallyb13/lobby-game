@@ -67,10 +67,6 @@ QuidStore.getCurrentState = function(){
   return currentState;
 };
 
-QuidStore.checkEmpty = function(rowPos, colPos){
-  return currentState.board.grid[rowPos][colPos] === '';
-};
-
 QuidStore.isEligible = function(rowPos, colPos){
   var staged = currentState.stagedToken,
   isEmpty = currentState.board.grid[rowPos][colPos] === '';
