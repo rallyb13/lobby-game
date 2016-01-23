@@ -71,6 +71,25 @@ QuidStore.checkEmpty = function(rowPos, colPos){
   return currentState.board.grid[rowPos][colPos] === '';
 };
 
+QuidStore.completeMove = function(rowPos, colPos){
+  var playedToken = currentState.stagedToken;
+
+  playedToken = this.handleMatches(playedToken, rowPos, colPos);
+  currentState.board.grid[rowPos][colPos] = playedToken;
+  currentState.movesRemaining--;
+  if (currentState.movesRemaining === 0){
+    this.handleElection();
+  }
+
+  if (this.isGameOver()){
+    this.endGame('board');
+  } else {
+    this.setNextToken();
+  }
+  this.moveConstituents(rowPos, colPos);
+  this.emitChange();
+};
+
 QuidStore.cardinalCheck = function(token, rowPos, colPos){
   var possibleMatches = [ [rowPos, colPos+1], [rowPos, colPos-1], [rowPos+1, colPos], [rowPos-1, colPos]],
     board = currentState.board,
@@ -93,18 +112,14 @@ QuidStore.cardinalCheck = function(token, rowPos, colPos){
   return matchCoords;
 };
 
-QuidStore.moveConstituents = function() {
+QuidStore.findTokenType = function(token){
   var board = currentState.board,
-    newRowPos = '',
-    newColPos = '',
-    newCoords = '',
-    emptyCoords = [],
     array = [],
     currentConsCoords = [];
 
   for (var i=0; i < board.rows; i++) {
     for (var j = 0; j < board.columns; j++){
-      if (board.grid[i][j] === 'con'){
+      if (board.grid[i][j] === token){
         array.push(i);
         array.push(j);
         currentConsCoords.push(array);
@@ -112,40 +127,32 @@ QuidStore.moveConstituents = function() {
       array = [];
     }
   }
-
-  for (var i = 0; i < currentConsCoords.length; i++) {
-    var coords = currentConsCoords[i],
-      x = coords[0],
-      y = coords[1];
-
-    emptyCoords = this.cardinalCheck('', x, y);
-    if (emptyCoords.length > 0) {
-      newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
-      newRowPos = newCoords[0];
-      newColPos = newCoords[1];
-      currentState.board.grid[newRowPos][newColPos] = 'con';
-      currentState.board.grid[x][y] = '';
-    }
-  }
+  return currentConsCoords;
 };
 
-QuidStore.completeMove = function(rowPos, colPos){
-  var playedToken = currentState.stagedToken;
+QuidStore.moveConstituents = function(rowPos, colPos) {
+  var currentConsCoords = this.findTokenType('con'),
+    emptyCoords = [],
+    newRowPos,
+    newColPos,
+    newCoords,
+    x,
+    y;
 
-  playedToken = this.handleMatches(playedToken, rowPos, colPos);
-  currentState.board.grid[rowPos][colPos] = playedToken;
-  currentState.movesRemaining--;
-  if (currentState.movesRemaining === 0){
-    this.handleElection();
+  for (var i = 0; i < currentConsCoords.length; i++) {
+    x = currentConsCoords[i][0],
+    y = currentConsCoords[i][1];
+    if(x !== rowPos || y !== colPos){
+      emptyCoords = this.cardinalCheck('', x, y);
+      if (emptyCoords.length > 0) {
+        newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
+        newRowPos = newCoords[0];
+        newColPos = newCoords[1];
+        currentState.board.grid[newRowPos][newColPos] = 'con';
+        currentState.board.grid[x][y] = '';
+      }
+    }
   }
-
-  if (this.isGameOver()){
-    this.endGame('board');
-  } else {
-    this.setNextToken();
-  }
-  this.moveConstituents();
-  this.emitChange();
 };
 
 QuidStore.setNextToken = function(){
