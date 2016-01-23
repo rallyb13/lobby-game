@@ -17,7 +17,6 @@ var GridSquare = React.createClass({
           backgroundColor: Utils.handleColors(tokenGroup, 'bColor'),
           height: '16.29%',
           width: '16.66%',
-          outline: '1px solid #141414',
           display: 'inline-block',
           position: 'relative',
           minHeight: '90px',
@@ -33,8 +32,7 @@ var GridSquare = React.createClass({
     if (QuidStore.checkEmpty(rowPos, colPos) === true) {
       QuidStore.completeMove(rowPos, colPos);
     }
-  },
-
+  }
 });
 
 export default GridSquare
