@@ -17,7 +17,7 @@ var currentState = {
   nextGoal: 125000,
   message: 'Click any unoccupied square in the grid to place the next item. Try to match 3 to build up to better items.',
   electedOffice: 'State Delegate',
-  doubles: []
+  megaAccepts: []
 };
 
 QuidStore.setupBoard = function () {
@@ -71,30 +71,16 @@ QuidStore.getCurrentState = function(){
 QuidStore.isEligible = function(rowPos, colPos){
   var staged = currentState.stagedToken,
   isEmpty = currentState.board.grid[rowPos][colPos] === '',
-  strings = [],
-  doubles,
-  adjacents,
-  adjString,
-  i;
+  validForMega = currentState.megaAccepts,
+  stringCoords;
 
   if (staged === 'mega'){
     if (isEmpty){
-      adjacents = this.findAdjacents(rowPos, colPos);
-      doubles = currentState.doubles;
-      if (doubles.length > 0){
-        doubles.forEach( function(double){
-          strings.push(JSON.stringify(double));
-        });
-        for (i = 0; i < adjacents.length; i++){
-          adjString = JSON.stringify(adjacents[i])
-          if (strings.indexOf(adjString) !== -1){
-            return true;
-          }
-        }
-      }
-      return false
+      stringCoords = [rowPos, colPos];
+      stringCoords = JSON.stringify(stringCoords);
+      return (validForMega.indexOf(stringCoords) !== -1);
     } else {
-      return false
+      return false;
     }
   } else if (staged === 'pork'){
     return !isEmpty;
@@ -116,12 +102,28 @@ QuidStore.completeMove = function(rowPos, colPos){
   if (this.isGameOver()){
     this.endGame('board');
   } else {
+    this.moveConstituents(rowPos, colPos);
     this.setNextToken();
   }
-  this.moveConstituents(rowPos, colPos);
-  currentState.doubles = this.checkPairs();
   this.emitChange();
 };
+
+QuidStore.checkMegaValid = function(){
+  var doubles = this.checkPairs(),
+    validSpaces = [],
+    me = this,
+    checks = [];
+
+  doubles.forEach(function (double) {
+    checks = me.cardinalCheck('', double[0], double[1]);
+    if(checks.length > 0){
+      checks.forEach(function (check) {
+        validSpaces.push(check);
+      });
+    }
+  });
+  return validSpaces;
+}
 
 QuidStore.checkPairs = function(){
   var board = currentState.board,
@@ -143,14 +145,8 @@ QuidStore.checkPairs = function(){
   return doubles;
 };
 
-QuidStore.findAdjacents = function(rowPos, colPos){
-  return [
-    [rowPos, colPos+1], [rowPos, colPos-1], [rowPos+1, colPos], [rowPos-1, colPos]
-  ];
-};
-
 QuidStore.cardinalCheck = function(token, rowPos, colPos){
-  var possibleMatches = this.findAdjacents(rowPos, colPos),
+  var possibleMatches = [ [rowPos, colPos+1], [rowPos, colPos-1], [rowPos+1, colPos], [rowPos-1, colPos] ],
     board = currentState.board,
     matchCoords = [],
     checkRow,
@@ -215,8 +211,25 @@ QuidStore.moveConstituents = function(rowPos, colPos) {
 };
 
 QuidStore.setNextToken = function(){
-  var tokens = currentState.tokensArray;
+  var tokens = currentState.tokensArray,
+    valStrings = [],
+    validEmpties;
+
   currentState.stagedToken = tokens[Math.floor(Math.random() * tokens.length)];
+
+  //special case of megaphone token requires board know if there are valid moves for it
+  //and in order to let squares know which are eligible, want array of (stringified) coords
+  if (currentState.stagedToken === 'mega'){
+    validEmpties = this.checkMegaValid();
+    if (validEmpties.length > 0) {
+      validEmpties.forEach( function(val) {
+        valStrings.push(JSON.stringify(val));
+      });
+      currentState.megaAccepts = valStrings;
+    } else {
+      this.setNextToken();
+    }
+  }
 };
 
 QuidStore.handleMatches = function(token, rowPos, colPos, isRecursive){
