@@ -4,20 +4,26 @@ import Utils from '../utils';
 import Token from './Token';
 
 var GridSquare = React.createClass({
-  componentWillMount: function(){
-    this.setState({tokenGroup: this.props.token.slice(0,3)});
-  },
-
-  componentWillUpdate: function(){
-    this.setState({tokenGroup: this.props.token.slice(0,3)});
-  },
 
   render: function(){
-    this.setColors(this.state.tokenGroup);
-    return (
-      <div onClick={this.placeToken} style={this.styles.gridSquare} >
-        <Token symbol={this.props.token} /></div>
-    );
+    var tokenGroup = this.props.token.slice(0,3);
+    return React.cloneElement(
+      <div onClick={this.placeToken} >
+        <Token symbol={this.props.token} />
+      </div>,
+      { style:
+        {
+          color : Utils.handleColors(tokenGroup, 'color'),
+          backgroundColor: Utils.handleColors(tokenGroup, 'bColor'),
+          height: '16.29%',
+          width: '16.66%',
+          outline: '1px solid #141414',
+          display: 'inline-block',
+          position: 'relative',
+          minHeight: '90px',
+          minWidth: '90px'
+        }
+    });
   },
 
   placeToken: function(){
@@ -28,23 +34,6 @@ var GridSquare = React.createClass({
       QuidStore.completeMove(rowPos, colPos);
     }
   },
-
-  setColors: function(tokenGroup){
-    this.styles.gridSquare.color = Utils.handleColors(tokenGroup, 'color');
-    this.styles.gridSquare.backgroundColor = Utils.handleColors(tokenGroup, 'bColor');
-  },
-
-  styles: {
-     gridSquare: {
-      height: '16.29%',
-      width: '16.66%',
-      outline: '1px solid #141414',
-      display: 'inline-block',
-      position: 'relative',
-      minHeight: '90px',
-      minWidth: '90px'
-     }
-  }
 
 });
 
