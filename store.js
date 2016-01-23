@@ -71,6 +71,23 @@ QuidStore.checkEmpty = function(rowPos, colPos){
   return currentState.board.grid[rowPos][colPos] === '';
 };
 
+QuidStore.isEligible = function(rowPos, colPos){
+  var staged = currentState.stagedToken,
+  isEmpty = currentState.board.grid[rowPos][colPos] === '';
+
+  if (staged === 'mega'){
+    if (isEmpty){
+      return true //this one will be MUCH changed soon
+    } else {
+      return false
+    }
+  } else if (staged === 'pork'){
+    return !isEmpty;
+  } else {
+    return isEmpty;
+  }
+};
+
 QuidStore.completeMove = function(rowPos, colPos){
   var playedToken = currentState.stagedToken;
 
