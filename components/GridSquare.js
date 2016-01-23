@@ -19,6 +19,7 @@ var GridSquare = React.createClass({
           width: '16.66%',
           display: 'inline-block',
           position: 'relative',
+          marginBottom: '-4px',
           minHeight: '90px',
           minWidth: '90px'
         }
