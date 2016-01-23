@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "classnames": "^2.2.3",
+    "radium": "^0.16.2",
     "react": "^0.14.6",
     "react-dom": "^0.14.6"
   }

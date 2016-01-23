@@ -37,13 +37,13 @@ var Utils = {
 
   handleColors: function(tokenGroup, attribute){
     var colorMap = {
-      'oil': {color: 'gray', bColor: 'black'},
-      'agr': {color: 'green', bColor: 'yellow'},
-      'mil': {color: 'black', bColor: 'red'},
-      'fin': {color: 'yellow', bColor: 'green'},
-      '': {color: '#4B5043', bColor: '#A4BD99'},
-      'con': {color: 'red', bColor: 'blue'},
-      'por': {color: 'red', bColor: 'pink'},
+      'oil': {color: 'gray', bColor: 'black', hover: 'black'},
+      'agr': {color: 'green', bColor: 'yellow', hover: 'yellow'},
+      'mil': {color: 'black', bColor: 'red', hover: 'red'},
+      'fin': {color: 'yellow', bColor: 'green', hover: 'green'},
+      '': {color: '#4B5043', bColor: '#A4BD99', hover: '#fff'},
+      'con': {color: 'red', bColor: 'blue', hover: 'blue'},
+      'por': {color: 'red', bColor: 'pink', hover: 'pink'},
     }
     return colorMap[tokenGroup][attribute];
   },
