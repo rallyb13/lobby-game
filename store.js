@@ -8,7 +8,7 @@ var currentState = {
     columns: 6,
     grid: []
   },
-  tokensArray: ['oil1', 'mil1', 'fin1', 'agr1', 'con'],
+  tokensArray: ['oil1', 'mil1', 'fin1', 'agr1', 'mega'],
   stagedToken: 'oil1',
   movesRemaining: 730,
   score: 0,
@@ -16,7 +16,8 @@ var currentState = {
   phase: 1,
   nextGoal: 125000,
   message: 'Click any unoccupied square in the grid to place the next item. Try to match 3 to build up to better items.',
-  electedOffice: 'State Delegate'
+  electedOffice: 'State Delegate',
+  doubles: []
 };
 
 QuidStore.setupBoard = function () {
@@ -69,11 +70,29 @@ QuidStore.getCurrentState = function(){
 
 QuidStore.isEligible = function(rowPos, colPos){
   var staged = currentState.stagedToken,
-  isEmpty = currentState.board.grid[rowPos][colPos] === '';
+  isEmpty = currentState.board.grid[rowPos][colPos] === '',
+  strings = [],
+  doubles,
+  adjacents,
+  adjString,
+  i;
 
   if (staged === 'mega'){
     if (isEmpty){
-      return true //this one will be MUCH changed soon
+      adjacents = this.findAdjacents(rowPos, colPos);
+      doubles = currentState.doubles;
+      if (doubles.length > 0){
+        doubles.forEach( function(double){
+          strings.push(JSON.stringify(double));
+        });
+        for (i = 0; i < adjacents.length; i++){
+          adjString = JSON.stringify(adjacents[i])
+          if (strings.indexOf(adjString) !== -1){
+            return true;
+          }
+        }
+      }
+      return false
     } else {
       return false
     }
@@ -100,11 +119,38 @@ QuidStore.completeMove = function(rowPos, colPos){
     this.setNextToken();
   }
   this.moveConstituents(rowPos, colPos);
+  currentState.doubles = this.checkPairs();
   this.emitChange();
 };
 
+QuidStore.checkPairs = function(){
+  var board = currentState.board,
+  doubles = [],
+  coords = [],
+  token;
+
+  for (var i=0; i < board.rows; i++){
+    for (var j = 0; j < board.columns; j++){
+      token = board.grid[i][j];
+      if (token !== '' && token !== 'con') {
+        coords = this.cardinalCheck(token, i, j);
+        if (coords.length === 1){
+          doubles.push(coords[0]);
+        }
+      }
+    }
+  }
+  return doubles;
+};
+
+QuidStore.findAdjacents = function(rowPos, colPos){
+  return [
+    [rowPos, colPos+1], [rowPos, colPos-1], [rowPos+1, colPos], [rowPos-1, colPos]
+  ];
+};
+
 QuidStore.cardinalCheck = function(token, rowPos, colPos){
-  var possibleMatches = [ [rowPos, colPos+1], [rowPos, colPos-1], [rowPos+1, colPos], [rowPos-1, colPos]],
+  var possibleMatches = this.findAdjacents(rowPos, colPos),
     board = currentState.board,
     matchCoords = [],
     checkRow,
