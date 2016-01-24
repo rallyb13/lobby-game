@@ -17,7 +17,8 @@ var currentState = {
   nextGoal: 125000,
   message: 'Click any unoccupied square in the grid to place the next item. Try to match 3 to build up to better items.',
   electedOffice: 'State Delegate',
-  megaAccepts: []
+  megaPossCoords: [],
+  megaPossTokens: [],
 };
 
 QuidStore.setupBoard = function () {
@@ -71,7 +72,7 @@ QuidStore.getCurrentState = function(){
 QuidStore.isEligible = function(rowPos, colPos){
   var staged = currentState.stagedToken,
   isEmpty = currentState.board.grid[rowPos][colPos] === '',
-  validForMega = currentState.megaAccepts,
+  validForMega = currentState.megaPossCoords,
   stringCoords;
 
   if (staged === 'mega'){
@@ -90,13 +91,14 @@ QuidStore.isEligible = function(rowPos, colPos){
 };
 
 QuidStore.completeMove = function(rowPos, colPos){
-  var playedToken = currentState.stagedToken;
+  var token = currentState.stagedToken;
 
-  if (playedToken === 'mega'){
-    playedToken = this.convertMega(rowPos, colPos);
+  if (token === 'mega'){
+    token = this.convertMega(rowPos, colPos);
   }
-  playedToken = this.handleMatches(playedToken, rowPos, colPos);
-  currentState.board.grid[rowPos][colPos] = playedToken;
+  console.log(token);
+  token = this.handleMatches(token, rowPos, colPos);
+  currentState.board.grid[rowPos][colPos] = token;
   currentState.movesRemaining--;
   if (currentState.movesRemaining === 0){
     this.handleElection();
@@ -112,67 +114,59 @@ QuidStore.completeMove = function(rowPos, colPos){
 };
 
 QuidStore.checkMegaValid = function(){
-  var doubles = this.checkPairs(),
-    blanks = this.findTokenType(''),
-    validSpaces = [],
+    var blanks = this.findTokenCoords(''),
     neighbors = [],
     neighTokens = [],
     me = this,
-    checks = [],
+    validSpaces = [],
+    combos = [],
+    comboOptions = [],
+    stringCoords,
     rowPos,
     colPos,
-    token,
-    index;
+    token;
 
-  doubles.forEach(function (double) {
-    checks = me.cardinalCheck('', double[0], double[1]);
-    if(checks.length > 0){
-      checks.forEach(function (check) {
-        validSpaces.push(check);
-      });
-    }
-  });
 
+  //Loop through array of empty space coords to check mega validity:
   blanks.forEach(function (blank) {
+    stringCoords = JSON.stringify(blank);
     neighbors = me.getAdjacents(blank[0], blank[1]);
+    //Each neighbor of a blank space, if holding a combinable token...
     for(var i = 0; i < neighbors.length; i++){
       rowPos = neighbors[i][0];
       colPos = neighbors[i][1];
       token = currentState.board.grid[rowPos][colPos];
       if (token !== '' && token !== 'con'){
-        neighTokens.push(token);
-      }
-    }
-    while (neighTokens.length > 1){
-      token = neighTokens.pop();
-      if (neighTokens.indexOf(token) !== -1){
-        validSpaces.push(blank);
-      }
-    }
-    neighTokens = [];
-  });
-  return validSpaces;
-}
-
-QuidStore.checkPairs = function(){
-  var board = currentState.board,
-  doubles = [],
-  coords = [],
-  token;
-
-  //only handles already paired tokens
-  for (var i=0; i < board.rows; i++){
-    for (var j = 0; j < board.columns; j++){
-      token = board.grid[i][j];
-      if (token !== '' && token !== 'con') {
-        coords = this.cardinalCheck(token, i, j);
-        if (coords.length === 1){
-          doubles.push(coords[0]);
+        //might already have a pair...
+        if(me.cardinalCheck(token, rowPos, colPos).length > 0){
+          combos.push(token);
+          if (validSpaces.indexOf(stringCoords) === -1){
+            validSpaces.push(stringCoords);
+          }
+        //or might have a match with another neighbor we need to check for next:
+        } else {
+          neighTokens.push(token);
         }
       }
     }
-  }
-  return doubles;
+    //all previously unmatched neighbors are checked against each other
+    while (neighTokens.length > 1){
+      token = neighTokens.pop();
+      if (neighTokens.indexOf(token) !== -1){
+        combos.push(token);
+        if (validSpaces.indexOf(stringCoords) === -1){
+          validSpaces.push(stringCoords);
+        }
+      }
+    }
+    if (combos.length > 0) {
+      comboOptions.push(combos);
+    }
+    neighTokens = [];
+    combos = [];
+  });
+  currentState.megaPossCoords = validSpaces;
+  currentState.megaPossTokens = comboOptions;
 };
 
 QuidStore.getAdjacents = function(rowPos, colPos){
@@ -213,7 +207,7 @@ QuidStore.cardinalCheck = function(token, rowPos, colPos){
   return matchCoords;
 };
 
-QuidStore.findTokenType = function(token){
+QuidStore.findTokenCoords = function(token){
   var board = currentState.board,
     array = [],
     currentConsCoords = [];
@@ -232,7 +226,7 @@ QuidStore.findTokenType = function(token){
 };
 
 QuidStore.moveConstituents = function(rowPos, colPos) {
-  var currentConsCoords = this.findTokenType('con'),
+  var currentConsCoords = this.findTokenCoords('con'),
     emptyCoords = [],
     newRowPos,
     newColPos,
@@ -258,48 +252,27 @@ QuidStore.moveConstituents = function(rowPos, colPos) {
 
 QuidStore.setNextToken = function(){
   var tokens = currentState.tokensArray,
-    valStrings = [],
-    validEmpties;
+    valStrings = [];
 
   currentState.stagedToken = tokens[Math.floor(Math.random() * tokens.length)];
 
-  //special case of megaphone token requires board know if there are valid moves for it
-  //and in order to let squares know which are eligible, want array of (stringified) coords
   if (currentState.stagedToken === 'mega'){
-    validEmpties = this.checkMegaValid();
-    if (validEmpties.length > 0) {
-      validEmpties.forEach( function(val) {
-        valStrings.push(JSON.stringify(val));
-      });
-      currentState.megaAccepts = valStrings;
-    } else {
+    this.checkMegaValid();
+    if (currentState.megaPossCoords.length === 0) {
       this.setNextToken();
     }
   }
 };
 
 QuidStore.convertMega = function(rowPos, colPos){
-    var adjacents = this.getAdjacents(rowPos, colPos),
-    nearTokens = [],
-    possMatchTokens = [],
-    me = this,
-    token,
-    rowCheck,
-    colCheck;
+    var possTokensMap = currentState.megaPossTokens,
+      tokensMap = currentState.megaPossCoords,
+      coords = JSON.stringify( [rowPos, colPos] ),
+      index = tokensMap.indexOf(coords),
+      possTokens = possTokensMap[index];
 
-  adjacents.forEach( function(adj){
-    rowCheck = adj[0];
-    colCheck = adj[1];
-    token = currentState.board.grid[rowCheck][colCheck];
-    if (token !== '' && token !== 'con' && token !== 'pork'){
-      nearTokens.push(token);
-      if (me.cardinalCheck(token, rowCheck, colCheck).length > 0){
-        possMatchTokens.push(token);
-      }
-    }
-  });
-  if (possMatchTokens.length === 1){
-    return possMatchTokens[0];
+  if (possTokens.length === 1){
+    return possTokens[0];
   }
 };
 
