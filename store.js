@@ -280,6 +280,9 @@ QuidStore.convertMega = function(rowPos, colPos){
       priorities.push(Utils.getTokenData(tok, 'priority'));
     });
     bestPriority = Math.min.apply(Math, priorities);
+    while (priorities.indexOf(bestPriority + 1) !== -1){
+      bestPriority = bestPriority + 1;
+    }
     index2 = priorities.indexOf(bestPriority);
     return possTokens[index2];
   }
