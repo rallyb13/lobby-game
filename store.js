@@ -113,9 +113,16 @@ QuidStore.completeMove = function(rowPos, colPos){
 
 QuidStore.checkMegaValid = function(){
   var doubles = this.checkPairs(),
+    blanks = this.findTokenType(''),
     validSpaces = [],
+    neighbors = [],
+    neighTokens = [],
     me = this,
-    checks = [];
+    checks = [],
+    rowPos,
+    colPos,
+    token,
+    index;
 
   doubles.forEach(function (double) {
     checks = me.cardinalCheck('', double[0], double[1]);
@@ -124,6 +131,25 @@ QuidStore.checkMegaValid = function(){
         validSpaces.push(check);
       });
     }
+  });
+
+  blanks.forEach(function (blank) {
+    neighbors = me.getAdjacents(blank[0], blank[1]);
+    for(var i = 0; i < neighbors.length; i++){
+      rowPos = neighbors[i][0];
+      colPos = neighbors[i][1];
+      token = currentState.board.grid[rowPos][colPos];
+      if (token !== '' && token !== 'con'){
+        neighTokens.push(token);
+      }
+    }
+    while (neighTokens.length > 1){
+      token = neighTokens.pop();
+      if (neighTokens.indexOf(token) !== -1){
+        validSpaces.push(blank);
+      }
+    }
+    neighTokens = [];
   });
   return validSpaces;
 }
@@ -134,6 +160,7 @@ QuidStore.checkPairs = function(){
   coords = [],
   token;
 
+  //only handles already paired tokens
   for (var i=0; i < board.rows; i++){
     for (var j = 0; j < board.columns; j++){
       token = board.grid[i][j];
