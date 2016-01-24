@@ -8,14 +8,14 @@ var currentState = {
     columns: 6,
     grid: []
   },
-  tokensArray: ['oil1', 'mil1', 'fin1', 'agr1', 'mega'],
+  tokensArray: ['oil1', 'oil1', 'oil2', 'fin1', 'mil1', 'mega'],
   stagedToken: 'oil1',
-  movesRemaining: 730,
+  movesRemaining: 180,
   score: 0,
   bankBalance:  0,
   phase: 1,
   nextGoal: 125000,
-  message: 'Click any unoccupied square in the grid to place the next item. Try to match 3 to build up to better items.',
+  message: 'Click any unoccupied square in the grid to place the next item. Match 3 to make more valuable items.',
   electedOffice: 'State Delegate',
   megaPossCoords: [],
   megaPossTokens: [],
@@ -357,20 +357,20 @@ QuidStore.handleElection = function(){
   } else {
     currentState.phase++;
     this.changePhase(currentState.phase);
-    //TODO: final tokens-->lobbyist bench conversion???
   }
 };
 
 //TODO: all of these Utils maps need to be filled out for whole game
 QuidStore.changePhase = function(phase){
-  var coords;
+  var phaseData = Utils.getPhaseData(phase),
+    coords;
   //change every election
-  currentState.movesRemaining = Utils.resetMovesCounter(phase);
-  currentState.nextGoal = Utils.setNextGoal(phase);
+  currentState.movesRemaining = phaseData.moves;
+  currentState.nextGoal = phaseData.goal;
 
   //change more often
+  currentState.message = phaseData.msg;
   // currentState.tokensArray = Utils.changePossibleTokens(phase, currentState.movesRemaining);
-  currentState.message = Utils.changeMessage(phase, currentState.movesRemaining);
 
   //changes less often
   currentState.electedOffice = Utils.setElectedOffice(phase, currentState.electedOffice);

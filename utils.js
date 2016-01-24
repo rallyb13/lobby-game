@@ -48,6 +48,44 @@ var Utils = {
     return colorMap[tokenGroup][attribute];
   },
 
+  getPhaseData: function(phase){
+    var phaseMap = {
+      1: { moves: 180, goal: 125000, msg: ""},
+      2: { moves: 145, goal: 105000, msg: "Congratulations on your win, but this time you'll face a primary challenge. And in this district, that's the tougher race!" },
+      3: { moves: 45, goal: 35000, msg: "Whew! Pete Pandurin put up a tough challenge. He'll be back, but right now, you'd better focus on the general!"},
+      4: { moves: 145, goal: 200000, msg: "You've held your seat, but Pete's back, and he really wants your seat. He's already started raising money for ad buys..."},
+      5: { moves: 45, goal: 50000, msg: "You're our nominee! Other party's actually putting up a challenge, but nothing you can't handle."},
+      6: { moves: 180, goal: 125000, msg: "Welcome to another term in the State House of Delegates. Incumbency has really set in, so you could probably stay here forever if you wanted to.", repeat: 0},
+      7: { moves: 180, goal: 125000, msg: ''},
+      8: { moves: 315, goal: 125000, msg: ''},
+      9: { moves: 45, goal: 125000, msg: ''},
+      10: { moves: 315, goal: 125000, msg: ''},
+      11: { moves: 45, goal: 125000, msg: ''},
+      12: { moves: 360, goal: 125000, msg: ''},
+      13: { moves: 360, goal: 125000, msg: '', repeat: 0},
+      14: { moves: 130, goal: 125000, msg: ''},
+      15: { moves: 50, goal: 125000, msg: ''},
+      16: { moves: 155, goal: 125000, msg: ''},
+      17: { moves: 75, goal: 125000, msg: ''},
+      18: { moves: 155, goal: 125000, msg: ''},
+      19: { moves: 75, goal: 125000, msg: ''},
+      20: { moves: 155, goal: 125000, msg: ''},
+      21: { moves: 75, goal: 125000, msg: ''},
+      22: { moves: 155, goal: 125000, msg: ''},
+      23: { moves: 75, goal: 125000, msg: ''},
+      24: { moves: 615, goal: 125000, msg: ''},
+      25: { moves: 75, goal: 125000, msg: ''},
+      26: { moves: 690, goal: 125000, msg: ''},
+      27: { moves: 615, goal: 125000, msg: ''},
+      28: { moves: 75, goal: 125000, msg: ''},
+      29: { moves: 690, goal: 125000, msg: ''},
+      30: { moves: 615, goal: 125000, msg: ''},
+      31: { moves: 75, goal: 125000, msg: ''},
+      32: { moves: 690, goal: 125000, msg: ''}
+    }
+    return phaseMap[phase];
+  },
+
   resetMovesCounter: function(phase){
     var MovesCountMap = {
       1: 730,
@@ -82,10 +120,10 @@ var Utils = {
   setElectedOffice: function(phase, currentOffice) {
     var electedOfficeMap = {
           1: 'State Delegate',
-          5: 'State Senator',
-          9: 'Congressperson',
-          15: 'Junior Senator',
-          21: 'Senior Senator'
+          8: 'State Senator',
+          16: 'US Representative',
+          24: 'US Senator (Junior)',
+          30: 'US Senator (Senior)'
         };
     if (typeof electedOfficeMap[phase] === 'undefined'){
       return currentOffice;
