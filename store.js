@@ -24,7 +24,7 @@ var currentState = {
 QuidStore.setupBoard = function () {
   var rows = currentState.board.rows,
     columns = currentState.board.columns,
-    startingTokens = ['mil1', 'agr1', 'fin1', 'oil1', 'oil1', 'oil2', 'con', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
+    startingTokens = ['mil1', 'fin1', 'oil1', 'oil1', 'oil2', 'con', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
     token;
 
     for (var i=0; i < rows; i++) {
@@ -135,7 +135,7 @@ QuidStore.checkMegaValid = function(){
       rowPos = neighbors[i][0];
       colPos = neighbors[i][1];
       token = currentState.board.grid[rowPos][colPos];
-      if (token !== '' && token !== 'con'){
+      if (token !== '' && token !== 'con' && token.slice(3) !== '5'){
         //might already have a pair...
         if(me.cardinalCheck(token, rowPos, colPos).length > 0){
           combos.push(token);
