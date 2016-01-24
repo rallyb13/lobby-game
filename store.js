@@ -149,12 +149,26 @@ QuidStore.checkPairs = function(){
 };
 
 QuidStore.getAdjacents = function(rowPos, colPos){
-  return [ [rowPos, colPos+1], [rowPos, colPos-1], [rowPos+1, colPos], [rowPos-1, colPos] ];
-}
+  var adjacents = [],
+    board = currentState.board;
+
+  if (rowPos > 0){
+    adjacents.push([rowPos-1, colPos]);
+  }
+  if (colPos > 0){
+    adjacents.push([rowPos, colPos-1]);
+  }
+  if (rowPos + 1 < board.rows){
+    adjacents.push([rowPos+1, colPos]);
+  }
+  if (colPos + 1 < board.columns){
+    adjacents.push([rowPos, colPos+1])
+  }
+  return adjacents;
+};
 
 QuidStore.cardinalCheck = function(token, rowPos, colPos){
   var possibleMatches = this.getAdjacents(rowPos, colPos),
-    board = currentState.board,
     matchCoords = [],
     checkRow,
     checkCol,
@@ -165,10 +179,8 @@ QuidStore.cardinalCheck = function(token, rowPos, colPos){
     checkRow = possibleMatches[i][0];
     checkCol = possibleMatches[i][1];
 
-    if (checkRow >= 0 && checkRow < board.rows && checkCol >= 0 && checkCol < board.columns ) {
-      if (currentState.board.grid[checkRow][checkCol] === token) {
-        matchCoords.push([checkRow, checkCol]);
-      }
+    if (currentState.board.grid[checkRow][checkCol] === token) {
+      matchCoords.push([checkRow, checkCol]);
     }
   }
   return matchCoords;
@@ -240,7 +252,7 @@ QuidStore.setNextToken = function(){
 };
 
 QuidStore.convertMega = function(rowPos, colPos){
-  var adjacents = this.getAdjacents(rowPos, colPos),
+    var adjacents = this.getAdjacents(rowPos, colPos),
     nearTokens = [],
     possMatchTokens = [],
     me = this,
