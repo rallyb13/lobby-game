@@ -96,7 +96,6 @@ QuidStore.completeMove = function(rowPos, colPos){
   if (token === 'mega'){
     token = this.convertMega(rowPos, colPos);
   }
-  console.log(token);
   token = this.handleMatches(token, rowPos, colPos);
   currentState.board.grid[rowPos][colPos] = token;
   currentState.movesRemaining--;
@@ -268,11 +267,21 @@ QuidStore.convertMega = function(rowPos, colPos){
     var possTokensMap = currentState.megaPossTokens,
       tokensMap = currentState.megaPossCoords,
       coords = JSON.stringify( [rowPos, colPos] ),
-      index = tokensMap.indexOf(coords),
-      possTokens = possTokensMap[index];
+      index1 = tokensMap.indexOf(coords),
+      possTokens = possTokensMap[index1],
+      priorities = [],
+      bestPriority,
+      index2;
 
   if (possTokens.length === 1){
     return possTokens[0];
+  } else {
+    possTokens.forEach( function(tok) {
+      priorities.push(Utils.getTokenData(tok, 'priority'));
+    });
+    bestPriority = Math.min.apply(Math, priorities);
+    index2 = priorities.indexOf(bestPriority);
+    return possTokens[index2];
   }
 };
 
