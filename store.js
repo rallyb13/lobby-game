@@ -8,7 +8,7 @@ var currentState = {
     columns: 6,
     grid: []
   },
-  tokensArray: ['oil1', 'oil1', 'oil2', 'fin1', 'mil1', 'mega'],
+  tokensArray: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3'],
   stagedToken: 'oil1',
   movesRemaining: 180,
   score: 0,
@@ -19,6 +19,7 @@ var currentState = {
   electedOffice: 'State Delegate',
   megaPossCoords: [],
   megaPossTokens: [],
+  trigger: 160
 };
 
 QuidStore.setupBoard = function () {
@@ -91,7 +92,9 @@ QuidStore.isEligible = function(rowPos, colPos){
 };
 
 QuidStore.completeMove = function(rowPos, colPos){
-  var token = currentState.stagedToken;
+  var token = currentState.stagedToken,
+    moves = currentState.movesRemaining,
+    progressionData;
 
   if (token === 'mega'){
     token = this.convertMega(rowPos, colPos);
@@ -99,8 +102,13 @@ QuidStore.completeMove = function(rowPos, colPos){
   token = this.handleMatches(token, rowPos, colPos);
   currentState.board.grid[rowPos][colPos] = token;
   currentState.movesRemaining--;
-  if (currentState.movesRemaining === 0){
+  if (moves === 0){
     this.handleElection();
+  } else if (moves === currentState.trigger) {
+    progressionData = Utils.progressGame(currentState.phase, moves);
+    currentState.tokensArray = progressionData.tokens;
+    currentState.message = progressionData.msg;
+    currentState.trigger = progressionData.nextTrigger;
   }
 
   if (this.isGameOver()){
@@ -124,7 +132,6 @@ QuidStore.checkMegaValid = function(){
     rowPos,
     colPos,
     token;
-
 
   //Loop through array of empty space coords to check mega validity:
   blanks.forEach(function (blank) {

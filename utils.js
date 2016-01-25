@@ -87,17 +87,28 @@ var Utils = {
   },
 
   //TODO: refactor for only for mid-phase messages
-  changeMessage: function(currentState) {
+  progressGame: function(currentState, moves) {
     var gamePhase = currentState.gamePhase,
-        nextGoal = currentState.nextGoal,
         movesRemaining = currentState.movesRemaining,
-        messageMap = {
-          1: 'Congrats on your election. Now raise some money.'
-          // 1: 'You need to raise $' + {nextGoal} + ' in ' + {movesRemaining} 'days in order to win re-election!',
-          // 2: 'Primary challenger! You need $' + nextGoal + ' in only ' + movesRemaining + ' days.',
-          // 3: 'You survived your primary. Hope you can still raise $' + nextGoal + ' in the ' + movesRemaining + 'days.'
+        progressionMap = {
+          1: {
+            160: {
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'con'],
+              msg: "Keep this up, and the oil lobby will keep your coffers stuffed. Though you may annoy some constituents...",
+              nextTrigger: 140
+            },
+            140: {
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con', 'mega'],
+              msg: "Passing helpful legislation isn't the only way to help out your friendly lobbyists. Use your position of authority to give them a voice. The megaphone can be quite a wild card.",
+              nextTrigger: 115
+            }
+          },
+          2: {
+            115: {},
+            72: {}
+          }
         };
-    return messageMap[gamePhase];
+    return progressionMap[currentState][moves];
   },
 
   setElectedOffice: function(phase, currentOffice) {
