@@ -19,7 +19,8 @@ var currentState = {
   electedOffice: 'State Delegate',
   megaPossCoords: [],
   megaPossTokens: [],
-  trigger: 160
+  trigger: 160,
+  newMessage: true
 };
 
 QuidStore.setupBoard = function () {
@@ -104,13 +105,17 @@ QuidStore.completeMove = function(rowPos, colPos){
   currentState.movesRemaining--;
   if (moves === 0){
     this.handleElection();
+    currentState.newMessage = true;
   } else if (moves === currentState.trigger) {
     progressionData = Utils.progressGame(currentState.phase, moves);
     if (typeof progressionData !== 'undefined'){
       currentState.tokensArray = progressionData.tokens;
       currentState.message = progressionData.msg;
       currentState.trigger = progressionData.nextTrigger;
+      currentState.newMessage = true;
     }
+  } else {
+    currentState.newMessage = false;
   }
 
   if (this.isGameOver()){
