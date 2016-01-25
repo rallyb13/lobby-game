@@ -118,7 +118,7 @@ QuidStore.completeMove = function(rowPos, colPos){
     moves = currentState.movesRemaining,
     progressionData;
 
-  //handle placement of special tokens
+  //handle placement of tokens
   if (token === 'mega'){
     token = this.convertMega(rowPos, colPos);
   } else if (token === 'pork'){
@@ -126,6 +126,11 @@ QuidStore.completeMove = function(rowPos, colPos){
   }
   token = this.handleMatches(token, rowPos, colPos);
   currentState.board.grid[rowPos][colPos] = token;
+
+  //handle special token removal
+  if (currentState.createPowerUp.length !== 0){
+    this.removeTopLevelTokens();
+  }
 
   //update move count, handle phase/move-triggered events
   currentState.movesRemaining--;
@@ -315,6 +320,15 @@ QuidStore.addTopLevelToken = function(token, rowPos, colPos){
     currentState.createPowerUp = sameTokenCoords;
   }
 };
+
+QuidStore.removeTopLevelTokens = function(){
+  var coords = currentState.createPowerUp,
+    token = currentState.board.grid[coords[0][0]][coords[0][1]];
+
+  this.clearMatches(coords);
+  currentState.createPowerUp = [];
+  //TODO: When power-ups created, power-ups++!!!
+}
 
 QuidStore.convertMega = function(rowPos, colPos){
     var possTokensMap = currentState.megaPossTokens,
