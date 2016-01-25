@@ -8,7 +8,7 @@ var currentState = {
     columns: 6,
     grid: []
   },
-  tokensArray: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3'],
+  tokensArray: ['oil1', 'oil1', 'oil2'],
   stagedToken: 'oil1',
   movesRemaining: 180,
   score: 0,
@@ -25,7 +25,7 @@ var currentState = {
 QuidStore.setupBoard = function () {
   var rows = currentState.board.rows,
     columns = currentState.board.columns,
-    startingTokens = ['mil1', 'fin1', 'oil1', 'oil1', 'oil2', 'con', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
+    startingTokens = ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'con', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
     token;
 
     for (var i=0; i < rows; i++) {
@@ -106,9 +106,11 @@ QuidStore.completeMove = function(rowPos, colPos){
     this.handleElection();
   } else if (moves === currentState.trigger) {
     progressionData = Utils.progressGame(currentState.phase, moves);
-    currentState.tokensArray = progressionData.tokens;
-    currentState.message = progressionData.msg;
-    currentState.trigger = progressionData.nextTrigger;
+    if (typeof progressionData !== 'undefined'){
+      currentState.tokensArray = progressionData.tokens;
+      currentState.message = progressionData.msg;
+      currentState.trigger = progressionData.nextTrigger;
+    }
   }
 
   if (this.isGameOver()){

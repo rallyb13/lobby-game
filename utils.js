@@ -101,11 +101,34 @@ var Utils = {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con', 'mega'],
               msg: "Passing helpful legislation isn't the only way to help out your friendly lobbyists. Use your position of authority to give them a voice. The megaphone can be quite a wild card.",
               nextTrigger: 115
+            },
+            115: {
+              tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'con'],
+              msg: "Oil drops fill oil barrels... Legislate away restrictions on where we can drill! Refineries mean jobs. And those pipelines mean...plenty of profit to go around!",
+              nextTrigger: 82
+            },
+            82: {
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con', 'con', 'mega'],
+              msg: "Maybe you should build these constituents a park. It'll cost you money to publicize (and to, ah, speed up the process), but it might placate some of them awhile.",
+              nextTrigger: 44
+            },
+            44: {
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con', 'con', 'mega'],
+              msg: "Don't let those constituents get in the way of what you need to do for the people who pay your way! Come election time, money buys ads, and ads suppress turnout. And our party always wins this district (we carved it that way).",
+              nextTrigger: 115
             }
           },
           2: {
-            115: {},
-            72: {}
+            115: {
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con', 'con', 'con', 'mega'],
+              msg: "Guy named Pete something-or-other is challenging you for the nomination. We're gonna need to spend more on the primary than the general!",
+              nextTrigger: 72
+            },
+            72: {
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'oil4', 'con', 'con', 'con', 'mega'],
+              msg: "Don't worry about election laws that say money raised is earmarked as for this election or that one. This is what super-PACs are for. Rolling money on through election cycles is just one of many ways we winners buck the system.",
+              nextTrigger: 33
+            }
           }
         };
     return progressionMap[currentState][moves];
