@@ -8,20 +8,24 @@ var currentState = {
     columns: 6,
     grid: []
   },
-  tokensArray: ['oil1', 'oil1', 'oil2', 'con1'],
+  tokensArray: ['oil1', 'oil1', 'oil2', 'oil3', 'oil4', 'oil4', 'oil5'],
   stagedToken: 'oil1',
+  //white paper data
   movesRemaining: 180,
   score: 0,
   bankBalance:  0,
   phase: 1,
   nextGoal: 125000,
-  message: 'Click any unoccupied square in the grid to place the next item. Match 3 to make more valuable items.',
   electedOffice: 'State Delegate',
-  megaPossCoords: [],
-  megaPossTokens: [],
+  message: 'Click any unoccupied square in the grid to place the next item. Match 3 to make more valuable items.',
   trigger: 160,
   newMessage: true,
-  porkOn: []
+  //special token quick refs
+  megaPossCoords: [],
+  megaPossTokens: [],
+  porkOn: [],
+  levelFives: [], //all level5 tokens on board
+  createPowerUp: [] //only has content if set about to be combined
 };
 
 QuidStore.setupBoard = function () {
@@ -93,11 +97,28 @@ QuidStore.isEligible = function(rowPos, colPos){
   }
 };
 
+QuidStore.isAboutToGo = function(rowPos, colPos){
+  var fives = currentState.createPowerUp,
+    i;
+
+  if (fives.length === 0){
+    return false;
+  } else {
+    for (i = 0; i < fives.length; i++){
+      if(rowPos === fives[i][0] && colPos === fives[i][1]){
+        return true;
+      }
+    }
+    return false
+  }
+};
+
 QuidStore.completeMove = function(rowPos, colPos){
   var token = currentState.stagedToken,
     moves = currentState.movesRemaining,
     progressionData;
 
+  //handle placement of special tokens
   if (token === 'mega'){
     token = this.convertMega(rowPos, colPos);
   } else if (token === 'pork'){
@@ -105,6 +126,8 @@ QuidStore.completeMove = function(rowPos, colPos){
   }
   token = this.handleMatches(token, rowPos, colPos);
   currentState.board.grid[rowPos][colPos] = token;
+
+  //update move count, handle phase/move-triggered events
   currentState.movesRemaining--;
   if (moves === 0){
     this.handleElection();
@@ -121,11 +144,15 @@ QuidStore.completeMove = function(rowPos, colPos){
     currentState.newMessage = false;
   }
 
+  //check game end, proceed to automatic actions
   if (this.isGameOver()){
     this.endGame('board');
   } else {
     this.moveConstituents(rowPos, colPos);
     this.setNextToken();
+    if (token.slice(3,4) === '5'){
+      this.addTopLevelToken(token, rowPos, colPos);
+    }
   }
   this.emitChange();
 };
@@ -277,6 +304,15 @@ QuidStore.setNextToken = function(){
     if (currentState.megaPossCoords.length === 0) {
       this.setNextToken();
     }
+  }
+};
+
+QuidStore.addTopLevelToken = function(token, rowPos, colPos){
+  var stringCoords = JSON.stringify([rowPos, colPos]),
+    sameTokenCoords = this.findTokenCoords(token);
+  currentState.levelFives.push(stringCoords);
+  if (sameTokenCoords.length === 5){
+    currentState.createPowerUp = sameTokenCoords;
   }
 };
 

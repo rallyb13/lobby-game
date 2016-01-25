@@ -7,7 +7,8 @@ import Radium from 'radium';
 var GridSquare = React.createClass({
 
   render: function(){
-    var tokenGroup = this.props.token.slice(0,3);
+    var tokenGroup = this.props.token.slice(0,3),
+      aboutToGo = this.props.aboutToGo;
     return React.cloneElement(
       <div onClick={this.placeToken} >
         <Token symbol={this.props.token} />
@@ -15,7 +16,7 @@ var GridSquare = React.createClass({
       { style:
         {
           color : Utils.handleColors(tokenGroup, 'color'),
-          backgroundColor: Utils.handleColors(tokenGroup, 'bColor'),
+          backgroundColor: this.handleAboutToGo(aboutToGo, tokenGroup),
           ':hover': {backgroundColor: Utils.handleColors(tokenGroup, 'hover')},
           height: '16.29%',
           width: '16.66%',
@@ -32,7 +33,15 @@ var GridSquare = React.createClass({
     if (this.props.eligible) {
       QuidStore.completeMove(this.props.rowPos, this.props.colPos);
     }
-  }
+  },
+
+  handleAboutToGo: function(selected, tokenGroup){
+    if (selected){
+      return 'magenta';
+    } else {
+      return Utils.handleColors(tokenGroup, 'bColor');
+    }
+  },
 });
 
 export default Radium(GridSquare);
