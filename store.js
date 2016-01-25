@@ -8,7 +8,7 @@ var currentState = {
     columns: 6,
     grid: []
   },
-  tokensArray: ['oil1', 'oil1', 'oil2', 'pork'],
+  tokensArray: ['oil1', 'oil1', 'oil2', 'con'],
   stagedToken: 'oil1',
   movesRemaining: 180,
   score: 0,
@@ -101,7 +101,7 @@ QuidStore.completeMove = function(rowPos, colPos){
   if (token === 'mega'){
     token = this.convertMega(rowPos, colPos);
   } else if (token === 'pork'){
-    currentState.porkOn.push([rowPos, colPos]);
+    currentState.porkOn.push( JSON.stringify([rowPos, colPos]) );
     console.log(currentState.porkOn);
   }
   token = this.handleMatches(token, rowPos, colPos);
@@ -329,6 +329,9 @@ QuidStore.handleMatches = function(token, rowPos, colPos, isRecursive){
   if (matchCoords.length >= 2){
     newToken = Utils.getTokenData(token, 'nextUp');
     if (newToken !== 'final') {
+      if (currentState.porkOn.length > 0){
+        this.handlePork(matchCoords, rowPos, colPos);
+      }
       this.clearMatches(matchCoords);
       newToken = this.handleMatches(newToken, rowPos, colPos, true);
       return newToken;
@@ -366,6 +369,26 @@ QuidStore.handleScoreboard = function(count, token, isRecursive) {
   }
   currentState.score = currentState.score + points;
   currentState.bankBalance = currentState.bankBalance + money;
+};
+
+QuidStore.handlePork = function(matches, rowPos, colPos){
+  var me = this,
+    porkers,
+    stringCoords,
+    index;
+
+  matches.push([rowPos, colPos]);
+  matches.forEach( function(match) {
+    porkers = me.cardinalCheck('pork', match[0], match[1]);
+    if (porkers.length > 0){
+      porkers.forEach( function (pork){
+        stringCoords = JSON.stringify(pork);
+        index = currentState.porkOn.indexOf(stringCoords);
+        currentState.porkOn.splice(index, 1);
+        currentState.board.grid[pork[0]][pork[1]] = '';
+      });
+    }
+  });
 };
 
 QuidStore.handleElection = function(){
