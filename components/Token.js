@@ -29,7 +29,7 @@ var Token = React.createClass({
       'icon-bank': this.props.symbol === 'fin4',
       'icon-tower': this.props.symbol === 'fin5',
 
-      'icon-vote': this.props.symbol === 'con',
+      'icon-vote': this.props.symbol === 'con1',
       'icon-megaphone': this.props.symbol === 'mega'
     });
 

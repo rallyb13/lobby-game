@@ -29,9 +29,11 @@ var Utils = {
       'fin4': {nextUp: 'fin5', pts: 1777, mPts: 5000, val: 1900, mVal: 10001, priority: 1 },
       'fin5': {nextUp: 'final', pts: 1999, mPts: 0, val: 2000, mVal: 0 },
 
-      'con': {nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
+      'con1': {nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
       'mega': {nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
-      'pork': {nextUp: 'final', pts: 666, mPts: 0, val: 666, mVal: 0 }
+      'pork': {nextUp: 'final', pts: 666, mPts: 0, val: 666, mVal: 0 },
+
+      ''
     }
     return tokenMap[token][attribute];
   },
@@ -94,39 +96,39 @@ var Utils = {
         progressionMap = {
           1: {
             160: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'con'],
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'con1'],
               msg: "Keep this up, and the oil lobby will keep your coffers stuffed. Though you may annoy some constituents...",
               nextTrigger: 140
             },
             140: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con', 'mega'],
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'mega'],
               msg: "Passing helpful legislation isn't the only way to help out your friendly lobbyists. Use your position of authority to give them a voice. The megaphone can be quite a wild card.",
               nextTrigger: 115
             },
             115: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'con'],
+              tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'con1'],
               msg: "Oil drops fill oil barrels... Legislate away restrictions on where we can drill! Refineries mean jobs. And those pipelines mean...plenty of profit to go around!",
               nextTrigger: 82
             },
             82: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con', 'con', 'mega'],
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1', 'mega'],
               msg: "Maybe you should build these constituents a park. It'll cost you money to publicize (and to, ah, speed up the process), but it might placate some of them awhile.",
               nextTrigger: 44
             },
             44: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con', 'con', 'mega'],
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
               msg: "Don't let those constituents get in the way of what you need to do for the people who pay your way! Come election time, money buys ads, and ads suppress turnout. And our party always wins this district (we carved it that way).",
               nextTrigger: 115
             }
           },
           2: {
             115: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con', 'con', 'con', 'mega'],
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1', 'con1', 'mega'],
               msg: "Guy named Pete something-or-other is challenging you for the nomination. We're gonna need to spend more on the primary than the general!",
               nextTrigger: 72
             },
             72: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'oil4', 'con', 'con', 'con', 'mega'],
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'con1', 'mega'],
               msg: "Don't worry about election laws that say money raised is earmarked as for this election or that one. This is what super-PACs are for. Rolling money on through election cycles is just one of many ways we winners buck the system.",
               nextTrigger: 33
             }

@@ -8,7 +8,7 @@ var currentState = {
     columns: 6,
     grid: []
   },
-  tokensArray: ['oil1', 'oil1', 'oil2', 'con'],
+  tokensArray: ['oil1', 'oil1', 'oil2', 'con1'],
   stagedToken: 'oil1',
   movesRemaining: 180,
   score: 0,
@@ -27,7 +27,7 @@ var currentState = {
 QuidStore.setupBoard = function () {
   var rows = currentState.board.rows,
     columns = currentState.board.columns,
-    startingTokens = ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'con', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
+    startingTokens = ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'con1', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
     token;
 
     for (var i=0; i < rows; i++) {
@@ -102,7 +102,6 @@ QuidStore.completeMove = function(rowPos, colPos){
     token = this.convertMega(rowPos, colPos);
   } else if (token === 'pork'){
     currentState.porkOn.push( JSON.stringify([rowPos, colPos]) );
-    console.log(currentState.porkOn);
   }
   token = this.handleMatches(token, rowPos, colPos);
   currentState.board.grid[rowPos][colPos] = token;
@@ -153,7 +152,7 @@ QuidStore.checkMegaValid = function(){
       rowPos = neighbors[i][0];
       colPos = neighbors[i][1];
       token = currentState.board.grid[rowPos][colPos];
-      if (token !== '' && token !== 'con' && token.slice(3) !== '5'){
+      if (token !== '' && token.slice(0,3) !== 'con' && token.slice(3) !== '5'){
         //might already have a pair...
         if(me.cardinalCheck(token, rowPos, colPos).length > 0){
           combos.push(token);
@@ -243,7 +242,7 @@ QuidStore.findTokenCoords = function(token){
 };
 
 QuidStore.moveConstituents = function(rowPos, colPos) {
-  var currentConsCoords = this.findTokenCoords('con'),
+  var currentConsCoords = this.findTokenCoords('con1'),
     emptyCoords = [],
     newRowPos,
     newColPos,
@@ -260,7 +259,7 @@ QuidStore.moveConstituents = function(rowPos, colPos) {
         newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
         newRowPos = newCoords[0];
         newColPos = newCoords[1];
-        currentState.board.grid[newRowPos][newColPos] = 'con';
+        currentState.board.grid[newRowPos][newColPos] = 'con1';
         currentState.board.grid[x][y] = '';
       }
     }
