@@ -8,7 +8,7 @@ var currentState = {
     columns: 6,
     grid: []
   },
-  tokensArray: ['oil1', 'oil1', 'oil2'],
+  tokensArray: ['oil1', 'oil1', 'oil2', 'pork'],
   stagedToken: 'oil1',
   movesRemaining: 180,
   score: 0,
@@ -20,7 +20,8 @@ var currentState = {
   megaPossCoords: [],
   megaPossTokens: [],
   trigger: 160,
-  newMessage: true
+  newMessage: true,
+  porkOn: []
 };
 
 QuidStore.setupBoard = function () {
@@ -99,6 +100,9 @@ QuidStore.completeMove = function(rowPos, colPos){
 
   if (token === 'mega'){
     token = this.convertMega(rowPos, colPos);
+  } else if (token === 'pork'){
+    currentState.porkOn.push([rowPos, colPos]);
+    console.log(currentState.porkOn);
   }
   token = this.handleMatches(token, rowPos, colPos);
   currentState.board.grid[rowPos][colPos] = token;
@@ -382,9 +386,8 @@ QuidStore.changePhase = function(phase){
   currentState.movesRemaining = phaseData.moves;
   currentState.nextGoal = phaseData.goal;
 
-  //change more often
+  //change more often (tokensArray also, but not on phase change)
   currentState.message = phaseData.msg;
-  // currentState.tokensArray = Utils.changePossibleTokens(phase, currentState.movesRemaining);
 
   //changes less often
   currentState.electedOffice = Utils.setElectedOffice(phase, currentState.electedOffice);

@@ -31,6 +31,7 @@ var Utils = {
 
       'con': {nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
       'mega': {nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
+      'pork': {nextUp: 'final', pts: 666, mPts: 0, val: 666, mVal: 0 }
     }
     return tokenMap[token][attribute];
   },
