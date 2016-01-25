@@ -30,10 +30,14 @@ var Utils = {
       'fin5': {nextUp: 'final', pts: 1999, mPts: 0, val: 2000, mVal: 0 },
 
       'con1': {nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
+      'con2': {nextUp: 'final', pts: 7, mPts: 0, val: -100, mVal: 0, dMin: 25, dMax: 40 },
+      'con3': {nextUp: 'final', pts: 8, mPts: 0, val: -1000, mVal: 0, dMin: 25, dMax: 45 },
+      'con4': {nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0, dMin: 25, dMax: 45 },
+      'con5': {nextUp: 'final', pts: 9, mPts: 0, val: -5000, mVal: 0, dMin: 35, dMax: 55 },
+      'con6': {nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0, dMin: 35, dMax: 60 },
+      'con7': {nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0, dMin: 35, dMax: 70 },
       'mega': {nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
       'pork': {nextUp: 'final', pts: 666, mPts: 0, val: 666, mVal: 0 },
-
-      ''
     }
     return tokenMap[token][attribute];
   },
