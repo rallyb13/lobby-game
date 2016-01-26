@@ -6,8 +6,9 @@ var currentState = {
   board: {
     rows: 6, columns: 6, grid: []
   },
-  tokensArray: ['oil1', 'oil5', 'oil5', 'agr5', 'oil4', 'oil5', 'con1'],
+  tokensArray: ['oil1', 'oil3', 'oil4', 'oil2', 'oil5', 'con1'],
   stagedToken: 'oil1',
+  holdToken: false,
   //white paper data
   movesRemaining: 180,
   score: 0,
@@ -113,6 +114,14 @@ QuidStore.isAboutToGo = function(rowPos, colPos){
     }
     return false
   }
+};
+
+QuidStore.useAppeasement = function(token){
+  if (currentState.holdToken === false){
+    currentState.holdToken = currentState.stagedToken;
+  }
+  currentState.stagedToken = token;
+  this.emitChange();
 };
 
 QuidStore.completeMove = function(rowPos, colPos){
@@ -326,7 +335,12 @@ QuidStore.setNextToken = function(){
   var tokens = currentState.tokensArray,
     valStrings = [];
 
-  currentState.stagedToken = tokens[Math.floor(Math.random() * tokens.length)];
+  if (currentState.holdToken === false){
+    currentState.stagedToken = tokens[Math.floor(Math.random() * tokens.length)];
+  } else {
+    currentState.stagedToken = currentState.holdToken;
+    currentState.holdToken = false;
+  }
 
   if (currentState.stagedToken === 'mega'){
     this.checkMegaValid();

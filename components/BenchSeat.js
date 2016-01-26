@@ -1,5 +1,6 @@
 import React from 'react';
 import Token from './Token';
+import QuidStore from '../store';
 import Utils from '../utils';
 
 var BenchSeat = React.createClass({
@@ -7,7 +8,7 @@ var BenchSeat = React.createClass({
     var powerUp = this.props.powerUp,
       tokenGroup = this.props.token.slice(0,3);
     return React.cloneElement(
-      <div>
+      <div onClick={this.useHelper}>
         <Token symbol={this.props.token} />
         <span style={{color:'white'}}> {this.props.count} </span>
       </div>,
@@ -26,11 +27,19 @@ var BenchSeat = React.createClass({
     );
   },
 
+  useHelper: function(){
+    var token = this.props.token;
+
+    if (this.props.powerUp){
+      QuidStore.usePowerUp(token);
+    } else {
+      QuidStore.useAppeasement(token);
+    }
+  },
+
   pickSide: function(powerUp){
     return powerUp ? 'left' : 'right';
   }
-
-
 });
 
 export default BenchSeat;
