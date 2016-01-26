@@ -4,11 +4,9 @@ var QuidStore = new EventEmitter();
 var CHANGE_EVENT = 'change';
 var currentState = {
   board: {
-    rows: 6,
-    columns: 6,
-    grid: []
+    rows: 6, columns: 6, grid: []
   },
-  tokensArray: ['oil1', 'oil1', 'oil2', 'oil3', 'oil4', 'oil4', 'oil5'],
+  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2', 'con1', 'con1', 'con1', 'con2'],
   stagedToken: 'oil1',
   //white paper data
   movesRemaining: 180,
@@ -18,22 +16,17 @@ var currentState = {
   nextGoal: 125000,
   electedOffice: 'State Delegate',
   message: 'Click any unoccupied square in the grid to place the next item. Match 3 to make more valuable items.',
-  trigger: 160,
-  newMessage: true,
+  trigger: 160, //move # at which message will change
+  newMessage: true, //only true at first appearance of new message
   //special token quick refs
-  megaPossCoords: [],
-  megaPossTokens: [],
-  porkOn: [],
+  megaPossCoords: [], //coordinates where megaphone can be dropped
+  megaPossTokens: [], //arrays of valid tokens megaphone can become (at coordinate corresponding to megaPossCoords)
+  porkOn: [], //pork tokens on board
+  appeasements: [], //appeasement tokens on board
   levelFives: [], //all level5 tokens on board
   createPowerUp: [], //only has content if set about to be combined
   helpers: {
-    'oil6': 0,
-    'agr6': 0,
-    'mil6': 0,
-    'fin6': 0,
-    'con2': 1,
-    'con3': 0,
-    'con5': 0
+    'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 0, 'con5': 0
   }
 };
 
@@ -132,6 +125,8 @@ QuidStore.completeMove = function(rowPos, colPos){
     token = this.convertMega(rowPos, colPos);
   } else if (token === 'pork'){
     currentState.porkOn.push( JSON.stringify([rowPos, colPos]) );
+  } else if (token.slice(0,3) === 'con' && token !== 'con1'){
+    currentState.appeasements.push( [rowPos, colPos] );
   }
   token = this.handleMatches(token, rowPos, colPos);
   currentState.board.grid[rowPos][colPos] = token;
@@ -139,6 +134,9 @@ QuidStore.completeMove = function(rowPos, colPos){
   //handle special token removal
   if (currentState.createPowerUp.length !== 0){
     this.removeTopLevelTokens();
+  }
+  if (currentState.appeasements.length !==0){
+    this.removeConstituents(token, rowPos, colPos);
   }
 
   //update move count, handle phase/move-triggered events
@@ -168,7 +166,6 @@ QuidStore.completeMove = function(rowPos, colPos){
       this.addTopLevelToken(token, rowPos, colPos);
     }
   }
-  console.log(currentState.helpers['oil6']);
   this.emitChange();
 };
 
@@ -306,6 +303,18 @@ QuidStore.moveConstituents = function(rowPos, colPos) {
       }
     }
   }
+};
+
+QuidStore.removeConstituents = function(token, rowPos, colPos){
+  var appeasements = currentState.appeasements,
+    me = this,
+    toClearCoords;
+
+  appeasements.forEach( function(app){
+    toClearCoords = me.cardinalCheck('con1', app[0], app[1]);
+    me.clearMatches(toClearCoords);
+  });
+  currentState.board.grid[rowPos][colPos] = token;
 };
 
 QuidStore.setNextToken = function(){
