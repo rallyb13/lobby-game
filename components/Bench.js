@@ -14,8 +14,6 @@ var Bench = React.createClass({
       token = tokens[i];
       count = helpers[token];
       if (count > 0){
-        console.log(token);
-        console.log(count);
         seats.push(<BenchSeat token={token} count={count} key={i}/>);
       }
     }
@@ -31,9 +29,9 @@ var Bench = React.createClass({
     bench: {
       color: 'white',
       backgroundColor: 'blue',
-      height: '100px',
+      height: '70px',
       float: 'left',
-      width: '50%',
+      width: '500px',
       display: 'block',
       position: 'relative'
     }
