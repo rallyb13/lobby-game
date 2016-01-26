@@ -19774,22 +19774,30 @@
 	    columns: 6,
 	    grid: []
 	  },
-	  tokensArray: ['oil1', 'mil1', 'fin1', 'agr1', 'mega'],
+	  tokensArray: ['oil1', 'oil1', 'oil2', 'oil3', 'oil4', 'oil4', 'oil5'],
 	  stagedToken: 'oil1',
-	  movesRemaining: 730,
+	  //white paper data
+	  movesRemaining: 180,
 	  score: 0,
 	  bankBalance: 0,
 	  phase: 1,
 	  nextGoal: 125000,
-	  message: 'Click any unoccupied square in the grid to place the next item. Try to match 3 to build up to better items.',
 	  electedOffice: 'State Delegate',
-	  megaAccepts: []
+	  message: 'Click any unoccupied square in the grid to place the next item. Match 3 to make more valuable items.',
+	  trigger: 160,
+	  newMessage: true,
+	  //special token quick refs
+	  megaPossCoords: [],
+	  megaPossTokens: [],
+	  porkOn: [],
+	  levelFives: [], //all level5 tokens on board
+	  createPowerUp: [] //only has content if set about to be combined
 	};
 
 	QuidStore.setupBoard = function () {
 	  var rows = currentState.board.rows,
 	      columns = currentState.board.columns,
-	      startingTokens = ['mil1', 'agr1', 'fin1', 'oil1', 'oil1', 'oil2', 'con', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
+	      startingTokens = ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'con1', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
 	      token;
 
 	  for (var i = 0; i < rows; i++) {
@@ -19837,7 +19845,7 @@
 	QuidStore.isEligible = function (rowPos, colPos) {
 	  var staged = currentState.stagedToken,
 	      isEmpty = currentState.board.grid[rowPos][colPos] === '',
-	      validForMega = currentState.megaAccepts,
+	      validForMega = currentState.megaPossCoords,
 	      stringCoords;
 
 	  if (staged === 'mega') {
@@ -19855,72 +19863,147 @@
 	  }
 	};
 
+	QuidStore.isAboutToGo = function (rowPos, colPos) {
+	  var fives = currentState.createPowerUp,
+	      i;
+
+	  if (fives.length === 0) {
+	    return false;
+	  } else {
+	    for (i = 0; i < fives.length; i++) {
+	      if (rowPos === fives[i][0] && colPos === fives[i][1]) {
+	        return true;
+	      }
+	    }
+	    return false;
+	  }
+	};
+
 	QuidStore.completeMove = function (rowPos, colPos) {
-	  var playedToken = currentState.stagedToken;
+	  var token = currentState.stagedToken,
+	      moves = currentState.movesRemaining,
+	      progressionData;
 
-	  if (playedToken === 'mega') {
-	    playedToken = this.convertMega(rowPos, colPos);
+	  //handle placement of tokens
+	  if (token === 'mega') {
+	    token = this.convertMega(rowPos, colPos);
+	  } else if (token === 'pork') {
+	    currentState.porkOn.push(JSON.stringify([rowPos, colPos]));
 	  }
-	  playedToken = this.handleMatches(playedToken, rowPos, colPos);
-	  currentState.board.grid[rowPos][colPos] = playedToken;
+	  token = this.handleMatches(token, rowPos, colPos);
+	  currentState.board.grid[rowPos][colPos] = token;
+
+	  //handle special token removal
+	  if (currentState.createPowerUp.length !== 0) {
+	    this.removeTopLevelTokens();
+	  }
+
+	  //update move count, handle phase/move-triggered events
 	  currentState.movesRemaining--;
-	  if (currentState.movesRemaining === 0) {
+	  if (moves === 0) {
 	    this.handleElection();
+	    currentState.newMessage = true;
+	  } else if (moves === currentState.trigger) {
+	    progressionData = _utils2.default.progressGame(currentState.phase, moves);
+	    if (typeof progressionData !== 'undefined') {
+	      currentState.tokensArray = progressionData.tokens;
+	      currentState.message = progressionData.msg;
+	      currentState.trigger = progressionData.nextTrigger;
+	      currentState.newMessage = true;
+	    }
+	  } else {
+	    currentState.newMessage = false;
 	  }
 
+	  //check game end, proceed to automatic actions
 	  if (this.isGameOver()) {
 	    this.endGame('board');
 	  } else {
 	    this.moveConstituents(rowPos, colPos);
 	    this.setNextToken();
+	    if (token.slice(3, 4) === '5') {
+	      this.addTopLevelToken(token, rowPos, colPos);
+	    }
 	  }
 	  this.emitChange();
 	};
 
 	QuidStore.checkMegaValid = function () {
-	  var doubles = this.checkPairs(),
-	      validSpaces = [],
+	  var blanks = this.findTokenCoords(''),
+	      neighbors = [],
+	      neighTokens = [],
 	      me = this,
-	      checks = [];
-
-	  doubles.forEach(function (double) {
-	    checks = me.cardinalCheck('', double[0], double[1]);
-	    if (checks.length > 0) {
-	      checks.forEach(function (check) {
-	        validSpaces.push(check);
-	      });
-	    }
-	  });
-	  return validSpaces;
-	};
-
-	QuidStore.checkPairs = function () {
-	  var board = currentState.board,
-	      doubles = [],
-	      coords = [],
+	      validSpaces = [],
+	      combos = [],
+	      comboOptions = [],
+	      stringCoords,
+	      rowPos,
+	      colPos,
 	      token;
 
-	  for (var i = 0; i < board.rows; i++) {
-	    for (var j = 0; j < board.columns; j++) {
-	      token = board.grid[i][j];
-	      if (token !== '' && token !== 'con') {
-	        coords = this.cardinalCheck(token, i, j);
-	        if (coords.length === 1) {
-	          doubles.push(coords[0]);
+	  //Loop through array of empty space coords to check mega validity:
+	  blanks.forEach(function (blank) {
+	    stringCoords = JSON.stringify(blank);
+	    neighbors = me.getAdjacents(blank[0], blank[1]);
+	    //Each neighbor of a blank space, if holding a combinable token...
+	    for (var i = 0; i < neighbors.length; i++) {
+	      rowPos = neighbors[i][0];
+	      colPos = neighbors[i][1];
+	      token = currentState.board.grid[rowPos][colPos];
+	      if (token !== '' && token.slice(0, 3) !== 'con' && token.slice(3) !== '5') {
+	        //might already have a pair...
+	        if (me.cardinalCheck(token, rowPos, colPos).length > 0) {
+	          combos.push(token);
+	          if (validSpaces.indexOf(stringCoords) === -1) {
+	            validSpaces.push(stringCoords);
+	          }
+	          //or might have a match with another neighbor we need to check for next:
+	        } else {
+	            neighTokens.push(token);
+	          }
+	      }
+	    }
+	    //all previously unmatched neighbors are checked against each other
+	    while (neighTokens.length > 1) {
+	      token = neighTokens.pop();
+	      if (neighTokens.indexOf(token) !== -1) {
+	        combos.push(token);
+	        if (validSpaces.indexOf(stringCoords) === -1) {
+	          validSpaces.push(stringCoords);
 	        }
 	      }
 	    }
-	  }
-	  return doubles;
+	    if (combos.length > 0) {
+	      comboOptions.push(combos);
+	    }
+	    neighTokens = [];
+	    combos = [];
+	  });
+	  currentState.megaPossCoords = validSpaces;
+	  currentState.megaPossTokens = comboOptions;
 	};
 
 	QuidStore.getAdjacents = function (rowPos, colPos) {
-	  return [[rowPos, colPos + 1], [rowPos, colPos - 1], [rowPos + 1, colPos], [rowPos - 1, colPos]];
+	  var adjacents = [],
+	      board = currentState.board;
+
+	  if (rowPos > 0) {
+	    adjacents.push([rowPos - 1, colPos]);
+	  }
+	  if (colPos > 0) {
+	    adjacents.push([rowPos, colPos - 1]);
+	  }
+	  if (rowPos + 1 < board.rows) {
+	    adjacents.push([rowPos + 1, colPos]);
+	  }
+	  if (colPos + 1 < board.columns) {
+	    adjacents.push([rowPos, colPos + 1]);
+	  }
+	  return adjacents;
 	};
 
 	QuidStore.cardinalCheck = function (token, rowPos, colPos) {
 	  var possibleMatches = this.getAdjacents(rowPos, colPos),
-	      board = currentState.board,
 	      matchCoords = [],
 	      checkRow,
 	      checkCol,
@@ -19931,16 +20014,14 @@
 	    checkRow = possibleMatches[i][0];
 	    checkCol = possibleMatches[i][1];
 
-	    if (checkRow >= 0 && checkRow < board.rows && checkCol >= 0 && checkCol < board.columns) {
-	      if (currentState.board.grid[checkRow][checkCol] === token) {
-	        matchCoords.push([checkRow, checkCol]);
-	      }
+	    if (currentState.board.grid[checkRow][checkCol] === token) {
+	      matchCoords.push([checkRow, checkCol]);
 	    }
 	  }
 	  return matchCoords;
 	};
 
-	QuidStore.findTokenType = function (token) {
+	QuidStore.findTokenCoords = function (token) {
 	  var board = currentState.board,
 	      array = [],
 	      currentConsCoords = [];
@@ -19959,7 +20040,7 @@
 	};
 
 	QuidStore.moveConstituents = function (rowPos, colPos) {
-	  var currentConsCoords = this.findTokenType('con'),
+	  var currentConsCoords = this.findTokenCoords('con1'),
 	      emptyCoords = [],
 	      newRowPos,
 	      newColPos,
@@ -19975,7 +20056,7 @@
 	        newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
 	        newRowPos = newCoords[0];
 	        newColPos = newCoords[1];
-	        currentState.board.grid[newRowPos][newColPos] = 'con';
+	        currentState.board.grid[newRowPos][newColPos] = 'con1';
 	        currentState.board.grid[x][y] = '';
 	      }
 	    }
@@ -19984,48 +20065,58 @@
 
 	QuidStore.setNextToken = function () {
 	  var tokens = currentState.tokensArray,
-	      valStrings = [],
-	      validEmpties;
+	      valStrings = [];
 
 	  currentState.stagedToken = tokens[Math.floor(Math.random() * tokens.length)];
 
-	  //special case of megaphone token requires board know if there are valid moves for it
-	  //and in order to let squares know which are eligible, want array of (stringified) coords
 	  if (currentState.stagedToken === 'mega') {
-	    validEmpties = this.checkMegaValid();
-	    if (validEmpties.length > 0) {
-	      validEmpties.forEach(function (val) {
-	        valStrings.push(JSON.stringify(val));
-	      });
-	      currentState.megaAccepts = valStrings;
-	    } else {
+	    this.checkMegaValid();
+	    if (currentState.megaPossCoords.length === 0) {
 	      this.setNextToken();
 	    }
 	  }
 	};
 
-	QuidStore.convertMega = function (rowPos, colPos) {
-	  var adjacents = this.getAdjacents(rowPos, colPos),
-	      nearTokens = [],
-	      possMatchTokens = [],
-	      me = this,
-	      token,
-	      rowCheck,
-	      colCheck;
+	QuidStore.addTopLevelToken = function (token, rowPos, colPos) {
+	  var stringCoords = JSON.stringify([rowPos, colPos]),
+	      sameTokenCoords = this.findTokenCoords(token);
+	  currentState.levelFives.push(stringCoords);
+	  if (sameTokenCoords.length === 5) {
+	    currentState.createPowerUp = sameTokenCoords;
+	  }
+	};
 
-	  adjacents.forEach(function (adj) {
-	    rowCheck = adj[0];
-	    colCheck = adj[1];
-	    token = currentState.board.grid[rowCheck][colCheck];
-	    if (token !== '' && token !== 'con' && token !== 'pork') {
-	      nearTokens.push(token);
-	      if (me.cardinalCheck(token, rowCheck, colCheck).length > 0) {
-	        possMatchTokens.push(token);
-	      }
+	QuidStore.removeTopLevelTokens = function () {
+	  var coords = currentState.createPowerUp,
+	      token = currentState.board.grid[coords[0][0]][coords[0][1]];
+
+	  this.clearMatches(coords);
+	  currentState.createPowerUp = [];
+	  //TODO: When power-ups created, power-ups++!!!
+	};
+
+	QuidStore.convertMega = function (rowPos, colPos) {
+	  var possTokensMap = currentState.megaPossTokens,
+	      tokensMap = currentState.megaPossCoords,
+	      coords = JSON.stringify([rowPos, colPos]),
+	      index1 = tokensMap.indexOf(coords),
+	      possTokens = possTokensMap[index1],
+	      priorities = [],
+	      bestPriority,
+	      index2;
+
+	  if (possTokens.length === 1) {
+	    return possTokens[0];
+	  } else {
+	    possTokens.forEach(function (tok) {
+	      priorities.push(_utils2.default.getTokenData(tok, 'priority'));
+	    });
+	    bestPriority = Math.min.apply(Math, priorities);
+	    while (priorities.indexOf(bestPriority + 1) !== -1) {
+	      bestPriority = bestPriority + 1;
 	    }
-	  });
-	  if (possMatchTokens.length === 1) {
-	    return possMatchTokens[0];
+	    index2 = priorities.indexOf(bestPriority);
+	    return possTokens[index2];
 	  }
 	};
 
@@ -20052,6 +20143,9 @@
 	  if (matchCoords.length >= 2) {
 	    newToken = _utils2.default.getTokenData(token, 'nextUp');
 	    if (newToken !== 'final') {
+	      if (currentState.porkOn.length > 0) {
+	        this.handlePork(matchCoords, rowPos, colPos);
+	      }
 	      this.clearMatches(matchCoords);
 	      newToken = this.handleMatches(newToken, rowPos, colPos, true);
 	      return newToken;
@@ -20091,6 +20185,26 @@
 	  currentState.bankBalance = currentState.bankBalance + money;
 	};
 
+	QuidStore.handlePork = function (matches, rowPos, colPos) {
+	  var me = this,
+	      porkers,
+	      stringCoords,
+	      index;
+
+	  matches.push([rowPos, colPos]);
+	  matches.forEach(function (match) {
+	    porkers = me.cardinalCheck('pork', match[0], match[1]);
+	    if (porkers.length > 0) {
+	      porkers.forEach(function (pork) {
+	        stringCoords = JSON.stringify(pork);
+	        index = currentState.porkOn.indexOf(stringCoords);
+	        currentState.porkOn.splice(index, 1);
+	        currentState.board.grid[pork[0]][pork[1]] = '';
+	      });
+	    }
+	  });
+	};
+
 	QuidStore.handleElection = function () {
 	  currentState.bankBalance = currentState.bankBalance - currentState.nextGoal;
 	  if (currentState.bankBalance < 0) {
@@ -20098,20 +20212,19 @@
 	  } else {
 	    currentState.phase++;
 	    this.changePhase(currentState.phase);
-	    //TODO: final tokens-->lobbyist bench conversion???
 	  }
 	};
 
 	//TODO: all of these Utils maps need to be filled out for whole game
 	QuidStore.changePhase = function (phase) {
-	  var coords;
+	  var phaseData = _utils2.default.getPhaseData(phase),
+	      coords;
 	  //change every election
-	  currentState.movesRemaining = _utils2.default.resetMovesCounter(phase);
-	  currentState.nextGoal = _utils2.default.setNextGoal(phase);
+	  currentState.movesRemaining = phaseData.moves;
+	  currentState.nextGoal = phaseData.goal;
 
-	  //change more often
-	  // currentState.tokensArray = Utils.changePossibleTokens(phase, currentState.movesRemaining);
-	  currentState.message = _utils2.default.changeMessage(phase, currentState.movesRemaining);
+	  //change more often (tokensArray also, but not on phase change)
+	  currentState.message = phaseData.msg;
 
 	  //changes less often
 	  currentState.electedOffice = _utils2.default.setElectedOffice(phase, currentState.electedOffice);
@@ -20165,22 +20278,22 @@
 
 	  getTokenData: function getTokenData(token, attribute) {
 	    var tokenMap = {
-	      'oil1': { nextUp: 'oil2', pts: 5, mPts: 20, val: 100, mVal: 250, priority: 16 },
-	      'oil2': { nextUp: 'oil3', pts: 10, mPts: 45, val: 200, mVal: 500, priority: 15 },
-	      'oil3': { nextUp: 'oil4', pts: 25, mPts: 95, val: 300, mVal: 1000, priority: 14 },
-	      'oil4': { nextUp: 'oil5', pts: 50, mPts: 195, val: 400, mVal: 2500, priority: 13 },
+	      'oil1': { nextUp: 'oil2', pts: 5, mPts: 20, val: 100, mVal: 250, priority: 19 },
+	      'oil2': { nextUp: 'oil3', pts: 10, mPts: 45, val: 200, mVal: 500, priority: 18 },
+	      'oil3': { nextUp: 'oil4', pts: 25, mPts: 95, val: 300, mVal: 1000, priority: 17 },
+	      'oil4': { nextUp: 'oil5', pts: 50, mPts: 195, val: 400, mVal: 2500, priority: 16 },
 	      'oil5': { nextUp: 'final', pts: 100, mPts: 0, val: 500, mVal: 0 },
 
-	      'agr1': { nextUp: 'agr2', pts: 50, mPts: 205, val: 600, mVal: 2000, priority: 12 },
-	      'agr2': { nextUp: 'agr3', pts: 100, mPts: 500, val: 700, mVal: 2500, priority: 11 },
-	      'agr3': { nextUp: 'agr4', pts: 150, mPts: 750, val: 800, mVal: 3000, priority: 10 },
-	      'agr4': { nextUp: 'agr5', pts: 200, mPts: 1000, val: 900, mVal: 4321, priority: 9 },
+	      'agr1': { nextUp: 'agr2', pts: 50, mPts: 205, val: 600, mVal: 2000, priority: 14 },
+	      'agr2': { nextUp: 'agr3', pts: 100, mPts: 500, val: 700, mVal: 2500, priority: 13 },
+	      'agr3': { nextUp: 'agr4', pts: 150, mPts: 750, val: 800, mVal: 3000, priority: 12 },
+	      'agr4': { nextUp: 'agr5', pts: 200, mPts: 1000, val: 900, mVal: 4321, priority: 11 },
 	      'agr5': { nextUp: 'final', pts: 250, mPts: 0, val: 1000, mVal: 0 },
 
-	      'mil1': { nextUp: 'mil2', pts: 200, mPts: 500, val: 1100, mVal: 4400, priority: 8 },
-	      'mil2': { nextUp: 'mil3', pts: 400, mPts: 1000, val: 1200, mVal: 4995, priority: 7 },
-	      'mil3': { nextUp: 'mil4', pts: 600, mPts: 1500, val: 1300, mVal: 5555, priority: 6 },
-	      'mil4': { nextUp: 'mil5', pts: 800, mPts: 2000, val: 1400, mVal: 7500, priority: 5 },
+	      'mil1': { nextUp: 'mil2', pts: 200, mPts: 500, val: 1100, mVal: 4400, priority: 9 },
+	      'mil2': { nextUp: 'mil3', pts: 400, mPts: 1000, val: 1200, mVal: 4995, priority: 8 },
+	      'mil3': { nextUp: 'mil4', pts: 600, mPts: 1500, val: 1300, mVal: 5555, priority: 7 },
+	      'mil4': { nextUp: 'mil5', pts: 800, mPts: 2000, val: 1400, mVal: 7500, priority: 6 },
 	      'mil5': { nextUp: 'final', pts: 1000, mPts: 0, val: 1500, mVal: 0 },
 
 	      'fin1': { nextUp: 'fin2', pts: 1111, mPts: 2222, val: 1600, mVal: 7500, priority: 4 },
@@ -20189,8 +20302,15 @@
 	      'fin4': { nextUp: 'fin5', pts: 1777, mPts: 5000, val: 1900, mVal: 10001, priority: 1 },
 	      'fin5': { nextUp: 'final', pts: 1999, mPts: 0, val: 2000, mVal: 0 },
 
-	      'con': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
-	      'mega': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 }
+	      'con1': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
+	      'con2': { nextUp: 'final', pts: 7, mPts: 0, val: -100, mVal: 0, dMin: 25, dMax: 40 },
+	      'con3': { nextUp: 'final', pts: 8, mPts: 0, val: -1000, mVal: 0, dMin: 25, dMax: 45 },
+	      'con4': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0, dMin: 25, dMax: 45 },
+	      'con5': { nextUp: 'final', pts: 9, mPts: 0, val: -5000, mVal: 0, dMin: 35, dMax: 55 },
+	      'con6': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0, dMin: 35, dMax: 60 },
+	      'con7': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0, dMin: 35, dMax: 70 },
+	      'mega': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
+	      'pork': { nextUp: 'final', pts: 666, mPts: 0, val: 666, mVal: 0 }
 	    };
 	    return tokenMap[token][attribute];
 	  },
@@ -20208,45 +20328,99 @@
 	    return colorMap[tokenGroup][attribute];
 	  },
 
-	  resetMovesCounter: function resetMovesCounter(phase) {
-	    var MovesCountMap = {
-	      1: 730,
-	      2: 610,
-	      3: 120
+	  getPhaseData: function getPhaseData(phase) {
+	    var phaseMap = {
+	      1: { moves: 180, goal: 125000, msg: "" },
+	      2: { moves: 145, goal: 105000, msg: "Congratulations on your win, but this time you'll face a primary challenge. And in this district, that's the tougher race!" },
+	      3: { moves: 45, goal: 35000, msg: "Whew! Pete Pandurin put up a tough challenge. He'll be back, but right now, you'd better focus on the general!" },
+	      4: { moves: 145, goal: 200000, msg: "You've held your seat, but Pete's back, and he really wants your seat. He's already started raising money for ad buys..." },
+	      5: { moves: 45, goal: 50000, msg: "You're our nominee! Other party's actually putting up a challenge, but nothing you can't handle." },
+	      6: { moves: 180, goal: 125000, msg: "Welcome to another term in the State House of Delegates. Incumbency has really set in, so you could probably stay here forever if you wanted to.", repeat: 0 },
+	      7: { moves: 180, goal: 125000, msg: '' },
+	      8: { moves: 315, goal: 125000, msg: '' },
+	      9: { moves: 45, goal: 125000, msg: '' },
+	      10: { moves: 315, goal: 125000, msg: '' },
+	      11: { moves: 45, goal: 125000, msg: '' },
+	      12: { moves: 360, goal: 125000, msg: '' },
+	      13: { moves: 360, goal: 125000, msg: '', repeat: 0 },
+	      14: { moves: 130, goal: 125000, msg: '' },
+	      15: { moves: 50, goal: 125000, msg: '' },
+	      16: { moves: 155, goal: 125000, msg: '' },
+	      17: { moves: 75, goal: 125000, msg: '' },
+	      18: { moves: 155, goal: 125000, msg: '' },
+	      19: { moves: 75, goal: 125000, msg: '' },
+	      20: { moves: 155, goal: 125000, msg: '' },
+	      21: { moves: 75, goal: 125000, msg: '' },
+	      22: { moves: 155, goal: 125000, msg: '' },
+	      23: { moves: 75, goal: 125000, msg: '' },
+	      24: { moves: 615, goal: 125000, msg: '' },
+	      25: { moves: 75, goal: 125000, msg: '' },
+	      26: { moves: 690, goal: 125000, msg: '' },
+	      27: { moves: 615, goal: 125000, msg: '' },
+	      28: { moves: 75, goal: 125000, msg: '' },
+	      29: { moves: 690, goal: 125000, msg: '' },
+	      30: { moves: 615, goal: 125000, msg: '' },
+	      31: { moves: 75, goal: 125000, msg: '' },
+	      32: { moves: 690, goal: 125000, msg: '' }
 	    };
-	    return MovesCountMap[phase];
+	    return phaseMap[phase];
 	  },
 
-	  setNextGoal: function setNextGoal(phase) {
-	    var goalMap = {
-	      1: 125000,
-	      2: 75000,
-	      3: 100000
-	    };
-	    return goalMap[phase];
-	  },
-
-	  changeMessage: function changeMessage(currentState) {
+	  //TODO: refactor for only for mid-phase messages
+	  progressGame: function progressGame(currentState, moves) {
 	    var gamePhase = currentState.gamePhase,
-	        nextGoal = currentState.nextGoal,
 	        movesRemaining = currentState.movesRemaining,
-	        messageMap = {
-	      1: 'Congrats on your election. Now raise some money.'
-	      // 1: 'You need to raise $' + {nextGoal} + ' in ' + {movesRemaining} 'days in order to win re-election!',
-	      // 2: 'Primary challenger! You need $' + nextGoal + ' in only ' + movesRemaining + ' days.',
-	      // 3: 'You survived your primary. Hope you can still raise $' + nextGoal + ' in the ' + movesRemaining + 'days.'
+	        progressionMap = {
+	      1: {
+	        160: {
+	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'con1'],
+	          msg: "Keep this up, and the oil lobby will keep your coffers stuffed. Though you may annoy some constituents...",
+	          nextTrigger: 140
+	        },
+	        140: {
+	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'mega'],
+	          msg: "Passing helpful legislation isn't the only way to help out your friendly lobbyists. Use your position of authority to give them a voice. The megaphone can be quite a wild card.",
+	          nextTrigger: 115
+	        },
+	        115: {
+	          tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'con1'],
+	          msg: "Oil drops fill oil barrels... Legislate away restrictions on where we can drill! Refineries mean jobs. And those pipelines mean...plenty of profit to go around!",
+	          nextTrigger: 82
+	        },
+	        82: {
+	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1', 'mega'],
+	          msg: "Maybe you should build these constituents a park. It'll cost you money to publicize (and to, ah, speed up the process), but it might placate some of them awhile.",
+	          nextTrigger: 44
+	        },
+	        44: {
+	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
+	          msg: "Don't let those constituents get in the way of what you need to do for the people who pay your way! Come election time, money buys ads, and ads suppress turnout. And our party always wins this district (we carved it that way).",
+	          nextTrigger: 115
+	        }
+	      },
+	      2: {
+	        115: {
+	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1', 'con1', 'mega'],
+	          msg: "Guy named Pete something-or-other is challenging you for the nomination. We're gonna need to spend more on the primary than the general!",
+	          nextTrigger: 72
+	        },
+	        72: {
+	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'con1', 'mega'],
+	          msg: "Don't worry about election laws that say money raised is earmarked as for this election or that one. This is what super-PACs are for. Rolling money on through election cycles is just one of many ways we winners buck the system.",
+	          nextTrigger: 33
+	        }
+	      }
 	    };
-	    return messageMap[gamePhase];
+	    return progressionMap[currentState][moves];
 	  },
 
 	  setElectedOffice: function setElectedOffice(phase, currentOffice) {
-	    console.log(currentOffice);
 	    var electedOfficeMap = {
 	      1: 'State Delegate',
-	      5: 'State Senator',
-	      9: 'Congressperson',
-	      15: 'Junior Senator',
-	      21: 'Senior Senator'
+	      8: 'State Senator',
+	      16: 'US Representative',
+	      24: 'US Senator (Junior)',
+	      30: 'US Senator (Senior)'
 	    };
 	    if (typeof electedOfficeMap[phase] === 'undefined') {
 	      return currentOffice;
@@ -20642,7 +20816,7 @@
 	    for (i = 0; i < rowNum; i++) {
 	      for (j = 0; j < colNum; j++) {
 	        count++;
-	        squares.push(_react2.default.createElement(_GridSquare2.default, { rowPos: i, colPos: j, token: this.props.board.grid[i][j], eligible: this.checkDrop(i, j), key: count }));
+	        squares.push(_react2.default.createElement(_GridSquare2.default, { rowPos: i, colPos: j, token: this.props.board.grid[i][j], eligible: this.checkDrop(i, j), aboutToGo: this.checkUplift(i, j), key: count }));
 	      }
 	    }
 
@@ -20655,6 +20829,10 @@
 
 	  checkDrop: function checkDrop(rowPos, colPos) {
 	    return _store2.default.isEligible(rowPos, colPos);
+	  },
+
+	  checkUplift: function checkUplift(rowPos, colPos) {
+	    return _store2.default.isAboutToGo(rowPos, colPos);
 	  },
 
 	  styles: {
@@ -20710,14 +20888,15 @@
 	  displayName: 'GridSquare',
 
 	  render: function render() {
-	    var tokenGroup = this.props.token.slice(0, 3);
+	    var tokenGroup = this.props.token.slice(0, 3),
+	        aboutToGo = this.props.aboutToGo;
 	    return _react2.default.cloneElement(_react2.default.createElement(
 	      'div',
 	      { onClick: this.placeToken },
 	      _react2.default.createElement(_Token2.default, { symbol: this.props.token })
 	    ), { style: {
 	        color: _utils2.default.handleColors(tokenGroup, 'color'),
-	        backgroundColor: _utils2.default.handleColors(tokenGroup, 'bColor'),
+	        backgroundColor: this.handleAboutToGo(aboutToGo, tokenGroup),
 	        ':hover': { backgroundColor: _utils2.default.handleColors(tokenGroup, 'hover') },
 	        height: '16.29%',
 	        width: '16.66%',
@@ -20733,6 +20912,14 @@
 	  placeToken: function placeToken() {
 	    if (this.props.eligible) {
 	      _store2.default.completeMove(this.props.rowPos, this.props.colPos);
+	    }
+	  },
+
+	  handleAboutToGo: function handleAboutToGo(selected, tokenGroup) {
+	    if (selected) {
+	      return 'magenta';
+	    } else {
+	      return _utils2.default.handleColors(tokenGroup, 'bColor');
 	    }
 	  }
 	});
@@ -20787,7 +20974,7 @@
 	      'icon-bank': this.props.symbol === 'fin4',
 	      'icon-tower': this.props.symbol === 'fin5',
 
-	      'icon-vote': this.props.symbol === 'con',
+	      'icon-vote': this.props.symbol === 'con1',
 	      'icon-megaphone': this.props.symbol === 'mega'
 	    });
 
@@ -24283,7 +24470,7 @@
 	      _react2.default.createElement(
 	        'div',
 	        { style: this.styles.bodyBoard },
-	        _react2.default.createElement(_Message2.default, { message: this.props.state.message }),
+	        _react2.default.createElement(_Message2.default, { alert: this.props.state.newMessage, message: this.props.state.message }),
 	        _react2.default.createElement(_Score2.default, { score: this.props.state.score }),
 	        _react2.default.createElement(_Bank2.default, { bankBalance: this.props.state.bankBalance }),
 	        _react2.default.createElement(_Office2.default, { electedOffice: this.props.state.electedOffice }),
@@ -24337,15 +24524,30 @@
 	  displayName: 'Message',
 
 	  render: function render() {
+	    var msg = this.props.alert ? _react2.default.createElement(
+	      'p',
+	      { style: this.styles.alert },
+	      ' ',
+	      this.props.message,
+	      ' '
+	    ) : _react2.default.createElement(
+	      'p',
+	      null,
+	      this.props.message
+	    );
+
 	    return _react2.default.createElement(
 	      'div',
 	      null,
-	      _react2.default.createElement(
-	        'p',
-	        null,
-	        this.props.message
-	      )
+	      msg
 	    );
+	  },
+
+	  styles: {
+	    alert: {
+	      fontWeight: 700,
+	      color: 'maroon'
+	    }
 	  }
 	});
 

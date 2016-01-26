@@ -25,7 +25,16 @@ var currentState = {
   megaPossTokens: [],
   porkOn: [],
   levelFives: [], //all level5 tokens on board
-  createPowerUp: [] //only has content if set about to be combined
+  createPowerUp: [], //only has content if set about to be combined
+  helpers: {
+    'oil6': 0,
+    'agr6': 0,
+    'mil6': 0,
+    'fin6': 0,
+    'con2': 1,
+    'con3': 0,
+    'con5': 0
+  }
 };
 
 QuidStore.setupBoard = function () {
@@ -159,6 +168,7 @@ QuidStore.completeMove = function(rowPos, colPos){
       this.addTopLevelToken(token, rowPos, colPos);
     }
   }
+  console.log(currentState.helpers['oil6']);
   this.emitChange();
 };
 
@@ -323,11 +333,13 @@ QuidStore.addTopLevelToken = function(token, rowPos, colPos){
 
 QuidStore.removeTopLevelTokens = function(){
   var coords = currentState.createPowerUp,
-    token = currentState.board.grid[coords[0][0]][coords[0][1]];
+    token = currentState.board.grid[coords[0][0]][coords[0][1]],
+    powerUp = token.slice(0, 3) + '6';
 
   this.clearMatches(coords);
   currentState.createPowerUp = [];
-  //TODO: When power-ups created, power-ups++!!!
+  currentState.helpers[powerUp]++
+  currentState.score = currentState.score + 555;
 }
 
 QuidStore.convertMega = function(rowPos, colPos){
