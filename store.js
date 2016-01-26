@@ -6,7 +6,7 @@ var currentState = {
   board: {
     rows: 6, columns: 6, grid: []
   },
-  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2', 'con1', 'con1', 'con1', 'con2'],
+  tokensArray: ['oil1', 'oil5', 'oil5', 'agr5', 'oil4', 'oil5', 'con1'],
   stagedToken: 'oil1',
   //white paper data
   movesRemaining: 180,
@@ -118,6 +118,7 @@ QuidStore.isAboutToGo = function(rowPos, colPos){
 QuidStore.completeMove = function(rowPos, colPos){
   var token = currentState.stagedToken,
     moves = currentState.movesRemaining,
+    swarm = false,
     progressionData;
 
   //handle placement of tokens
@@ -160,7 +161,10 @@ QuidStore.completeMove = function(rowPos, colPos){
   if (this.isGameOver()){
     this.endGame('board');
   } else {
-    this.moveConstituents(rowPos, colPos);
+    if (currentState.appeasements.length + 3 < currentState.levelFives.length && currentState.movesRemaining % 7 === 1){
+      swarm = true;
+    }
+    this.moveConstituents(rowPos, colPos, swarm);
     this.setNextToken();
     if (token.slice(3,4) === '5'){
       this.addTopLevelToken(token, rowPos, colPos);
@@ -280,7 +284,7 @@ QuidStore.findTokenCoords = function(token){
   return currentConsCoords;
 };
 
-QuidStore.moveConstituents = function(rowPos, colPos) {
+QuidStore.moveConstituents = function(rowPos, colPos, swarm) {
   var currentConsCoords = this.findTokenCoords('con1'),
     emptyCoords = [],
     newRowPos,
@@ -288,7 +292,6 @@ QuidStore.moveConstituents = function(rowPos, colPos) {
     newCoords,
     x,
     y;
-
   for (var i = 0; i < currentConsCoords.length; i++) {
     x = currentConsCoords[i][0],
     y = currentConsCoords[i][1];
@@ -299,7 +302,9 @@ QuidStore.moveConstituents = function(rowPos, colPos) {
         newRowPos = newCoords[0];
         newColPos = newCoords[1];
         currentState.board.grid[newRowPos][newColPos] = 'con1';
-        currentState.board.grid[x][y] = '';
+        if (!swarm) {
+          currentState.board.grid[x][y] = '';
+        }
       }
     }
   }
@@ -343,9 +348,16 @@ QuidStore.addTopLevelToken = function(token, rowPos, colPos){
 QuidStore.removeTopLevelTokens = function(){
   var coords = currentState.createPowerUp,
     token = currentState.board.grid[coords[0][0]][coords[0][1]],
-    powerUp = token.slice(0, 3) + '6';
+    powerUp = token.slice(0, 3) + '6',
+    stringCoords,
+    index;
 
   this.clearMatches(coords);
+  coords.forEach( function(spot){
+    stringCoords = JSON.stringify(spot);
+    index = currentState.levelFives.indexOf(stringCoords);
+    currentState.levelFives.splice(index, 1);
+  });
   currentState.createPowerUp = [];
   currentState.helpers[powerUp]++
   currentState.score = currentState.score + 555;
