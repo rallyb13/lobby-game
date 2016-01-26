@@ -30,7 +30,7 @@ var Bench = React.createClass({
   styles: {
     bench: {
       color: 'white',
-      backgroundColor: 'blue',
+      backgroundColor: '#966F33',
       height: '70px',
       float: 'left',
       width: '500px',

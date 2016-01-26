@@ -39,7 +39,7 @@ var Grid = React.createClass({
           height: "100%",
           width: "69%",
           display: 'inline-block',
-          marginTop: '20px',
+          marginTop: '5px',
           marginBottom: '20px',
           //Set min-width so always have 6 columns
           minWidth: '550px'
