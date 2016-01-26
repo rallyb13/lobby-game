@@ -26,7 +26,8 @@ var GridSquare = React.createClass({
           minHeight: '90px',
           minWidth: '90px'
         }
-    });
+      }
+    );
   },
 
   placeToken: function(){
