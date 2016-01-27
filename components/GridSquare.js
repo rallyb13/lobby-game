@@ -42,7 +42,7 @@ var GridSquare = React.createClass({
     } else {
       return Utils.handleColors(tokenGroup, 'bColor');
     }
-  },
+  }
 });
 
 export default Radium(GridSquare);

@@ -10,7 +10,7 @@ var currentState = {
   stagedToken: 'oil1',
   holdToken: false,
   //white paper data
-  movesRemaining: 180,
+  movesRemaining: 40,
   score: 0,
   bankBalance:  0,
   phase: 1,
@@ -38,30 +38,30 @@ QuidStore.setupBoard = function () {
     startingTokens = ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'con1', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
     token;
 
-    for (var i=0; i < rows; i++) {
-      var row = [];
-      for (var j=0; j < columns; j++) {
-        row.push('');
-      }
-      currentState.board.grid.push(row);
+  for (var i=0; i < rows; i++) {
+    var row = [];
+    for (var j=0; j < columns; j++) {
+      row.push('');
     }
+    currentState.board.grid.push(row);
+  }
 
-    // go though starting tokens and put the values on the board
-    for (var i=0; i < startingTokens.length; i++) {
-      var x = Math.floor(Math.random() * rows),
-        y = Math.floor(Math.random() * columns);
-        currentState.board.grid[x][y] = startingTokens[i];
-    }
+  // go though starting tokens and put the values on the board
+  for (var i=0; i < startingTokens.length; i++) {
+    var x = Math.floor(Math.random() * rows),
+      y = Math.floor(Math.random() * columns);
+      currentState.board.grid[x][y] = startingTokens[i];
+  }
 
-    //eliminate pre-matched tokens
-    for (var i=0; i < rows; i++){
-      for (var j = 0; j < columns; j++){
-        token = currentState.board.grid[i][j];
-        if (token !== '' && this.cardinalCheck(token, i, j).length >= 2){
-          currentState.board.grid[i][j] = '';
-        }
+  //eliminate pre-matched tokens
+  for (var i=0; i < rows; i++){
+    for (var j = 0; j < columns; j++){
+      token = currentState.board.grid[i][j];
+      if (token !== '' && this.cardinalCheck(token, i, j).length >= 2){
+        currentState.board.grid[i][j] = '';
       }
     }
+  }
 };
 
 QuidStore.emitChange = function() {
@@ -156,6 +156,7 @@ QuidStore.completeMove = function(rowPos, colPos){
     currentState.porkOn.push( JSON.stringify([rowPos, colPos]) );
   } else if (token.slice(0,3) === 'con' && token !== 'con1'){
     currentState.appeasements.push( [rowPos, colPos] );
+    this.handleAppeasement(token, rowPos, colPos);
   }
   token = this.handleMatches(token, rowPos, colPos);
   currentState.board.grid[rowPos][colPos] = token;
@@ -353,6 +354,40 @@ QuidStore.removeConstituents = function(token, rowPos, colPos){
   });
   currentState.board.grid[rowPos][colPos] = token;
 };
+
+QuidStore.handleAppeasement = function(token, rowPos, colPos){
+  var min = Utils.getTokenData(token, 'dMin'),
+    max = Utils.getTokenData(token, 'dMax'),
+    time = Math.floor(Math.random() * (max - min) ) + min,
+    moveTrigger = currentState.movesRemaining - time,
+    phaseTrigger = currentState.phase;
+
+  while (moveTrigger < 0){
+    phaseTrigger++;
+    moveTrigger = moveTrigger + Utils.getPhaseData(phaseTrigger)['moves'];
+  }
+  this.addChangeListener(
+    function(){
+      var newToken = Utils.getTokenData(token, 'nextDown'),
+      index,
+      i;
+      console.log(moveTrigger);
+      if (currentState.movesRemaining === moveTrigger && currentState.phase === phaseTrigger){
+        if (newToken === ''){
+          currentState.board.grid[rowPos][colPos] = newToken;
+          for (i = 0; i < currentState.appeasements.length; i++){
+            if (currentState.appeasements[i][0] === rowPos && currentState.appeasements[i][1] === colPos){
+              index = i;
+            }
+          }
+          currentState.appeasements.splice(index, 1);
+          // this.removeChangeListener(this.onChange, this.checkAppeaseTimer(token, rowPos, colPos, moveTrigger, phaseTrigger));
+        // } else {
+        }
+      }
+    });
+};
+
 
 QuidStore.setNextToken = function(){
   var tokens = currentState.tokensArray,
