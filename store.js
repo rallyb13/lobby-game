@@ -6,7 +6,7 @@ var currentState = {
   board: {
     rows: 6, columns: 6, grid: []
   },
-  tokensArray: ['oil1', 'oil3', 'oil4', 'oil2', 'oil5', 'con1'],
+  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2','oil2', 'con1'],
   stagedToken: 'oil1',
   holdToken: false,
   //white paper data
@@ -26,6 +26,7 @@ var currentState = {
   appeasements: [], //appeasement tokens on board
   levelFives: [], //all level5 tokens on board
   createPowerUp: [], //only has content if set about to be combined
+  freeze: 0, //number of moves con1 tokens frozen for
   helpers: {
     'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 0, 'con5': 0
   }
@@ -123,6 +124,24 @@ QuidStore.useAppeasement = function(token){
   currentState.stagedToken = token;
   this.emitChange();
 };
+
+QuidStore.usePowerUp = function(token){
+  var type = token.slice(0,3),
+    cons;
+
+  if (type === 'oil') {
+    currentState.bankBalance = currentState.bankBalance + 25000;
+  } else if (type === 'agr'){
+    currentState.freeze = currentState.freeze + 10;
+  } else if (type === 'mil'){
+    cons = this.findTokenCoords('con1');
+    this.clearMatches(cons);
+  } else {
+    currentState.bankBalance = currentState.bankBalance + 250000;
+  }
+  currentState.helpers[token]--;
+  this.emitChange();
+}
 
 QuidStore.completeMove = function(rowPos, colPos){
   var token = currentState.stagedToken,
@@ -301,21 +320,25 @@ QuidStore.moveConstituents = function(rowPos, colPos, swarm) {
     newCoords,
     x,
     y;
-  for (var i = 0; i < currentConsCoords.length; i++) {
-    x = currentConsCoords[i][0],
-    y = currentConsCoords[i][1];
-    if(x !== rowPos || y !== colPos){
-      emptyCoords = this.cardinalCheck('', x, y);
-      if (emptyCoords.length > 0) {
-        newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
-        newRowPos = newCoords[0];
-        newColPos = newCoords[1];
-        currentState.board.grid[newRowPos][newColPos] = 'con1';
-        if (!swarm) {
-          currentState.board.grid[x][y] = '';
+  if (currentState.freeze === 0){
+    for (var i = 0; i < currentConsCoords.length; i++) {
+      x = currentConsCoords[i][0],
+      y = currentConsCoords[i][1];
+      if(x !== rowPos || y !== colPos){
+        emptyCoords = this.cardinalCheck('', x, y);
+        if (emptyCoords.length > 0) {
+          newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
+          newRowPos = newCoords[0];
+          newColPos = newCoords[1];
+          currentState.board.grid[newRowPos][newColPos] = 'con1';
+          if (!swarm) {
+            currentState.board.grid[x][y] = '';
+          }
         }
       }
     }
+  } else {
+    currentState.freeze--;
   }
 };
 
