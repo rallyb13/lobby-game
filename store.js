@@ -10,7 +10,7 @@ var currentState = {
   stagedToken: 'oil1',
   holdToken: false,
   //white paper data
-  movesRemaining: 40,
+  movesRemaining: 180,
   score: 0,
   bankBalance:  0,
   phase: 1,
@@ -366,26 +366,26 @@ QuidStore.handleAppeasement = function(token, rowPos, colPos){
     phaseTrigger++;
     moveTrigger = moveTrigger + Utils.getPhaseData(phaseTrigger)['moves'];
   }
-  this.addChangeListener(
-    function(){
-      var newToken = Utils.getTokenData(token, 'nextDown'),
-      index,
-      i;
-      console.log(moveTrigger);
-      if (currentState.movesRemaining === moveTrigger && currentState.phase === phaseTrigger){
-        if (newToken === ''){
-          currentState.board.grid[rowPos][colPos] = newToken;
-          for (i = 0; i < currentState.appeasements.length; i++){
-            if (currentState.appeasements[i][0] === rowPos && currentState.appeasements[i][1] === colPos){
-              index = i;
-            }
-          }
-          currentState.appeasements.splice(index, 1);
-          // this.removeChangeListener(this.onChange, this.checkAppeaseTimer(token, rowPos, colPos, moveTrigger, phaseTrigger));
-        // } else {
+  this.addChangeListener(this.onNextMove.bind(this, token, rowPos, colPos, moveTrigger, phaseTrigger));
+};
+
+QuidStore.onNextMove = function(token, rowPos, colPos, moveTrigger, phaseTrigger){
+  var newToken = Utils.getTokenData(token, 'nextDown'),
+  index,
+  i;
+  if (currentState.movesRemaining === moveTrigger && currentState.phase === phaseTrigger){
+    if (newToken === ''){
+      currentState.board.grid[rowPos][colPos] = newToken;
+      for (i = 0; i < currentState.appeasements.length; i++){
+        if (currentState.appeasements[i][0] === rowPos && currentState.appeasements[i][1] === colPos){
+          index = i;
         }
       }
-    });
+      currentState.appeasements.splice(index, 1);
+      // this.removeChangeListener(this.onNextMove.bind(this, token, rowPos, colPos, moveTrigger, phaseTrigger));
+    // } else {
+    }
+  }
 };
 
 
