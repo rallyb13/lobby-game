@@ -6,7 +6,7 @@ var currentState = {
   board: {
     rows: 6, columns: 6, grid: []
   },
-  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2','oil2', 'con1', 'mega'],
+  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2','oil2', 'con1'],
   stagedToken: 'oil1',
   holdToken: false,
   //white paper data
@@ -29,7 +29,8 @@ var currentState = {
   freeze: 0, //number of moves con1 tokens frozen for
   helpers: {
     'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 0, 'con5': 0
-  }
+  },
+  helperChange: false
 };
 
 QuidStore.setupBoard = function () {
@@ -143,6 +144,8 @@ QuidStore.completeMove = function(rowPos, colPos){
   //handle special token removal
   if (currentState.createPowerUp.length !== 0){
     this.removeTopLevelTokens();
+  } else {
+    currentState.helperChange = false;
   }
   if (currentState.appeasements.length !==0){
     this.checkAppeasements();
@@ -400,7 +403,8 @@ QuidStore.removeTopLevelTokens = function(){
     currentState.levelFives.splice(index, 1);
   });
   currentState.createPowerUp = [];
-  currentState.helpers[powerUp]++
+  currentState.helpers[powerUp]++;
+  currentState.helperChange = powerUp;
   currentState.score = currentState.score + 555;
 }
 

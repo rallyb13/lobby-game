@@ -42,7 +42,7 @@ var Utils = {
     return tokenMap[token][attribute];
   },
 
-  handleColors: function(tokenGroup, attribute){
+  handleColors: function(tokenGroup, attribute, selected){
     var colorMap = {
       'oil': {color: 'gray', bColor: 'black', hover: 'black'},
       'agr': {color: 'green', bColor: 'yellow', hover: 'yellow'},
@@ -53,7 +53,11 @@ var Utils = {
       'con': {color: 'red', bColor: 'blue', hover: 'blue'},
       'por': {color: 'red', bColor: 'pink', hover: 'pink'},
     }
-    return colorMap[tokenGroup][attribute];
+    if (selected === true) {
+      return 'magenta';
+    } else {
+      return colorMap[tokenGroup][attribute];
+    }
   },
 
   getPhaseData: function(phase){

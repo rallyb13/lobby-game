@@ -13,10 +13,10 @@ var Bench = React.createClass({
 
     for (i=0; i < tokens.length; i++){
       token = tokens[i];
-      powerUp = token.slice(3,4) === '6'
+      powerUp = token.slice(3,4) === '6';
       count = helpers[token];
       if (count > 0){
-        seats.push(<BenchSeat token={token} count={count} powerUp={powerUp} key={i}/>);
+        seats.push(<BenchSeat token={token} count={count} powerUp={powerUp} selected={this.props.poweringUp === token} key={i}/>);
       }
     }
 

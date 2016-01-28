@@ -6,7 +6,9 @@ import Utils from '../utils';
 var BenchSeat = React.createClass({
   render: function(){
     var powerUp = this.props.powerUp,
+      selected = this.props.selected,
       tokenGroup = this.props.token.slice(0,3);
+
     return React.cloneElement(
       <div onClick={this.useHelper}>
         <Token symbol={this.props.token} />
@@ -16,7 +18,7 @@ var BenchSeat = React.createClass({
         {
           float: this.pickSide(powerUp),
           color: Utils.handleColors(tokenGroup, 'color'),
-          backgroundColor: Utils.handleColors(tokenGroup, 'bColor'),
+          backgroundColor: Utils.handleColors(tokenGroup, 'bColor', selected),
           width: '60px',
           height: '60px',
           display: 'inline-block',

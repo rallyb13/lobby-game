@@ -24,7 +24,7 @@ var App = React.createClass ({
       <div>
         <div style={{maxWidth:'900px', margin: '0 auto'}}>
           <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
-          <Bench helpers={this.state.helpers}/>
+          <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange}/>
           <div style={this.styles.panel}>
             <div><Staging stagedToken={this.state.stagedToken} /></div>
             <Scoreboard state={this.state} />
