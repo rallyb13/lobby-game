@@ -49,6 +49,7 @@ var Utils = {
       'mil': {color: 'black', bColor: 'red', hover: 'red'},
       'fin': {color: 'yellow', bColor: 'green', hover: 'green'},
       '': {color: '#4B5043', bColor: '#A4BD99', hover: '#fff'},
+      'meg': {color: '#4B5043', bColor: '#A4BD99', hover: '#fff'},
       'con': {color: 'red', bColor: 'blue', hover: 'blue'},
       'por': {color: 'red', bColor: 'pink', hover: 'pink'},
     }
