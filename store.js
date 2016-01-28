@@ -28,7 +28,7 @@ var currentState = {
   createPowerUp: [], //only has content if set about to be combined
   freeze: 0, //number of moves con1 tokens frozen for
   helpers: {
-    'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 0, 'con5': 0
+    'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 0, 'con5': 3
   }
 };
 
@@ -155,19 +155,10 @@ QuidStore.completeMove = function(rowPos, colPos){
   } else if (token === 'pork'){
     currentState.porkOn.push( JSON.stringify([rowPos, colPos]) );
   } else if (token.slice(0,3) === 'con' && token !== 'con1'){
-    currentState.appeasements.push( [rowPos, colPos] );
-    this.handleAppeasement(token, rowPos, colPos);
+    this.addAppeasement(token, rowPos, colPos);
   }
   token = this.handleMatches(token, rowPos, colPos);
   currentState.board.grid[rowPos][colPos] = token;
-
-  //handle special token removal
-  if (currentState.createPowerUp.length !== 0){
-    this.removeTopLevelTokens();
-  }
-  if (currentState.appeasements.length !==0){
-    this.removeConstituents(token, rowPos, colPos);
-  }
 
   //update move count, handle phase/move-triggered events
   currentState.movesRemaining--;
@@ -184,6 +175,15 @@ QuidStore.completeMove = function(rowPos, colPos){
     }
   } else {
     currentState.newMessage = false;
+  }
+
+  //handle special token removal
+  if (currentState.createPowerUp.length !== 0){
+    this.removeTopLevelTokens();
+  }
+  if (currentState.appeasements.length !==0){
+    this.checkAppeasements();
+    this.removeConstituents(token, rowPos, colPos);
   }
 
   //check game end, proceed to automatic actions
@@ -355,7 +355,7 @@ QuidStore.removeConstituents = function(token, rowPos, colPos){
   currentState.board.grid[rowPos][colPos] = token;
 };
 
-QuidStore.handleAppeasement = function(token, rowPos, colPos){
+QuidStore.addAppeasement = function(token, rowPos, colPos){
   var min = Utils.getTokenData(token, 'dMin'),
     max = Utils.getTokenData(token, 'dMax'),
     time = Math.floor(Math.random() * (max - min) ) + min,
@@ -366,25 +366,31 @@ QuidStore.handleAppeasement = function(token, rowPos, colPos){
     phaseTrigger++;
     moveTrigger = moveTrigger + Utils.getPhaseData(phaseTrigger)['moves'];
   }
-  this.addChangeListener(this.onNextMove.bind(this, token, rowPos, colPos, moveTrigger, phaseTrigger));
+  currentState.appeasements.push( [rowPos, colPos, token, moveTrigger, phaseTrigger] );
 };
 
-QuidStore.onNextMove = function(token, rowPos, colPos, moveTrigger, phaseTrigger){
-  var newToken = Utils.getTokenData(token, 'nextDown'),
-  index,
-  i;
-  if (currentState.movesRemaining === moveTrigger && currentState.phase === phaseTrigger){
-    if (newToken === ''){
-      currentState.board.grid[rowPos][colPos] = newToken;
-      for (i = 0; i < currentState.appeasements.length; i++){
-        if (currentState.appeasements[i][0] === rowPos && currentState.appeasements[i][1] === colPos){
-          index = i;
-        }
-      }
-      currentState.appeasements.splice(index, 1);
-      // this.removeChangeListener(this.onNextMove.bind(this, token, rowPos, colPos, moveTrigger, phaseTrigger));
-    // } else {
+QuidStore.checkAppeasements = function(){
+  var appeasements = currentState.appeasements,
+    phase = currentState.phase,
+    move = currentState.movesRemaining,
+    indexes = [],
+    i;
+
+  for (i = appeasements.length - 1; i >= 0; i--){
+    if(appeasements[i][4] === phase && appeasements[i][3] === move){
+      this.removeAppeasement(i, appeasements[i][0], appeasements[i][1], appeasements[i][2]);
     }
+  }
+};
+
+QuidStore.removeAppeasement = function(index, rowPos, colPos, token){
+  var newToken = Utils.getTokenData(token, 'nextDown');
+
+  currentState.appeasements.splice(index, 1);
+  currentState.board.grid[rowPos][colPos] = newToken;
+
+  if (newToken !== ''){
+    this.addAppeasement(newToken, rowPos, colPos);
   }
 };
 
