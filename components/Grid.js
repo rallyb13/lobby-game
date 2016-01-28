@@ -8,13 +8,15 @@ var Grid = React.createClass({
         rowNum = this.props.board.rows,
         colNum = this.props.board.columns,
         count = 0,
+        token,
         i,
         j;
 
     for (i=0; i < rowNum; i++) {
       for (j=0; j < colNum; j++) {
         count++;
-        squares.push(<GridSquare rowPos={i} colPos={j} token={this.props.board.grid[i][j]} eligible={this.checkDrop(i, j)} aboutToGo={this.checkUplift(i, j)} key={count}/>);
+        token = this.props.board.grid[i][j];
+        squares.push(<GridSquare rowPos={i} colPos={j} token={token} eligible={this.checkDrop(i, j, token)} aboutToGo={this.checkUplift(i, j)} key={count}/>);
       }
     }
 
@@ -25,8 +27,25 @@ var Grid = React.createClass({
     );
   },
 
-  checkDrop: function(rowPos, colPos){
-    return QuidStore.isEligible(rowPos, colPos);
+  checkDrop: function(rowPos, colPos, token){
+    var staged = this.props.stagedToken,
+      isEmpty = token === '',
+      validForMega = this.props.megaPossCoords,
+      stringCoords;
+
+    if (staged === 'mega'){
+      if (isEmpty){
+        stringCoords = [rowPos, colPos];
+        stringCoords = JSON.stringify(stringCoords);
+        return (validForMega.indexOf(stringCoords) !== -1);
+      } else {
+        return false;
+      }
+    } else if (staged === 'pork'){
+      return !isEmpty;
+    } else {
+      return isEmpty;
+    }
   },
 
   checkUplift: function(rowPos, colPos){

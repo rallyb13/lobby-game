@@ -6,7 +6,7 @@ var currentState = {
   board: {
     rows: 6, columns: 6, grid: []
   },
-  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2','oil2', 'con1'],
+  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2','oil2', 'con1', 'mega'],
   stagedToken: 'oil1',
   holdToken: false,
   //white paper data
@@ -78,27 +78,6 @@ QuidStore.removeChangeListener = function(callback) {
 
 QuidStore.getCurrentState = function(){
   return currentState;
-};
-
-QuidStore.isEligible = function(rowPos, colPos){
-  var staged = currentState.stagedToken,
-  isEmpty = currentState.board.grid[rowPos][colPos] === '',
-  validForMega = currentState.megaPossCoords,
-  stringCoords;
-
-  if (staged === 'mega'){
-    if (isEmpty){
-      stringCoords = [rowPos, colPos];
-      stringCoords = JSON.stringify(stringCoords);
-      return (validForMega.indexOf(stringCoords) !== -1);
-    } else {
-      return false;
-    }
-  } else if (staged === 'pork'){
-    return !isEmpty;
-  } else {
-    return isEmpty;
-  }
 };
 
 QuidStore.isAboutToGo = function(rowPos, colPos){
