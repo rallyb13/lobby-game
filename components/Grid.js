@@ -49,7 +49,19 @@ var Grid = React.createClass({
   },
 
   checkUplift: function(rowPos, colPos){
-    return QuidStore.isAboutToGo(rowPos, colPos);
+    var fives = this.props.toPowerUp,
+      i;
+
+    if (fives.length === 0){
+      return false;
+    } else {
+      for (i = 0; i < fives.length; i++){
+        if(rowPos === fives[i][0] && colPos === fives[i][1]){
+          return true;
+        }
+      }
+      return false
+    }
   },
 
   styles: {

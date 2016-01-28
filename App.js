@@ -29,7 +29,7 @@ var App = React.createClass ({
             <div><Staging stagedToken={this.state.stagedToken} /></div>
             <Scoreboard state={this.state} />
           </div>
-          <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords}/>
+          <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toPowerUp={this.state.createPowerUp}/>
         </div>
       </div>
     );
