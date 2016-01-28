@@ -19675,15 +19675,19 @@
 
 	var _store2 = _interopRequireDefault(_store);
 
-	var _Grid = __webpack_require__(163);
+	var _Bench = __webpack_require__(163);
+
+	var _Bench2 = _interopRequireDefault(_Bench);
+
+	var _Grid = __webpack_require__(167);
 
 	var _Grid2 = _interopRequireDefault(_Grid);
 
-	var _Scoreboard = __webpack_require__(215);
+	var _Scoreboard = __webpack_require__(217);
 
 	var _Scoreboard2 = _interopRequireDefault(_Scoreboard);
 
-	var _Staging = __webpack_require__(222);
+	var _Staging = __webpack_require__(224);
 
 	var _Staging2 = _interopRequireDefault(_Staging);
 
@@ -19717,7 +19721,7 @@
 	          { style: this.styles.gameTitle },
 	          'Quid: The Game of Outrageous Political Shenanigans'
 	        ),
-	        _react2.default.createElement(_Grid2.default, { board: this.state.board }),
+	        _react2.default.createElement(_Bench2.default, { helpers: this.state.helpers }),
 	        _react2.default.createElement(
 	          'div',
 	          { style: this.styles.panel },
@@ -19727,7 +19731,8 @@
 	            _react2.default.createElement(_Staging2.default, { stagedToken: this.state.stagedToken })
 	          ),
 	          _react2.default.createElement(_Scoreboard2.default, { state: this.state })
-	        )
+	        ),
+	        _react2.default.createElement(_Grid2.default, { board: this.state.board })
 	      )
 	    );
 	  },
@@ -19739,7 +19744,7 @@
 	  styles: {
 	    gameTitle: {
 	      color: 'white',
-	      padding: '25px'
+	      padding: '10px, 25px'
 	    },
 	    panel: {
 	      width: '30%',
@@ -19770,12 +19775,11 @@
 	var CHANGE_EVENT = 'change';
 	var currentState = {
 	  board: {
-	    rows: 6,
-	    columns: 6,
-	    grid: []
+	    rows: 6, columns: 6, grid: []
 	  },
-	  tokensArray: ['oil1', 'oil1', 'oil2', 'oil3', 'oil4', 'oil4', 'oil5'],
+	  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'con1'],
 	  stagedToken: 'oil1',
+	  holdToken: false,
 	  //white paper data
 	  movesRemaining: 180,
 	  score: 0,
@@ -19784,14 +19788,19 @@
 	  nextGoal: 125000,
 	  electedOffice: 'State Delegate',
 	  message: 'Click any unoccupied square in the grid to place the next item. Match 3 to make more valuable items.',
-	  trigger: 160,
-	  newMessage: true,
+	  trigger: 160, //move # at which message will change
+	  newMessage: true, //only true at first appearance of new message
 	  //special token quick refs
-	  megaPossCoords: [],
-	  megaPossTokens: [],
-	  porkOn: [],
+	  megaPossCoords: [], //coordinates where megaphone can be dropped
+	  megaPossTokens: [], //arrays of valid tokens megaphone can become (at coordinate corresponding to megaPossCoords)
+	  porkOn: [], //pork tokens on board
+	  appeasements: [], //appeasement tokens on board
 	  levelFives: [], //all level5 tokens on board
-	  createPowerUp: [] //only has content if set about to be combined
+	  createPowerUp: [], //only has content if set about to be combined
+	  freeze: 0, //number of moves con1 tokens frozen for
+	  helpers: {
+	    'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 0, 'con5': 0
+	  }
 	};
 
 	QuidStore.setupBoard = function () {
@@ -19879,9 +19888,36 @@
 	  }
 	};
 
+	QuidStore.useAppeasement = function (token) {
+	  if (currentState.holdToken === false) {
+	    currentState.holdToken = currentState.stagedToken;
+	  }
+	  currentState.stagedToken = token;
+	  this.emitChange();
+	};
+
+	QuidStore.usePowerUp = function (token) {
+	  var type = token.slice(0, 3),
+	      cons;
+
+	  if (type === 'oil') {
+	    currentState.bankBalance = currentState.bankBalance + 25000;
+	  } else if (type === 'agr') {
+	    currentState.freeze = currentState.freeze + 10;
+	  } else if (type === 'mil') {
+	    cons = this.findTokenCoords('con1');
+	    this.clearMatches(cons);
+	  } else {
+	    currentState.bankBalance = currentState.bankBalance + 250000;
+	  }
+	  currentState.helpers[token]--;
+	  this.emitChange();
+	};
+
 	QuidStore.completeMove = function (rowPos, colPos) {
 	  var token = currentState.stagedToken,
 	      moves = currentState.movesRemaining,
+	      swarm = false,
 	      progressionData;
 
 	  //handle placement of tokens
@@ -19889,14 +19925,11 @@
 	    token = this.convertMega(rowPos, colPos);
 	  } else if (token === 'pork') {
 	    currentState.porkOn.push(JSON.stringify([rowPos, colPos]));
+	  } else if (token.slice(0, 3) === 'con' && token !== 'con1') {
+	    this.addAppeasement(token, rowPos, colPos);
 	  }
 	  token = this.handleMatches(token, rowPos, colPos);
 	  currentState.board.grid[rowPos][colPos] = token;
-
-	  //handle special token removal
-	  if (currentState.createPowerUp.length !== 0) {
-	    this.removeTopLevelTokens();
-	  }
 
 	  //update move count, handle phase/move-triggered events
 	  currentState.movesRemaining--;
@@ -19915,11 +19948,23 @@
 	    currentState.newMessage = false;
 	  }
 
+	  //handle special token removal
+	  if (currentState.createPowerUp.length !== 0) {
+	    this.removeTopLevelTokens();
+	  }
+	  if (currentState.appeasements.length !== 0) {
+	    this.checkAppeasements();
+	    this.removeConstituents(token, rowPos, colPos);
+	  }
+
 	  //check game end, proceed to automatic actions
 	  if (this.isGameOver()) {
 	    this.endGame('board');
 	  } else {
-	    this.moveConstituents(rowPos, colPos);
+	    if (currentState.appeasements.length + 3 < currentState.levelFives.length && currentState.movesRemaining % 7 === 1) {
+	      swarm = true;
+	    }
+	    this.moveConstituents(rowPos, colPos, swarm);
 	    this.setNextToken();
 	    if (token.slice(3, 4) === '5') {
 	      this.addTopLevelToken(token, rowPos, colPos);
@@ -20039,7 +20084,7 @@
 	  return currentConsCoords;
 	};
 
-	QuidStore.moveConstituents = function (rowPos, colPos) {
+	QuidStore.moveConstituents = function (rowPos, colPos, swarm) {
 	  var currentConsCoords = this.findTokenCoords('con1'),
 	      emptyCoords = [],
 	      newRowPos,
@@ -20047,19 +20092,75 @@
 	      newCoords,
 	      x,
 	      y;
-
-	  for (var i = 0; i < currentConsCoords.length; i++) {
-	    x = currentConsCoords[i][0], y = currentConsCoords[i][1];
-	    if (x !== rowPos || y !== colPos) {
-	      emptyCoords = this.cardinalCheck('', x, y);
-	      if (emptyCoords.length > 0) {
-	        newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
-	        newRowPos = newCoords[0];
-	        newColPos = newCoords[1];
-	        currentState.board.grid[newRowPos][newColPos] = 'con1';
-	        currentState.board.grid[x][y] = '';
+	  if (currentState.freeze === 0) {
+	    for (var i = 0; i < currentConsCoords.length; i++) {
+	      x = currentConsCoords[i][0], y = currentConsCoords[i][1];
+	      if (x !== rowPos || y !== colPos) {
+	        emptyCoords = this.cardinalCheck('', x, y);
+	        if (emptyCoords.length > 0) {
+	          newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
+	          newRowPos = newCoords[0];
+	          newColPos = newCoords[1];
+	          currentState.board.grid[newRowPos][newColPos] = 'con1';
+	          if (!swarm) {
+	            currentState.board.grid[x][y] = '';
+	          }
+	        }
 	      }
 	    }
+	  } else {
+	    currentState.freeze--;
+	  }
+	};
+
+	QuidStore.removeConstituents = function (token, rowPos, colPos) {
+	  var appeasements = currentState.appeasements,
+	      me = this,
+	      toClearCoords;
+
+	  appeasements.forEach(function (app) {
+	    toClearCoords = me.cardinalCheck('con1', app[0], app[1]);
+	    me.clearMatches(toClearCoords);
+	  });
+	  currentState.board.grid[rowPos][colPos] = token;
+	};
+
+	QuidStore.addAppeasement = function (token, rowPos, colPos) {
+	  var min = _utils2.default.getTokenData(token, 'dMin'),
+	      max = _utils2.default.getTokenData(token, 'dMax'),
+	      time = Math.floor(Math.random() * (max - min)) + min,
+	      moveTrigger = currentState.movesRemaining - time,
+	      phaseTrigger = currentState.phase;
+
+	  while (moveTrigger < 0) {
+	    phaseTrigger++;
+	    moveTrigger = moveTrigger + _utils2.default.getPhaseData(phaseTrigger)['moves'];
+	  }
+	  currentState.appeasements.push([rowPos, colPos, token, moveTrigger, phaseTrigger]);
+	};
+
+	QuidStore.checkAppeasements = function () {
+	  var appeasements = currentState.appeasements,
+	      phase = currentState.phase,
+	      move = currentState.movesRemaining,
+	      indexes = [],
+	      i;
+
+	  for (i = appeasements.length - 1; i >= 0; i--) {
+	    if (appeasements[i][4] === phase && appeasements[i][3] === move) {
+	      this.removeAppeasement(i, appeasements[i][0], appeasements[i][1], appeasements[i][2]);
+	    }
+	  }
+	};
+
+	QuidStore.removeAppeasement = function (index, rowPos, colPos, token) {
+	  var newToken = _utils2.default.getTokenData(token, 'nextDown');
+
+	  currentState.appeasements.splice(index, 1);
+	  currentState.board.grid[rowPos][colPos] = newToken;
+
+	  if (newToken !== '') {
+	    this.addAppeasement(newToken, rowPos, colPos);
 	  }
 	};
 
@@ -20067,7 +20168,12 @@
 	  var tokens = currentState.tokensArray,
 	      valStrings = [];
 
-	  currentState.stagedToken = tokens[Math.floor(Math.random() * tokens.length)];
+	  if (currentState.holdToken === false) {
+	    currentState.stagedToken = tokens[Math.floor(Math.random() * tokens.length)];
+	  } else {
+	    currentState.stagedToken = currentState.holdToken;
+	    currentState.holdToken = false;
+	  }
 
 	  if (currentState.stagedToken === 'mega') {
 	    this.checkMegaValid();
@@ -20088,11 +20194,20 @@
 
 	QuidStore.removeTopLevelTokens = function () {
 	  var coords = currentState.createPowerUp,
-	      token = currentState.board.grid[coords[0][0]][coords[0][1]];
+	      token = currentState.board.grid[coords[0][0]][coords[0][1]],
+	      powerUp = token.slice(0, 3) + '6',
+	      stringCoords,
+	      index;
 
 	  this.clearMatches(coords);
+	  coords.forEach(function (spot) {
+	    stringCoords = JSON.stringify(spot);
+	    index = currentState.levelFives.indexOf(stringCoords);
+	    currentState.levelFives.splice(index, 1);
+	  });
 	  currentState.createPowerUp = [];
-	  //TODO: When power-ups created, power-ups++!!!
+	  currentState.helpers[powerUp]++;
+	  currentState.score = currentState.score + 555;
 	};
 
 	QuidStore.convertMega = function (rowPos, colPos) {
@@ -20303,12 +20418,12 @@
 	      'fin5': { nextUp: 'final', pts: 1999, mPts: 0, val: 2000, mVal: 0 },
 
 	      'con1': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
-	      'con2': { nextUp: 'final', pts: 7, mPts: 0, val: -100, mVal: 0, dMin: 25, dMax: 40 },
-	      'con3': { nextUp: 'final', pts: 8, mPts: 0, val: -1000, mVal: 0, dMin: 25, dMax: 45 },
-	      'con4': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0, dMin: 25, dMax: 45 },
-	      'con5': { nextUp: 'final', pts: 9, mPts: 0, val: -5000, mVal: 0, dMin: 35, dMax: 55 },
-	      'con6': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0, dMin: 35, dMax: 60 },
-	      'con7': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0, dMin: 35, dMax: 70 },
+	      'con2': { nextUp: 'final', pts: 7, mPts: 0, val: -100, mVal: 0, dMin: 25, dMax: 40, nextDown: '' },
+	      'con3': { nextUp: 'final', pts: 8, mPts: 0, val: -1000, mVal: 0, dMin: 25, dMax: 45, nextDown: 'con4' },
+	      'con4': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0, dMin: 25, dMax: 45, nextDown: '' },
+	      'con5': { nextUp: 'final', pts: 9, mPts: 0, val: -5000, mVal: 0, dMin: 35, dMax: 55, nextDown: 'con6' },
+	      'con6': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0, dMin: 35, dMax: 60, nextDown: 'con7' },
+	      'con7': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0, dMin: 35, dMax: 70, nextDown: '' },
 	      'mega': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
 	      'pork': { nextUp: 'final', pts: 666, mPts: 0, val: 666, mVal: 0 }
 	    };
@@ -20792,65 +20907,54 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _store = __webpack_require__(160);
+	var _BenchSeat = __webpack_require__(164);
 
-	var _store2 = _interopRequireDefault(_store);
-
-	var _GridSquare = __webpack_require__(164);
-
-	var _GridSquare2 = _interopRequireDefault(_GridSquare);
+	var _BenchSeat2 = _interopRequireDefault(_BenchSeat);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var Grid = _react2.default.createClass({
-	  displayName: 'Grid',
+	var Bench = _react2.default.createClass({
+	  displayName: 'Bench',
 
 	  render: function render() {
-	    var squares = [],
-	        rowNum = this.props.board.rows,
-	        colNum = this.props.board.columns,
-	        count = 0,
-	        i,
-	        j;
+	    var seats = [],
+	        helpers = this.props.helpers,
+	        tokens = Object.keys(helpers),
+	        powerUp,
+	        token,
+	        count,
+	        i;
 
-	    for (i = 0; i < rowNum; i++) {
-	      for (j = 0; j < colNum; j++) {
-	        count++;
-	        squares.push(_react2.default.createElement(_GridSquare2.default, { rowPos: i, colPos: j, token: this.props.board.grid[i][j], eligible: this.checkDrop(i, j), aboutToGo: this.checkUplift(i, j), key: count }));
+	    for (i = 0; i < tokens.length; i++) {
+	      token = tokens[i];
+	      powerUp = token.slice(3, 4) === '6';
+	      count = helpers[token];
+	      if (count > 0) {
+	        seats.push(_react2.default.createElement(_BenchSeat2.default, { token: token, count: count, powerUp: powerUp, key: i }));
 	      }
 	    }
 
 	    return _react2.default.createElement(
 	      'div',
-	      { style: this.styles.mainGrid },
-	      squares
+	      { style: this.styles.bench },
+	      seats
 	    );
 	  },
 
-	  checkDrop: function checkDrop(rowPos, colPos) {
-	    return _store2.default.isEligible(rowPos, colPos);
-	  },
-
-	  checkUplift: function checkUplift(rowPos, colPos) {
-	    return _store2.default.isAboutToGo(rowPos, colPos);
-	  },
-
 	  styles: {
-	    mainGrid: {
-	      backgroundColor: '#A4BD99',
-	      height: "100%",
-	      width: "69%",
-	      display: 'inline-block',
-	      marginTop: '20px',
-	      marginBottom: '20px',
-	      //Set min-width so always have 6 columns
-	      minWidth: '550px'
+	    bench: {
+	      color: 'white',
+	      backgroundColor: '#966F33',
+	      height: '70px',
+	      float: 'left',
+	      width: '500px',
+	      display: 'block',
+	      position: 'relative'
 	    }
 	  }
-
 	});
 
-	exports.default = Grid;
+	exports.default = Bench;
 
 /***/ },
 /* 164 */
@@ -20866,6 +20970,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _Token = __webpack_require__(165);
+
+	var _Token2 = _interopRequireDefault(_Token);
+
 	var _store = __webpack_require__(160);
 
 	var _store2 = _interopRequireDefault(_store);
@@ -20874,57 +20982,54 @@
 
 	var _utils2 = _interopRequireDefault(_utils);
 
-	var _Token = __webpack_require__(165);
-
-	var _Token2 = _interopRequireDefault(_Token);
-
-	var _radium = __webpack_require__(167);
-
-	var _radium2 = _interopRequireDefault(_radium);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var GridSquare = _react2.default.createClass({
-	  displayName: 'GridSquare',
+	var BenchSeat = _react2.default.createClass({
+	  displayName: 'BenchSeat',
 
 	  render: function render() {
-	    var tokenGroup = this.props.token.slice(0, 3),
-	        aboutToGo = this.props.aboutToGo;
+	    var powerUp = this.props.powerUp,
+	        tokenGroup = this.props.token.slice(0, 3);
 	    return _react2.default.cloneElement(_react2.default.createElement(
 	      'div',
-	      { onClick: this.placeToken },
-	      _react2.default.createElement(_Token2.default, { symbol: this.props.token })
+	      { onClick: this.useHelper },
+	      _react2.default.createElement(_Token2.default, { symbol: this.props.token }),
+	      _react2.default.createElement(
+	        'span',
+	        { style: { color: 'white' } },
+	        ' ',
+	        this.props.count,
+	        ' '
+	      )
 	    ), { style: {
+	        float: this.pickSide(powerUp),
 	        color: _utils2.default.handleColors(tokenGroup, 'color'),
-	        backgroundColor: this.handleAboutToGo(aboutToGo, tokenGroup),
-	        ':hover': { backgroundColor: _utils2.default.handleColors(tokenGroup, 'hover') },
-	        height: '16.29%',
-	        width: '16.66%',
+	        backgroundColor: _utils2.default.handleColors(tokenGroup, 'bColor'),
+	        width: '60px',
+	        height: '60px',
 	        display: 'inline-block',
 	        position: 'relative',
-	        marginBottom: '-4px',
-	        minHeight: '90px',
-	        minWidth: '90px'
+	        padding: '5px'
 	      }
 	    });
 	  },
 
-	  placeToken: function placeToken() {
-	    if (this.props.eligible) {
-	      _store2.default.completeMove(this.props.rowPos, this.props.colPos);
+	  useHelper: function useHelper() {
+	    var token = this.props.token;
+
+	    if (this.props.powerUp) {
+	      _store2.default.usePowerUp(token);
+	    } else {
+	      _store2.default.useAppeasement(token);
 	    }
 	  },
 
-	  handleAboutToGo: function handleAboutToGo(selected, tokenGroup) {
-	    if (selected) {
-	      return 'magenta';
-	    } else {
-	      return _utils2.default.handleColors(tokenGroup, 'bColor');
-	    }
+	  pickSide: function pickSide(powerUp) {
+	    return powerUp ? 'left' : 'right';
 	  }
 	});
 
-	exports.default = (0, _radium2.default)(GridSquare);
+	exports.default = BenchSeat;
 
 /***/ },
 /* 165 */
@@ -21063,31 +21168,179 @@
 	  value: true
 	});
 
-	var _enhancer = __webpack_require__(168);
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _store = __webpack_require__(160);
+
+	var _store2 = _interopRequireDefault(_store);
+
+	var _GridSquare = __webpack_require__(168);
+
+	var _GridSquare2 = _interopRequireDefault(_GridSquare);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Grid = _react2.default.createClass({
+	  displayName: 'Grid',
+
+	  render: function render() {
+	    var squares = [],
+	        rowNum = this.props.board.rows,
+	        colNum = this.props.board.columns,
+	        count = 0,
+	        i,
+	        j;
+
+	    for (i = 0; i < rowNum; i++) {
+	      for (j = 0; j < colNum; j++) {
+	        count++;
+	        squares.push(_react2.default.createElement(_GridSquare2.default, { rowPos: i, colPos: j, token: this.props.board.grid[i][j], eligible: this.checkDrop(i, j), aboutToGo: this.checkUplift(i, j), key: count }));
+	      }
+	    }
+
+	    return _react2.default.createElement(
+	      'div',
+	      { style: this.styles.mainGrid },
+	      squares
+	    );
+	  },
+
+	  checkDrop: function checkDrop(rowPos, colPos) {
+	    return _store2.default.isEligible(rowPos, colPos);
+	  },
+
+	  checkUplift: function checkUplift(rowPos, colPos) {
+	    return _store2.default.isAboutToGo(rowPos, colPos);
+	  },
+
+	  styles: {
+	    mainGrid: {
+	      backgroundColor: '#A4BD99',
+	      height: "100%",
+	      width: "69%",
+	      display: 'inline-block',
+	      marginTop: '5px',
+	      marginBottom: '20px',
+	      //Set min-width so always have 6 columns
+	      minWidth: '550px'
+	    }
+	  }
+
+	});
+
+	exports.default = Grid;
+
+/***/ },
+/* 168 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _store = __webpack_require__(160);
+
+	var _store2 = _interopRequireDefault(_store);
+
+	var _utils = __webpack_require__(161);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
+	var _Token = __webpack_require__(165);
+
+	var _Token2 = _interopRequireDefault(_Token);
+
+	var _radium = __webpack_require__(169);
+
+	var _radium2 = _interopRequireDefault(_radium);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var GridSquare = _react2.default.createClass({
+	  displayName: 'GridSquare',
+
+	  render: function render() {
+	    var tokenGroup = this.props.token.slice(0, 3),
+	        aboutToGo = this.props.aboutToGo;
+	    return _react2.default.cloneElement(_react2.default.createElement(
+	      'div',
+	      { onClick: this.placeToken },
+	      _react2.default.createElement(_Token2.default, { symbol: this.props.token })
+	    ), { style: {
+	        color: _utils2.default.handleColors(tokenGroup, 'color'),
+	        backgroundColor: this.handleAboutToGo(aboutToGo, tokenGroup),
+	        ':hover': { backgroundColor: _utils2.default.handleColors(tokenGroup, 'hover') },
+	        height: '16.29%',
+	        width: '16.66%',
+	        display: 'inline-block',
+	        position: 'relative',
+	        marginBottom: '-4px',
+	        minHeight: '90px',
+	        minWidth: '90px'
+	      }
+	    });
+	  },
+
+	  placeToken: function placeToken() {
+	    if (this.props.eligible) {
+	      _store2.default.completeMove(this.props.rowPos, this.props.colPos);
+	    }
+	  },
+
+	  handleAboutToGo: function handleAboutToGo(selected, tokenGroup) {
+	    if (selected) {
+	      return 'magenta';
+	    } else {
+	      return _utils2.default.handleColors(tokenGroup, 'bColor');
+	    }
+	  }
+	});
+
+	exports.default = (0, _radium2.default)(GridSquare);
+
+/***/ },
+/* 169 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _enhancer = __webpack_require__(170);
 
 	var _enhancer2 = _interopRequireDefault(_enhancer);
 
-	var _plugins = __webpack_require__(172);
+	var _plugins = __webpack_require__(174);
 
 	var _plugins2 = _interopRequireDefault(_plugins);
 
-	var _style = __webpack_require__(212);
+	var _style = __webpack_require__(214);
 
 	var _style2 = _interopRequireDefault(_style);
 
-	var _styleRoot = __webpack_require__(213);
+	var _styleRoot = __webpack_require__(215);
 
 	var _styleRoot2 = _interopRequireDefault(_styleRoot);
 
-	var _getState = __webpack_require__(206);
+	var _getState = __webpack_require__(208);
 
 	var _getState2 = _interopRequireDefault(_getState);
 
-	var _keyframes = __webpack_require__(175);
+	var _keyframes = __webpack_require__(177);
 
 	var _keyframes2 = _interopRequireDefault(_keyframes);
 
-	var _resolveStyles = __webpack_require__(170);
+	var _resolveStyles = __webpack_require__(172);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21106,7 +21359,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 168 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -21122,11 +21375,11 @@
 
 	var _react = __webpack_require__(1);
 
-	var _styleKeeper = __webpack_require__(169);
+	var _styleKeeper = __webpack_require__(171);
 
 	var _styleKeeper2 = _interopRequireDefault(_styleKeeper);
 
-	var _resolveStyles = __webpack_require__(170);
+	var _resolveStyles = __webpack_require__(172);
 
 	var _resolveStyles2 = _interopRequireDefault(_resolveStyles);
 
@@ -21288,7 +21541,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 169 */
+/* 171 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21360,7 +21613,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 170 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21373,27 +21626,27 @@
 	  value: true
 	});
 
-	var _config = __webpack_require__(171);
+	var _config = __webpack_require__(173);
 
-	var _cssRuleSetToString = __webpack_require__(176);
+	var _cssRuleSetToString = __webpack_require__(178);
 
 	var _cssRuleSetToString2 = _interopRequireDefault(_cssRuleSetToString);
 
-	var _getState = __webpack_require__(206);
+	var _getState = __webpack_require__(208);
 
 	var _getState2 = _interopRequireDefault(_getState);
 
-	var _getStateKey = __webpack_require__(207);
+	var _getStateKey = __webpack_require__(209);
 
 	var _getStateKey2 = _interopRequireDefault(_getStateKey);
 
-	var _mergeStyles = __webpack_require__(208);
+	var _mergeStyles = __webpack_require__(210);
 
-	var _plugins = __webpack_require__(172);
+	var _plugins = __webpack_require__(174);
 
 	var _plugins2 = _interopRequireDefault(_plugins);
 
-	var _exenv = __webpack_require__(211);
+	var _exenv = __webpack_require__(213);
 
 	var _exenv2 = _interopRequireDefault(_exenv);
 
@@ -21694,15 +21947,15 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 171 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _plugins = __webpack_require__(172);
+	var _plugins = __webpack_require__(174);
 
 /***/ },
-/* 172 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21711,29 +21964,29 @@
 	  value: true
 	});
 
-	var _config = __webpack_require__(171);
+	var _config = __webpack_require__(173);
 
-	var _checkPropsPlugin = __webpack_require__(173);
+	var _checkPropsPlugin = __webpack_require__(175);
 
 	var _checkPropsPlugin2 = _interopRequireDefault(_checkPropsPlugin);
 
-	var _keyframesPlugin = __webpack_require__(174);
+	var _keyframesPlugin = __webpack_require__(176);
 
 	var _keyframesPlugin2 = _interopRequireDefault(_keyframesPlugin);
 
-	var _mergeStyleArrayPlugin = __webpack_require__(200);
+	var _mergeStyleArrayPlugin = __webpack_require__(202);
 
 	var _mergeStyleArrayPlugin2 = _interopRequireDefault(_mergeStyleArrayPlugin);
 
-	var _prefixPlugin = __webpack_require__(201);
+	var _prefixPlugin = __webpack_require__(203);
 
 	var _prefixPlugin2 = _interopRequireDefault(_prefixPlugin);
 
-	var _resolveInteractionStylesPlugin = __webpack_require__(202);
+	var _resolveInteractionStylesPlugin = __webpack_require__(204);
 
 	var _resolveInteractionStylesPlugin2 = _interopRequireDefault(_resolveInteractionStylesPlugin);
 
-	var _resolveMediaQueriesPlugin = __webpack_require__(204);
+	var _resolveMediaQueriesPlugin = __webpack_require__(206);
 
 	var _resolveMediaQueriesPlugin2 = _interopRequireDefault(_resolveMediaQueriesPlugin);
 
@@ -21752,7 +22005,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 173 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -21765,7 +22018,7 @@
 	  value: true
 	});
 
-	var _index = __webpack_require__(172);
+	var _index = __webpack_require__(174);
 
 	var _checkProps = function checkProps() {};
 
@@ -21821,7 +22074,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 174 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21831,9 +22084,9 @@
 	});
 	exports.default = keyframesPlugin;
 
-	var _index = __webpack_require__(172);
+	var _index = __webpack_require__(174);
 
-	var _keyframes = __webpack_require__(175);
+	var _keyframes = __webpack_require__(177);
 
 	function keyframesPlugin(_ref // eslint-disable-line no-shadow
 	) {
@@ -21863,7 +22116,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 175 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21873,15 +22126,15 @@
 	});
 	exports.default = keyframes;
 
-	var _cssRuleSetToString = __webpack_require__(176);
+	var _cssRuleSetToString = __webpack_require__(178);
 
 	var _cssRuleSetToString2 = _interopRequireDefault(_cssRuleSetToString);
 
-	var _hash = __webpack_require__(199);
+	var _hash = __webpack_require__(201);
 
 	var _hash2 = _interopRequireDefault(_hash);
 
-	var _prefixer = __webpack_require__(180);
+	var _prefixer = __webpack_require__(182);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21902,7 +22155,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 176 */
+/* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21912,19 +22165,19 @@
 	});
 	exports.default = cssRuleSetToString;
 
-	var _appendPxIfNeeded = __webpack_require__(177);
+	var _appendPxIfNeeded = __webpack_require__(179);
 
 	var _appendPxIfNeeded2 = _interopRequireDefault(_appendPxIfNeeded);
 
-	var _camelCasePropsToDashCase = __webpack_require__(178);
+	var _camelCasePropsToDashCase = __webpack_require__(180);
 
 	var _camelCasePropsToDashCase2 = _interopRequireDefault(_camelCasePropsToDashCase);
 
-	var _mapObject = __webpack_require__(179);
+	var _mapObject = __webpack_require__(181);
 
 	var _mapObject2 = _interopRequireDefault(_mapObject);
 
-	var _prefixer = __webpack_require__(180);
+	var _prefixer = __webpack_require__(182);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21951,7 +22204,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 177 */
+/* 179 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -22004,7 +22257,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 178 */
+/* 180 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -22043,7 +22296,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 179 */
+/* 181 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -22061,7 +22314,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 180 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, process) {'use strict';
@@ -22072,7 +22325,7 @@
 	exports.getPrefixedKeyframes = getPrefixedKeyframes;
 	exports.getPrefixedStyle = getPrefixedStyle;
 
-	var _inlineStylePrefixer = __webpack_require__(181);
+	var _inlineStylePrefixer = __webpack_require__(183);
 
 	var _inlineStylePrefixer2 = _interopRequireDefault(_inlineStylePrefixer);
 
@@ -22132,7 +22385,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(4)))
 
 /***/ },
-/* 181 */
+/* 183 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22151,31 +22404,31 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var _utilsGetBrowserInformation = __webpack_require__(182);
+	var _utilsGetBrowserInformation = __webpack_require__(184);
 
 	var _utilsGetBrowserInformation2 = _interopRequireDefault(_utilsGetBrowserInformation);
 
-	var _utilsGetPrefixedKeyframes = __webpack_require__(184);
+	var _utilsGetPrefixedKeyframes = __webpack_require__(186);
 
 	var _utilsGetPrefixedKeyframes2 = _interopRequireDefault(_utilsGetPrefixedKeyframes);
 
-	var _utilsCapitalizeString = __webpack_require__(185);
+	var _utilsCapitalizeString = __webpack_require__(187);
 
 	var _utilsCapitalizeString2 = _interopRequireDefault(_utilsCapitalizeString);
 
-	var _utilsAssign = __webpack_require__(186);
+	var _utilsAssign = __webpack_require__(188);
 
 	var _utilsAssign2 = _interopRequireDefault(_utilsAssign);
 
-	var _utilsWarn = __webpack_require__(187);
+	var _utilsWarn = __webpack_require__(189);
 
 	var _utilsWarn2 = _interopRequireDefault(_utilsWarn);
 
-	var _caniuseData = __webpack_require__(188);
+	var _caniuseData = __webpack_require__(190);
 
 	var _caniuseData2 = _interopRequireDefault(_caniuseData);
 
-	var _Plugins = __webpack_require__(189);
+	var _Plugins = __webpack_require__(191);
 
 	var _Plugins2 = _interopRequireDefault(_Plugins);
 
@@ -22369,7 +22622,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 182 */
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22380,7 +22633,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _bowser = __webpack_require__(183);
+	var _bowser = __webpack_require__(185);
 
 	var _bowser2 = _interopRequireDefault(_bowser);
 
@@ -22585,7 +22838,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 183 */
+/* 185 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -22882,7 +23135,7 @@
 
 
 /***/ },
-/* 184 */
+/* 186 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -22907,7 +23160,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 185 */
+/* 187 */
 /***/ function(module, exports) {
 
 	// helper to capitalize strings
@@ -22924,7 +23177,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 186 */
+/* 188 */
 /***/ function(module, exports) {
 
 	// leight polyfill for Object.assign
@@ -22946,7 +23199,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 187 */
+/* 189 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {// only throw warnings if devmode is enabled
@@ -22966,13 +23219,13 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 188 */
+/* 190 */
 /***/ function(module, exports) {
 
 	var caniuseData = {"chrome":{"transform":35,"transformOrigin":35,"transformOriginX":35,"transformOriginY":35,"backfaceVisibility":35,"perspective":35,"perspectiveOrigin":35,"transformStyle":35,"transformOriginZ":35,"animation":42,"animationDelay":42,"animationDirection":42,"animationFillMode":42,"animationDuration":42,"animationIterationCount":42,"animationName":42,"animationPlayState":42,"animationTimingFunction":42,"appearance":50,"userSelect":50,"fontKerning":32,"textEmphasisPosition":50,"textEmphasis":50,"textEmphasisStyle":50,"textEmphasisColor":50,"boxDecorationBreak":50,"clipPath":50,"maskImage":50,"maskMode":50,"maskRepeat":50,"maskPosition":50,"maskClip":50,"maskOrigin":50,"maskSize":50,"maskComposite":50,"mask":50,"maskBorderSource":50,"maskBorderMode":50,"maskBorderSlice":50,"maskBorderWidth":50,"maskBorderOutset":50,"maskBorderRepeat":50,"maskBorder":50,"maskType":50,"textDecorationStyle":50,"textDecorationSkip":50,"textDecorationLine":50,"textDecorationColor":50,"filter":50,"fontFeatureSettings":47,"breakAfter":50,"breakBefore":50,"breakInside":50,"columnCount":50,"columnFill":50,"columnGap":50,"columnRule":50,"columnRuleColor":50,"columnRuleStyle":50,"columnRuleWidth":50,"columns":50,"columnSpan":50,"columnWidth":50},"safari":{"flex":8,"flexBasis":8,"flexDirection":8,"flexGrow":8,"flexFlow":8,"flexShrink":8,"flexWrap":8,"alignContent":8,"alignItems":8,"alignSelf":8,"justifyContent":8,"order":8,"transition":6,"transitionDelay":6,"transitionDuration":6,"transitionProperty":6,"transitionTimingFunction":6,"transform":8,"transformOrigin":8,"transformOriginX":8,"transformOriginY":8,"backfaceVisibility":8,"perspective":8,"perspectiveOrigin":8,"transformStyle":8,"transformOriginZ":8,"animation":8,"animationDelay":8,"animationDirection":8,"animationFillMode":8,"animationDuration":8,"animationIterationCount":8,"animationName":8,"animationPlayState":8,"animationTimingFunction":8,"appearance":9.1,"userSelect":9.1,"backdropFilter":9.1,"fontKerning":9.1,"scrollSnapType":9.1,"scrollSnapPointsX":9.1,"scrollSnapPointsY":9.1,"scrollSnapDestination":9.1,"scrollSnapCoordinate":9.1,"textEmphasisPosition":7,"textEmphasis":7,"textEmphasisStyle":7,"textEmphasisColor":7,"boxDecorationBreak":9.1,"clipPath":9.1,"maskImage":9.1,"maskMode":9.1,"maskRepeat":9.1,"maskPosition":9.1,"maskClip":9.1,"maskOrigin":9.1,"maskSize":9.1,"maskComposite":9.1,"mask":9.1,"maskBorderSource":9.1,"maskBorderMode":9.1,"maskBorderSlice":9.1,"maskBorderWidth":9.1,"maskBorderOutset":9.1,"maskBorderRepeat":9.1,"maskBorder":9.1,"maskType":9.1,"textDecorationStyle":9.1,"textDecorationSkip":9.1,"textDecorationLine":9.1,"textDecorationColor":9.1,"shapeImageThreshold":9.1,"shapeImageMargin":9.1,"shapeImageOutside":9.1,"filter":9,"hyphens":9.1,"flowInto":9.1,"flowFrom":9.1,"breakBefore":8,"breakAfter":8,"breakInside":8,"regionFragment":9.1,"columnCount":8,"columnFill":8,"columnGap":8,"columnRule":8,"columnRuleColor":8,"columnRuleStyle":8,"columnRuleWidth":8,"columns":8,"columnSpan":8,"columnWidth":8},"firefox":{"appearance":46,"userSelect":46,"boxSizing":28,"textAlignLast":46,"textDecorationStyle":35,"textDecorationSkip":35,"textDecorationLine":35,"textDecorationColor":35,"tabSize":46,"hyphens":42,"fontFeatureSettings":33,"breakAfter":46,"breakBefore":46,"breakInside":46,"columnCount":46,"columnFill":46,"columnGap":46,"columnRule":46,"columnRuleColor":46,"columnRuleStyle":46,"columnRuleWidth":46,"columns":46,"columnSpan":46,"columnWidth":46},"opera":{"flex":16,"flexBasis":16,"flexDirection":16,"flexGrow":16,"flexFlow":16,"flexShrink":16,"flexWrap":16,"alignContent":16,"alignItems":16,"alignSelf":16,"justifyContent":16,"order":16,"transform":22,"transformOrigin":22,"transformOriginX":22,"transformOriginY":22,"backfaceVisibility":22,"perspective":22,"perspectiveOrigin":22,"transformStyle":22,"transformOriginZ":22,"animation":29,"animationDelay":29,"animationDirection":29,"animationFillMode":29,"animationDuration":29,"animationIterationCount":29,"animationName":29,"animationPlayState":29,"animationTimingFunction":29,"appearance":36,"userSelect":36,"fontKerning":19,"textEmphasisPosition":36,"textEmphasis":36,"textEmphasisStyle":36,"textEmphasisColor":36,"boxDecorationBreak":36,"clipPath":36,"maskImage":36,"maskMode":36,"maskRepeat":36,"maskPosition":36,"maskClip":36,"maskOrigin":36,"maskSize":36,"maskComposite":36,"mask":36,"maskBorderSource":36,"maskBorderMode":36,"maskBorderSlice":36,"maskBorderWidth":36,"maskBorderOutset":36,"maskBorderRepeat":36,"maskBorder":36,"maskType":36,"filter":36,"fontFeatureSettings":36,"breakAfter":36,"breakBefore":36,"breakInside":36,"columnCount":36,"columnFill":36,"columnGap":36,"columnRule":36,"columnRuleColor":36,"columnRuleStyle":36,"columnRuleWidth":36,"columns":36,"columnSpan":36,"columnWidth":36},"ie":{"gridAutoRows":11,"gridTemplateColumns":11,"gridTemplate":11,"scrollSnapDestination":11,"gridGap":11,"gridRow":11,"gridRowStart":11,"flexFlow":10,"breakInside":11,"flowInto":11,"wrapThrough":11,"wrapMargin":11,"gridArea":11,"scrollSnapType":11,"transformOrigin":9,"transformOriginX":9,"userSelect":11,"touchAction":10,"scrollSnapPointsY":11,"gridTemplateRows":11,"breakAfter":11,"flexDirection":10,"gridAutoFlow":11,"flex":10,"flexWrap":10,"scrollSnapPointsX":11,"gridTemplateAreas":11,"hyphens":11,"transform":9,"flowFrom":11,"regionFragment":11,"gridColumnGap":11,"gridColumnEnd":11,"gridColumnStart":11,"scrollSnapCoordinate":11,"wrapFlow":11,"gridRowGap":11,"gridRowEnd":11,"breakBefore":11,"transformOriginY":9,"grid":11,"gridAutoColumns":11,"gridColumn":11,"textSizeAdjust":11},"edge":{"userSelect":14,"wrapFlow":14,"wrapThrough":14,"wrapMargin":14,"scrollSnapType":14,"scrollSnapPointsX":14,"scrollSnapPointsY":14,"scrollSnapDestination":14,"scrollSnapCoordinate":14,"hyphens":14,"flowInto":14,"flowFrom":14,"breakBefore":14,"breakAfter":14,"breakInside":14,"regionFragment":14,"gridTemplateColumns":14,"gridTemplateRows":14,"gridTemplateAreas":14,"gridTemplate":14,"gridAutoColumns":14,"gridAutoRows":14,"gridAutoFlow":14,"grid":14,"gridRowStart":14,"gridColumnStart":14,"gridRowEnd":14,"gridRow":14,"gridColumn":14,"gridColumnEnd":14,"gridColumnGap":14,"gridRowGap":14,"gridArea":14,"gridGap":14},"ios_saf":{"flex":8.1,"flexBasis":8.1,"flexDirection":8.1,"flexGrow":8.1,"flexFlow":8.1,"flexShrink":8.1,"flexWrap":8.1,"alignContent":8.1,"alignItems":8.1,"alignSelf":8.1,"justifyContent":8.1,"order":8.1,"transition":6,"transitionDelay":6,"transitionDuration":6,"transitionProperty":6,"transitionTimingFunction":6,"transform":8.1,"transformOrigin":8.1,"transformOriginX":8.1,"transformOriginY":8.1,"backfaceVisibility":8.1,"perspective":8.1,"perspectiveOrigin":8.1,"transformStyle":8.1,"transformOriginZ":8.1,"animation":8.1,"animationDelay":8.1,"animationDirection":8.1,"animationFillMode":8.1,"animationDuration":8.1,"animationIterationCount":8.1,"animationName":8.1,"animationPlayState":8.1,"animationTimingFunction":8.1,"appearance":9.3,"userSelect":9.3,"backdropFilter":9.3,"fontKerning":9.3,"scrollSnapType":9.3,"scrollSnapPointsX":9.3,"scrollSnapPointsY":9.3,"scrollSnapDestination":9.3,"scrollSnapCoordinate":9.3,"boxDecorationBreak":9.3,"clipPath":9.3,"maskImage":9.3,"maskMode":9.3,"maskRepeat":9.3,"maskPosition":9.3,"maskClip":9.3,"maskOrigin":9.3,"maskSize":9.3,"maskComposite":9.3,"mask":9.3,"maskBorderSource":9.3,"maskBorderMode":9.3,"maskBorderSlice":9.3,"maskBorderWidth":9.3,"maskBorderOutset":9.3,"maskBorderRepeat":9.3,"maskBorder":9.3,"maskType":9.3,"textSizeAdjust":9.3,"textDecorationStyle":9.3,"textDecorationSkip":9.3,"textDecorationLine":9.3,"textDecorationColor":9.3,"shapeImageThreshold":9.3,"shapeImageMargin":9.3,"shapeImageOutside":9.3,"filter":9,"hyphens":9.3,"flowInto":9.3,"flowFrom":9.3,"breakBefore":8.1,"breakAfter":8.1,"breakInside":8.1,"regionFragment":9.3,"columnCount":8.1,"columnFill":8.1,"columnGap":8.1,"columnRule":8.1,"columnRuleColor":8.1,"columnRuleStyle":8.1,"columnRuleWidth":8.1,"columns":8.1,"columnSpan":8.1,"columnWidth":8.1},"android":{"borderImage":4.2,"borderImageOutset":4.2,"borderImageRepeat":4.2,"borderImageSlice":4.2,"borderImageSource":4.2,"borderImageWidth":4.2,"flex":4.2,"flexBasis":4.2,"flexDirection":4.2,"flexGrow":4.2,"flexFlow":4.2,"flexShrink":4.2,"flexWrap":4.2,"alignContent":4.2,"alignItems":4.2,"alignSelf":4.2,"justifyContent":4.2,"order":4.2,"transition":4.2,"transitionDelay":4.2,"transitionDuration":4.2,"transitionProperty":4.2,"transitionTimingFunction":4.2,"transform":4.4,"transformOrigin":4.4,"transformOriginX":4.4,"transformOriginY":4.4,"backfaceVisibility":4.4,"perspective":4.4,"perspectiveOrigin":4.4,"transformStyle":4.4,"transformOriginZ":4.4,"animation":4.4,"animationDelay":4.4,"animationDirection":4.4,"animationFillMode":4.4,"animationDuration":4.4,"animationIterationCount":4.4,"animationName":4.4,"animationPlayState":4.4,"animationTimingFunction":4.4,"appearance":46,"userSelect":46,"fontKerning":4.4,"textEmphasisPosition":46,"textEmphasis":46,"textEmphasisStyle":46,"textEmphasisColor":46,"boxDecorationBreak":46,"clipPath":46,"maskImage":46,"maskMode":46,"maskRepeat":46,"maskPosition":46,"maskClip":46,"maskOrigin":46,"maskSize":46,"maskComposite":46,"mask":46,"maskBorderSource":46,"maskBorderMode":46,"maskBorderSlice":46,"maskBorderWidth":46,"maskBorderOutset":46,"maskBorderRepeat":46,"maskBorder":46,"maskType":46,"filter":46,"fontFeatureSettings":46,"breakAfter":46,"breakBefore":46,"breakInside":46,"columnCount":46,"columnFill":46,"columnGap":46,"columnRule":46,"columnRuleColor":46,"columnRuleStyle":46,"columnRuleWidth":46,"columns":46,"columnSpan":46,"columnWidth":46},"and_chr":{"appearance":47,"userSelect":47,"textEmphasisPosition":47,"textEmphasis":47,"textEmphasisStyle":47,"textEmphasisColor":47,"boxDecorationBreak":47,"clipPath":47,"maskImage":47,"maskMode":47,"maskRepeat":47,"maskPosition":47,"maskClip":47,"maskOrigin":47,"maskSize":47,"maskComposite":47,"mask":47,"maskBorderSource":47,"maskBorderMode":47,"maskBorderSlice":47,"maskBorderWidth":47,"maskBorderOutset":47,"maskBorderRepeat":47,"maskBorder":47,"maskType":47,"textDecorationStyle":47,"textDecorationSkip":47,"textDecorationLine":47,"textDecorationColor":47,"filter":47,"fontFeatureSettings":47,"breakAfter":47,"breakBefore":47,"breakInside":47,"columnCount":47,"columnFill":47,"columnGap":47,"columnRule":47,"columnRuleColor":47,"columnRuleStyle":47,"columnRuleWidth":47,"columns":47,"columnSpan":47,"columnWidth":47},"and_uc":{"flex":9.9,"flexBasis":9.9,"flexDirection":9.9,"flexGrow":9.9,"flexFlow":9.9,"flexShrink":9.9,"flexWrap":9.9,"alignContent":9.9,"alignItems":9.9,"alignSelf":9.9,"justifyContent":9.9,"order":9.9,"transition":9.9,"transitionDelay":9.9,"transitionDuration":9.9,"transitionProperty":9.9,"transitionTimingFunction":9.9,"transform":9.9,"transformOrigin":9.9,"transformOriginX":9.9,"transformOriginY":9.9,"backfaceVisibility":9.9,"perspective":9.9,"perspectiveOrigin":9.9,"transformStyle":9.9,"transformOriginZ":9.9,"animation":9.9,"animationDelay":9.9,"animationDirection":9.9,"animationFillMode":9.9,"animationDuration":9.9,"animationIterationCount":9.9,"animationName":9.9,"animationPlayState":9.9,"animationTimingFunction":9.9,"appearance":9.9,"userSelect":9.9,"fontKerning":9.9,"textEmphasisPosition":9.9,"textEmphasis":9.9,"textEmphasisStyle":9.9,"textEmphasisColor":9.9,"maskImage":9.9,"maskMode":9.9,"maskRepeat":9.9,"maskPosition":9.9,"maskClip":9.9,"maskOrigin":9.9,"maskSize":9.9,"maskComposite":9.9,"mask":9.9,"maskBorderSource":9.9,"maskBorderMode":9.9,"maskBorderSlice":9.9,"maskBorderWidth":9.9,"maskBorderOutset":9.9,"maskBorderRepeat":9.9,"maskBorder":9.9,"maskType":9.9,"textSizeAdjust":9.9,"filter":9.9,"hyphens":9.9,"flowInto":9.9,"flowFrom":9.9,"breakBefore":9.9,"breakAfter":9.9,"breakInside":9.9,"regionFragment":9.9,"fontFeatureSettings":9.9,"columnCount":9.9,"columnFill":9.9,"columnGap":9.9,"columnRule":9.9,"columnRuleColor":9.9,"columnRuleStyle":9.9,"columnRuleWidth":9.9,"columns":9.9,"columnSpan":9.9,"columnWidth":9.9},"op_mini":{"borderImage":5,"borderImageOutset":5,"borderImageRepeat":5,"borderImageSlice":5,"borderImageSource":5,"borderImageWidth":5,"tabSize":5,"objectFit":5,"objectPosition":5}}; module.exports = caniuseData
 
 /***/ },
-/* 189 */
+/* 191 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22983,37 +23236,37 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _pluginsCalc = __webpack_require__(190);
+	var _pluginsCalc = __webpack_require__(192);
 
 	var _pluginsCalc2 = _interopRequireDefault(_pluginsCalc);
 
-	var _pluginsCursor = __webpack_require__(191);
+	var _pluginsCursor = __webpack_require__(193);
 
 	var _pluginsCursor2 = _interopRequireDefault(_pluginsCursor);
 
-	var _pluginsFlex = __webpack_require__(192);
+	var _pluginsFlex = __webpack_require__(194);
 
 	var _pluginsFlex2 = _interopRequireDefault(_pluginsFlex);
 
-	var _pluginsSizing = __webpack_require__(193);
+	var _pluginsSizing = __webpack_require__(195);
 
 	var _pluginsSizing2 = _interopRequireDefault(_pluginsSizing);
 
-	var _pluginsGradient = __webpack_require__(194);
+	var _pluginsGradient = __webpack_require__(196);
 
 	var _pluginsGradient2 = _interopRequireDefault(_pluginsGradient);
 
-	var _pluginsTransition = __webpack_require__(195);
+	var _pluginsTransition = __webpack_require__(197);
 
 	var _pluginsTransition2 = _interopRequireDefault(_pluginsTransition);
 
 	// special flexbox specifications
 
-	var _pluginsFlexboxIE = __webpack_require__(197);
+	var _pluginsFlexboxIE = __webpack_require__(199);
 
 	var _pluginsFlexboxIE2 = _interopRequireDefault(_pluginsFlexboxIE);
 
-	var _pluginsFlexboxOld = __webpack_require__(198);
+	var _pluginsFlexboxOld = __webpack_require__(200);
 
 	var _pluginsFlexboxOld2 = _interopRequireDefault(_pluginsFlexboxOld);
 
@@ -23023,7 +23276,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 190 */
+/* 192 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23060,7 +23313,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 191 */
+/* 193 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23103,7 +23356,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 192 */
+/* 194 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23139,7 +23392,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 193 */
+/* 195 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23195,7 +23448,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 194 */
+/* 196 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23234,7 +23487,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 195 */
+/* 197 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23248,11 +23501,11 @@
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-	var _utilsCamelToDashCase = __webpack_require__(196);
+	var _utilsCamelToDashCase = __webpack_require__(198);
 
 	var _utilsCamelToDashCase2 = _interopRequireDefault(_utilsCamelToDashCase);
 
-	var _utilsCapitalizeString = __webpack_require__(185);
+	var _utilsCapitalizeString = __webpack_require__(187);
 
 	var _utilsCapitalizeString2 = _interopRequireDefault(_utilsCapitalizeString);
 
@@ -23312,7 +23565,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 196 */
+/* 198 */
 /***/ function(module, exports) {
 
 	/**
@@ -23334,7 +23587,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 197 */
+/* 199 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23400,7 +23653,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 198 */
+/* 200 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23474,7 +23727,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 199 */
+/* 201 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23505,7 +23758,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 200 */
+/* 202 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23514,7 +23767,7 @@
 	  value: true
 	});
 
-	var _index = __webpack_require__(172);
+	var _index = __webpack_require__(174);
 
 	// Convenient syntax for multiple styles: `style={[style1, style2, etc]}`
 	// Ignores non-objects, so you can do `this.state.isCool && styles.cool`.
@@ -23530,7 +23783,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 201 */
+/* 203 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23540,9 +23793,9 @@
 	});
 	exports.default = prefixPlugin;
 
-	var _index = __webpack_require__(172);
+	var _index = __webpack_require__(174);
 
-	var _prefixer = __webpack_require__(180);
+	var _prefixer = __webpack_require__(182);
 
 	function prefixPlugin(_ref // eslint-disable-line no-shadow
 	) {
@@ -23555,7 +23808,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 202 */
+/* 204 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23564,9 +23817,9 @@
 	  value: true
 	});
 
-	var _index = __webpack_require__(172);
+	var _index = __webpack_require__(174);
 
-	var _mouseUpListener = __webpack_require__(203);
+	var _mouseUpListener = __webpack_require__(205);
 
 	var _mouseUpListener2 = _interopRequireDefault(_mouseUpListener);
 
@@ -23689,7 +23942,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 203 */
+/* 205 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23737,7 +23990,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 204 */
+/* 206 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23749,15 +24002,15 @@
 	});
 	exports.default = resolveMediaQueries;
 
-	var _config = __webpack_require__(171);
+	var _config = __webpack_require__(173);
 
-	var _index = __webpack_require__(172);
+	var _index = __webpack_require__(174);
 
-	var _appendImportantToEachValue = __webpack_require__(205);
+	var _appendImportantToEachValue = __webpack_require__(207);
 
 	var _appendImportantToEachValue2 = _interopRequireDefault(_appendImportantToEachValue);
 
-	var _hash = __webpack_require__(199);
+	var _hash = __webpack_require__(201);
 
 	var _hash2 = _interopRequireDefault(_hash);
 
@@ -23924,7 +24177,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 205 */
+/* 207 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23934,11 +24187,11 @@
 	});
 	exports.default = appendImportantToEachValue;
 
-	var _appendPxIfNeeded = __webpack_require__(177);
+	var _appendPxIfNeeded = __webpack_require__(179);
 
 	var _appendPxIfNeeded2 = _interopRequireDefault(_appendPxIfNeeded);
 
-	var _mapObject = __webpack_require__(179);
+	var _mapObject = __webpack_require__(181);
 
 	var _mapObject2 = _interopRequireDefault(_mapObject);
 
@@ -23952,7 +24205,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 206 */
+/* 208 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23961,7 +24214,7 @@
 	  value: true
 	});
 
-	var _getStateKey = __webpack_require__(207);
+	var _getStateKey = __webpack_require__(209);
 
 	var _getStateKey2 = _interopRequireDefault(_getStateKey);
 
@@ -23977,7 +24230,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 207 */
+/* 209 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -23994,7 +24247,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 208 */
+/* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24007,7 +24260,7 @@
 	exports.isNestedStyle = isNestedStyle;
 	exports.mergeStyles = mergeStyles;
 
-	var _isPlainObject = __webpack_require__(209);
+	var _isPlainObject = __webpack_require__(211);
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
@@ -24045,7 +24298,7 @@
 	}
 
 /***/ },
-/* 209 */
+/* 211 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*!
@@ -24057,7 +24310,7 @@
 
 	'use strict';
 
-	var isObject = __webpack_require__(210);
+	var isObject = __webpack_require__(212);
 
 	function isObjectObject(o) {
 	  return isObject(o) === true
@@ -24088,7 +24341,7 @@
 
 
 /***/ },
-/* 210 */
+/* 212 */
 /***/ function(module, exports) {
 
 	/*!
@@ -24107,7 +24360,7 @@
 
 
 /***/ },
-/* 211 */
+/* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -24152,7 +24405,7 @@
 
 
 /***/ },
-/* 212 */
+/* 214 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24161,7 +24414,7 @@
 	  value: true
 	});
 
-	var _cssRuleSetToString = __webpack_require__(176);
+	var _cssRuleSetToString = __webpack_require__(178);
 
 	var _cssRuleSetToString2 = _interopRequireDefault(_cssRuleSetToString);
 
@@ -24252,7 +24505,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 213 */
+/* 215 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24265,15 +24518,15 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _enhancer = __webpack_require__(168);
+	var _enhancer = __webpack_require__(170);
 
 	var _enhancer2 = _interopRequireDefault(_enhancer);
 
-	var _styleKeeper = __webpack_require__(169);
+	var _styleKeeper = __webpack_require__(171);
 
 	var _styleKeeper2 = _interopRequireDefault(_styleKeeper);
 
-	var _styleSheet = __webpack_require__(214);
+	var _styleSheet = __webpack_require__(216);
 
 	var _styleSheet2 = _interopRequireDefault(_styleSheet);
 
@@ -24337,7 +24590,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 214 */
+/* 216 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24353,7 +24606,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _styleKeeper = __webpack_require__(169);
+	var _styleKeeper = __webpack_require__(171);
 
 	var _styleKeeper2 = _interopRequireDefault(_styleKeeper);
 
@@ -24416,7 +24669,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 215 */
+/* 217 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24429,27 +24682,27 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Message = __webpack_require__(216);
+	var _Message = __webpack_require__(218);
 
 	var _Message2 = _interopRequireDefault(_Message);
 
-	var _Score = __webpack_require__(217);
+	var _Score = __webpack_require__(219);
 
 	var _Score2 = _interopRequireDefault(_Score);
 
-	var _Bank = __webpack_require__(218);
+	var _Bank = __webpack_require__(220);
 
 	var _Bank2 = _interopRequireDefault(_Bank);
 
-	var _Office = __webpack_require__(219);
+	var _Office = __webpack_require__(221);
 
 	var _Office2 = _interopRequireDefault(_Office);
 
-	var _MoveCounter = __webpack_require__(220);
+	var _MoveCounter = __webpack_require__(222);
 
 	var _MoveCounter2 = _interopRequireDefault(_MoveCounter);
 
-	var _NextGoal = __webpack_require__(221);
+	var _NextGoal = __webpack_require__(223);
 
 	var _NextGoal2 = _interopRequireDefault(_NextGoal);
 
@@ -24505,7 +24758,7 @@
 	exports.default = Scoreboard;
 
 /***/ },
-/* 216 */
+/* 218 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24554,7 +24807,7 @@
 	exports.default = Message;
 
 /***/ },
-/* 217 */
+/* 219 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24594,7 +24847,7 @@
 	exports.default = Score;
 
 /***/ },
-/* 218 */
+/* 220 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24633,7 +24886,7 @@
 	exports.default = Bank;
 
 /***/ },
-/* 219 */
+/* 221 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24668,7 +24921,7 @@
 	exports.default = Office;
 
 /***/ },
-/* 220 */
+/* 222 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24703,7 +24956,7 @@
 	exports.default = MoveCounter;
 
 /***/ },
-/* 221 */
+/* 223 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24742,7 +24995,7 @@
 	exports.default = NextGoal;
 
 /***/ },
-/* 222 */
+/* 224 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
