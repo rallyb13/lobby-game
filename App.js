@@ -23,8 +23,8 @@ var App = React.createClass ({
   render(){
     var isGameOver = this.isGameOver(),
       nextBit;
-    if (isGameOver){
-      nextBit = <NextSelect />;
+    if (isGameOver || this.state.movesRemaining === 0){ //TODO: moves at 0 is a placeholder; will soon move handleElection here.
+      nextBit = <NextSelect gameOver={isGameOver} electionPhase={this.state.phase}/>;
     } else {
       nextBit = <Staging stagedToken={this.state.stagedToken} gameOver={isGameOver} />;
     }
