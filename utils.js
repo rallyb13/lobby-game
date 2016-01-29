@@ -62,7 +62,7 @@ var Utils = {
 
   getPhaseData: function(phase){
     var phaseMap = {
-      1: { moves: 180, goal: 125000, msg: ""},
+      1: { moves: 180, goal: 125000, end: "a lowly regional consultant for OilOnU, making a meager $75,000/yr.", msg: ""},
       2: { moves: 145, goal: 105000, msg: "Nice work! But this time you'll face a primary challenger. Prove you can help Big Oil more than Ollie 'Oilcan' Derricks can." },
       3: { moves: 45, goal: 35000, msg: "You greased 'Oilcan' Derricks for the primary win! Now put the pedal to the petrol and nab the general election."},
       4: { moves: 145, goal: 200000, msg: "You've held your seat. Looks like Derricks is back for a tougher challenge, though. Has he got a bigger lobby in his pocket, or is he just glad to see you?"},

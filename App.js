@@ -41,10 +41,15 @@ var App = React.createClass ({
   },
 
   isGameOver: function(){
-    var canMove = QuidStore.findTokenCoords('').length > 0,
-      canSpend = this.state.bankBalance >= 0,
-      gameOn = canMove && canSpend;
-    return !gameOn;
+    if (QuidStore.findTokenCoords('').length > 0){
+      if (this.state.bankBalance >= 0){
+        return false;
+      } else {
+        return 'bank';
+      }
+    } else {
+      return 'board';
+    }
   },
 
   styles: {

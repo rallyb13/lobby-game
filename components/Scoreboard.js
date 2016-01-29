@@ -12,7 +12,7 @@ var Scoreboard = React.createClass({
       <div style={this.styles.scoreboard}>
         <h3 style={this.styles.heading}>White Paper</h3>
         <div style={this.styles.bodyBoard}>
-          <Message alert={this.props.state.newMessage} message={this.props.state.message} gameOver={this.props.gameOver} />
+          <Message alert={this.props.state.newMessage} message={this.props.state.message} phase={this.props.state.phase} gameOver={this.props.gameOver} />
           <Score score={this.props.state.score} />
           <Bank bankBalance={this.props.state.bankBalance} />
           <Office electedOffice={this.props.state.electedOffice} />

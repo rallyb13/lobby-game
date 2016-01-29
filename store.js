@@ -514,12 +514,8 @@ QuidStore.handlePork = function(matches, rowPos, colPos){
 
 QuidStore.handleElection = function(){
   currentState.bankBalance = currentState.bankBalance - currentState.nextGoal;
-  if (currentState.bankBalance < 0){
-    this.endGame('election');
-  } else {
-    currentState.phase++;
-    this.changePhase(currentState.phase);
-  }
+  currentState.phase++;
+  this.changePhase(currentState.phase);
 };
 
 QuidStore.changePhase = function(phase){
@@ -537,18 +533,6 @@ QuidStore.changePhase = function(phase){
   coords = Utils.handleBoardChange(currentState.electedOffice);
   currentState.board.rows = coords[0];
   currentState.board.columns = coords[1];
-};
-
-//TODO: Button to restart game needs to replace stagedToken?
-QuidStore.endGame = function(failType){
-  var reason = 'Game Over.';
-  if (failType === 'board'){
-    reason = reason + ' Talk about gridlock!'
-  } else if (failType === 'election'){
-    reason = reason + ' People can be bought, just not always by you.'
-  }
-  currentState.stagedToken = '';
-  currentState.message = reason;
 };
 
 export default QuidStore;
