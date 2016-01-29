@@ -31,18 +31,10 @@ var GridSquare = React.createClass({
   },
 
   placeToken: function(){
-    if (this.props.eligible) {
+    if (this.props.eligible && !this.props.gameOver) {
       QuidStore.completeMove(this.props.rowPos, this.props.colPos);
     }
-  },
-
-  // handleAboutToGo: function(selected, tokenGroup){
-  //   if (selected){
-  //     return 'magenta';
-  //   } else {
-  //     return Utils.handleColors(tokenGroup, 'bColor');
-  //   }
-  // }
+  }
 });
 
 export default Radium(GridSquare);

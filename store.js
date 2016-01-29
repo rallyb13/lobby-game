@@ -152,18 +152,13 @@ QuidStore.completeMove = function(rowPos, colPos){
     this.removeConstituents(token, rowPos, colPos);
   }
 
-  //check game end, proceed to automatic actions
-  if (this.isGameOver()){
-    this.endGame('board');
-  } else {
-    if (currentState.appeasements.length + 3 < currentState.levelFives.length && currentState.movesRemaining % 7 === 1){
-      swarm = true;
-    }
-    this.moveConstituents(rowPos, colPos, swarm);
-    this.setNextToken();
-    if (token.slice(3,4) === '5'){
-      this.addTopLevelToken(token, rowPos, colPos);
-    }
+  if (currentState.appeasements.length + 3 < currentState.levelFives.length && currentState.movesRemaining % 7 === 1){
+    swarm = true;
+  }
+  this.moveConstituents(rowPos, colPos, swarm);
+  this.setNextToken();
+  if (token.slice(3,4) === '5'){
+    this.addTopLevelToken(token, rowPos, colPos);
   }
   this.emitChange();
 };
@@ -360,7 +355,6 @@ QuidStore.removeAppeasement = function(index, rowPos, colPos, token){
   }
 };
 
-
 QuidStore.setNextToken = function(){
   var tokens = currentState.tokensArray,
     valStrings = [];
@@ -528,7 +522,6 @@ QuidStore.handleElection = function(){
   }
 };
 
-//TODO: all of these Utils maps need to be filled out for whole game
 QuidStore.changePhase = function(phase){
   var phaseData = Utils.getPhaseData(phase),
     coords;
@@ -544,21 +537,6 @@ QuidStore.changePhase = function(phase){
   coords = Utils.handleBoardChange(currentState.electedOffice);
   currentState.board.rows = coords[0];
   currentState.board.columns = coords[1];
-};
-
-QuidStore.isGameOver = function(){
-  var board = currentState.board,
-    gameOver = true;
-
-  for (var i=0; i < board.rows; i++) {
-    for (var j = 0; j < board.columns; j++){
-      if (board.grid[i][j] === ''){
-        gameOver = false;
-        return gameOver;
-      }
-    }
-  }
-  return gameOver;
 };
 
 //TODO: Button to restart game needs to replace stagedToken?

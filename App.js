@@ -20,16 +20,17 @@ var App = React.createClass ({
   },
 
   render(){
+    var isGameOver = this.isGameOver();
     return (
       <div>
         <div style={{maxWidth:'900px', margin: '0 auto'}}>
           <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
           <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange}/>
           <div style={this.styles.panel}>
-            <div><Staging stagedToken={this.state.stagedToken} /></div>
-            <Scoreboard state={this.state} />
+            <div><Staging stagedToken={this.state.stagedToken} gameOver={isGameOver} /></div>
+            <Scoreboard state={this.state} gameOver={isGameOver}/>
           </div>
-          <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toPowerUp={this.state.createPowerUp}/>
+          <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toPowerUp={this.state.createPowerUp} gameOver={isGameOver}/>
         </div>
       </div>
     );
@@ -37,6 +38,13 @@ var App = React.createClass ({
 
   onChange: function() {
     this.setState(QuidStore.getCurrentState());
+  },
+
+  isGameOver: function(){
+    var canMove = QuidStore.findTokenCoords('').length > 0,
+      canSpend = this.state.bankBalance >= 0,
+      gameOn = canMove && canSpend;
+    return !gameOn;
   },
 
   styles: {

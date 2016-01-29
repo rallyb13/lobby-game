@@ -5,10 +5,14 @@ import Utils from '../utils'
 var Staging = React.createClass({
 
 	render: function(){
-		var tokenGroup = this.props.stagedToken.slice(0,3);
+		var tokenGroup = this.props.stagedToken.slice(0,3),
+			tokenDiv = <Token symbol={this.props.stagedToken}/>,
+			gameOver = this.props.gameOver,
+			toStage = gameOver ? <p></p> : tokenDiv;
+
 		return React.cloneElement(
 			<div>
-				<Token symbol={this.props.stagedToken}/>
+				{toStage}
 			</div>,
 			{ style: {
 					color: Utils.handleColors(tokenGroup, 'color'),
