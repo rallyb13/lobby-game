@@ -28,7 +28,7 @@ var currentState = {
   createPowerUp: [], //only has content if set about to be combined
   freeze: 0, //number of moves con1 tokens frozen for
   helpers: {
-    'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 0, 'con5': 0
+    'oil6': 1, 'agr6': 2, 'mil6': 3, 'fin6': 4, 'con2': 1, 'con3': 0, 'con5': 0
   },
   helperChange: false
 };
@@ -89,23 +89,18 @@ QuidStore.useAppeasement = function(token){
   this.emitChange();
 };
 
-QuidStore.usePowerUp = function(token){
-  var type = token.slice(0,3),
-    cons;
+QuidStore.deposit = function(num){
+  currentState.bankBalance = currentState.bankBalance + num;
+};
 
-  if (type === 'oil') {
-    currentState.bankBalance = currentState.bankBalance + 25000;
-  } else if (type === 'agr'){
-    currentState.freeze = currentState.freeze + 10;
-  } else if (type === 'mil'){
-    cons = this.findTokenCoords('con1');
-    this.clearMatches(cons);
-  } else {
-    currentState.bankBalance = currentState.bankBalance + 250000;
-  }
+QuidStore.freezeCons = function(){
+  currentState.freeze = currentState.freeze + 10;
+};
+
+QuidStore.changeHelperCount = function(token){
   currentState.helpers[token]--;
   this.emitChange();
-}
+};
 
 QuidStore.completeMove = function(rowPos, colPos){
   var token = currentState.stagedToken,
@@ -492,7 +487,6 @@ QuidStore.handleScoreboard =function(count, token, isRecursive) {
       points = Math.round(points * 1.3);
       money = Math.round(money * 1.25);
     }
-  } else {
   }
   currentState.score = currentState.score + points;
   currentState.bankBalance = currentState.bankBalance + money;

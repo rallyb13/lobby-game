@@ -33,7 +33,7 @@ var BenchSeat = React.createClass({
     var token = this.props.token;
 
     if (this.props.powerUp){
-      QuidStore.usePowerUp(token);
+      this.usePowerUp(token);
     } else {
       QuidStore.useAppeasement(token);
     }
@@ -41,6 +41,23 @@ var BenchSeat = React.createClass({
 
   pickSide: function(powerUp){
     return powerUp ? 'left' : 'right';
+  },
+
+  usePowerUp: function(token){
+    var type = token.slice(0,3),
+      cons;
+
+    if (type === 'oil') {
+      QuidStore.deposit(25000);
+    } else if (type === 'agr'){
+      QuidStore.freezeCons();
+    } else if (type === 'mil'){
+      cons = QuidStore.findTokenCoords('con1');
+      QuidStore.clearMatches(cons);
+    } else {
+      QuidStore.deposit(250000);
+    }
+    QuidStore.changeHelperCount(token);
   }
 });
 
