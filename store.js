@@ -152,10 +152,12 @@ QuidStore.completeMove = function(rowPos, colPos){
     this.removeConstituents(token, rowPos, colPos);
   }
 
+  //handle constituents
   if (currentState.appeasements.length + 3 < currentState.levelFives.length && currentState.movesRemaining % 7 === 1){
     swarm = true;
   }
   this.moveConstituents(rowPos, colPos, swarm);
+
   this.setNextToken();
   if (token.slice(3,4) === '5'){
     this.addTopLevelToken(token, rowPos, colPos);
@@ -470,15 +472,18 @@ QuidStore.clearMatches = function(matches){
   }
 };
 
-QuidStore.handleScoreboard = function(count, token, isRecursive) {
+QuidStore.handleScoreboard =function(count, token, isRecursive) {
   var points = 0,
     money = 0,
     bigMatchFactor = 1;
+
   if (count < 2 && isRecursive !== true) {
     points = Utils.getTokenData(token, 'pts');
     money = Utils.getTokenData(token, 'val');
   } else if (count >= 2){
-    bigMatchFactor = bigMatchFactor + (count * 0.75);
+    if (count !== 2 && Utils.getTokenData(token, 'nextUp') !== 'final'){
+      bigMatchFactor = (count === 2) ? 1 : 1 + (count * 0.75);
+    }
     points = Utils.getTokenData(token, 'mPts');
     points = Math.round(points * bigMatchFactor);
     money = Utils.getTokenData(token, 'mVal');
@@ -487,6 +492,7 @@ QuidStore.handleScoreboard = function(count, token, isRecursive) {
       points = Math.round(points * 1.3);
       money = Math.round(money * 1.25);
     }
+  } else {
   }
   currentState.score = currentState.score + points;
   currentState.bankBalance = currentState.bankBalance + money;
