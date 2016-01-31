@@ -28,7 +28,7 @@ var currentState = {
   createPowerUp: [], //only has content if set about to be combined
   freeze: 0, //number of moves con1 tokens frozen for
   helpers: {
-    'oil6': 1, 'agr6': 2, 'mil6': 3, 'fin6': 4, 'con2': 1, 'con3': 0, 'con5': 0
+    'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 0, 'con5': 0
   },
   helperChange: false
 };
@@ -51,15 +51,15 @@ QuidStore.setupBoard = function () {
   for (var i=0; i < startingTokens.length; i++) {
     var x = Math.floor(Math.random() * rows),
       y = Math.floor(Math.random() * columns);
-      currentState.board.grid[x][y] = startingTokens[i];
+      this.setToken(startingTokens[i], x, y);
   }
 
   //eliminate pre-matched tokens
   for (var i=0; i < rows; i++){
     for (var j = 0; j < columns; j++){
-      token = currentState.board.grid[i][j];
+      token = this.getToken(i, j);
       if (token !== '' && this.cardinalCheck(token, i, j).length >= 2){
-        currentState.board.grid[i][j] = '';
+        this.setToken('', i, j);
       }
     }
   }
@@ -79,6 +79,14 @@ QuidStore.removeChangeListener = function(callback) {
 
 QuidStore.getCurrentState = function(){
   return currentState;
+};
+
+QuidStore.getToken = function (rowPos, colPos){
+  return currentState.board.grid[rowPos][colPos];
+}
+
+QuidStore.setToken = function (token, rowPos, colPos){
+  currentState.board.grid[rowPos][colPos] = token;
 };
 
 QuidStore.useAppeasement = function(token){
@@ -117,7 +125,7 @@ QuidStore.completeMove = function(rowPos, colPos){
     this.addAppeasement(token, rowPos, colPos);
   }
   token = this.handleMatches(token, rowPos, colPos);
-  currentState.board.grid[rowPos][colPos] = token;
+  this.setToken(token, rowPos, colPos);
 
   //update move count, handle phase/move-triggered events
   currentState.movesRemaining--;
@@ -181,7 +189,7 @@ QuidStore.checkMegaValid = function(){
     for(var i = 0; i < neighbors.length; i++){
       rowPos = neighbors[i][0];
       colPos = neighbors[i][1];
-      token = currentState.board.grid[rowPos][colPos];
+      token = this.getToken(rowPos, colPos);
       if (token !== '' && token.slice(0,3) !== 'con' && token.slice(3) !== '5'){
         //might already have a pair...
         if(me.cardinalCheck(token, rowPos, colPos).length > 0){
@@ -246,7 +254,7 @@ QuidStore.cardinalCheck = function(token, rowPos, colPos){
     checkRow = possibleMatches[i][0];
     checkCol = possibleMatches[i][1];
 
-    if (currentState.board.grid[checkRow][checkCol] === token) {
+    if (this.getToken(checkRow,checkCol) === token) {
       matchCoords.push([checkRow, checkCol]);
     }
   }
@@ -289,9 +297,9 @@ QuidStore.moveConstituents = function(rowPos, colPos, swarm) {
           newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
           newRowPos = newCoords[0];
           newColPos = newCoords[1];
-          currentState.board.grid[newRowPos][newColPos] = 'con1';
+          this.setToken('con1', newRowPos, newColPos);
           if (!swarm) {
-            currentState.board.grid[x][y] = '';
+            this.setToken('', x, y);
           }
         }
       }
@@ -310,7 +318,7 @@ QuidStore.removeConstituents = function(token, rowPos, colPos){
     toClearCoords = me.cardinalCheck('con1', app[0], app[1]);
     me.clearMatches(toClearCoords);
   });
-  currentState.board.grid[rowPos][colPos] = token;
+  this.setToken(token, rowPos, colPos);
 };
 
 QuidStore.addAppeasement = function(token, rowPos, colPos){
@@ -345,7 +353,7 @@ QuidStore.removeAppeasement = function(index, rowPos, colPos, token){
   var newToken = Utils.getTokenData(token, 'nextDown');
 
   currentState.appeasements.splice(index, 1);
-  currentState.board.grid[rowPos][colPos] = newToken;
+  this.setToken(newToken, rowPos, colPos);
 
   if (newToken !== ''){
     this.addAppeasement(newToken, rowPos, colPos);
@@ -382,7 +390,7 @@ QuidStore.addTopLevelToken = function(token, rowPos, colPos){
 
 QuidStore.removeTopLevelTokens = function(){
   var coords = currentState.createPowerUp,
-    token = currentState.board.grid[coords[0][0]][coords[0][1]],
+    token = this.getToken(coords[0][0], coords[0][1]),
     powerUp = token.slice(0, 3) + '6',
     stringCoords,
     index;
@@ -463,7 +471,7 @@ QuidStore.handleMatches = function(token, rowPos, colPos, isRecursive){
 
 QuidStore.clearMatches = function(matches){
   for (var i = 0; i < matches.length; i++){
-    currentState.board.grid[matches[i][0]][matches[i][1]] = '';
+    this.setToken('', matches[i][0], matches[i][1]);
   }
 };
 
@@ -506,7 +514,7 @@ QuidStore.handlePork = function(matches, rowPos, colPos){
         stringCoords = JSON.stringify(pork);
         index = currentState.porkOn.indexOf(stringCoords);
         currentState.porkOn.splice(index, 1);
-        currentState.board.grid[pork[0]][pork[1]] = '';
+        this.setToken('', pork[0], pork[1]);
       });
     }
   });
