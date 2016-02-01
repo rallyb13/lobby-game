@@ -17,6 +17,7 @@ var currentState = {
   nextGoal: 125000,
   electedOffice: 'State Delegate',
   message: 'Click any unoccupied square in the grid to place the next item. Match 3 to make more valuable items.',
+  advanceQuestion: false, //true when phase change should prompt choice of office advancement
   trigger: 160, //move # at which message will change
   newMessage: true, //only true at first appearance of new message
   //special token quick refs
@@ -83,7 +84,7 @@ QuidStore.getCurrentState = function(){
 
 QuidStore.getToken = function (rowPos, colPos){
   return currentState.board.grid[rowPos][colPos];
-}
+};
 
 QuidStore.setToken = function (token, rowPos, colPos){
   currentState.board.grid[rowPos][colPos] = token;
@@ -130,8 +131,7 @@ QuidStore.completeMove = function(rowPos, colPos){
   //update move count, handle phase/move-triggered events
   currentState.movesRemaining--;
   if (moves === 0){
-    this.handleElection();
-    currentState.newMessage = true;
+    currentState.newMessage = true; //TODO: move to message!
   } else if (moves === currentState.trigger) {
     progressionData = Utils.progressGame(currentState.phase, moves);
     if (typeof progressionData !== 'undefined'){
@@ -189,7 +189,7 @@ QuidStore.checkMegaValid = function(){
     for(var i = 0; i < neighbors.length; i++){
       rowPos = neighbors[i][0];
       colPos = neighbors[i][1];
-      token = this.getToken(rowPos, colPos);
+      token = me.getToken(rowPos, colPos);
       if (token !== '' && token.slice(0,3) !== 'con' && token.slice(3) !== '5'){
         //might already have a pair...
         if(me.cardinalCheck(token, rowPos, colPos).length > 0){
@@ -520,15 +520,14 @@ QuidStore.handlePork = function(matches, rowPos, colPos){
   });
 };
 
-QuidStore.handleElection = function(){
-  currentState.bankBalance = currentState.bankBalance - currentState.nextGoal;
-  currentState.phase++;
-  this.changePhase(currentState.phase);
-};
-
-QuidStore.changePhase = function(phase){
-  var phaseData = Utils.getPhaseData(phase),
+QuidStore.changePhase = function(phaseShift){
+  var phase,
+    phaseData,
     coords;
+
+  currentState.phase = currentState.phase + phaseShift;
+  phase = currentState.phase;
+  phaseData = Utils.getPhaseData(phase);
   //change every election
   currentState.movesRemaining = phaseData.moves;
   currentState.nextGoal = phaseData.goal;

@@ -1,5 +1,6 @@
 import React from 'react';
 import QuidStore from './store';
+import Utils from './utils';
 import Bench from './components/Bench';
 import Grid from './components/Grid';
 import NextSelect from './components/NextSelect';
@@ -22,9 +23,15 @@ var App = React.createClass ({
 
   render(){
     var isGameOver = this.isGameOver(),
-      nextBit;
-    if (isGameOver || this.state.movesRemaining === 0){ //TODO: moves at 0 is a placeholder; will soon move handleElection here.
-      nextBit = <NextSelect gameOver={isGameOver} electionPhase={this.state.phase}/>;
+      nextBit,
+      advMsg;
+
+    if(this.state.movesRemaining === 0){
+      advMsg = this.handleElection();
+    }
+
+    if (isGameOver || advMsg !== 'none' ){
+      nextBit = <NextSelect gameOver={isGameOver} advMsg={advMsg} electionPhase={this.state.phase}/>;
     } else {
       nextBit = <Staging stagedToken={this.state.stagedToken} gameOver={isGameOver} />;
     }
@@ -57,6 +64,15 @@ var App = React.createClass ({
     } else {
       return 'board';
     }
+  },
+
+  handleElection: function(){
+    var advMsg = Utils.setElectionChoice(currentState.phase);
+    QuidStore.deposit(-this.state.nextGoal);
+    if (advMsg === 'none'){
+      QuidStore.changePhase(1);
+    }
+    return advMsg;
   },
 
   styles: {
