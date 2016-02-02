@@ -193,11 +193,11 @@ var Utils = {
 
   setElectionChoice: function(phase) {
     var advMsgMap = {
-      5: 'Would you like to run for State Senate?'
-      6: 'NOW would you like to run for State Senate?'
-      12: 'How would you like to go to DC? Want to run for US Rep?'
-      13: 'Want to go to DC now? The US Congress awaits...'
-      18: 'Want to challenge X for that Senate seat?'
+      5: 'Would you like to run for State Senate?',
+      6: 'NOW would you like to run for State Senate?',
+      12: 'How would you like to go to DC? Want to run for US Rep?',
+      13: 'Want to go to DC now? The US Congress awaits...',
+      18: 'Want to challenge X for that Senate seat?',
       19: 'Want to challenge Y for his Senate seat?'
     };
     if (typeof advMsgMap[phase] === 'undefined'){

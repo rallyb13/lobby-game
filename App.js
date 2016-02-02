@@ -23,8 +23,8 @@ var App = React.createClass ({
 
   render(){
     var isGameOver = this.isGameOver(),
-      nextBit,
-      advMsg;
+      advMsg = 'none',
+      nextBit;
 
     if(this.state.movesRemaining === 0){
       advMsg = this.handleElection();
@@ -67,7 +67,7 @@ var App = React.createClass ({
   },
 
   handleElection: function(){
-    var advMsg = Utils.setElectionChoice(currentState.phase);
+    var advMsg = Utils.setElectionChoice(this.state.phase);
     QuidStore.deposit(-this.state.nextGoal);
     if (advMsg === 'none'){
       QuidStore.changePhase(1);
