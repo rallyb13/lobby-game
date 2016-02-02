@@ -10,7 +10,7 @@ var NextSelect = React.createClass({
       displayButton = <button style={this.styles.button} onClick={this.restart}> Restart </button>;
     } else {
       displayButton = <div>
-          <button> Higher Office! </button>
+          <button onClick={this.acceptAdvance} > Higher Office! </button>
           <button onClick={this.refuseAdvance} > Am Comfy Here </button>
           <div>{advMsg}</div>
         </div>;
@@ -36,10 +36,27 @@ var NextSelect = React.createClass({
       adjustment = 1;
     } else if (phase === 6 || phase === 13) {
       adjustment = 0;
-      QuidStore.rerunPhase();
+      QuidStore.rerunPhase(true);
     } else if (phase === 19){
       adjustment = -1
-      QuidStore.rerunPhase();
+      QuidStore.rerunPhase(true);
+    }
+    QuidStore.changePhase(adjustment);
+  },
+
+  acceptAdvance: function(phase, repeat){
+    var phase = this.props.phase,
+      repeat = this.props.repeat,
+      adjustment;
+
+    if (phase === 5 || phase === 12) {
+      adjustment = 2;
+    } else if (phase === 6 || phase === 13){
+      adjustment = 1;
+      QuidStore.rerunPhase(false);
+    } else if (phase === 19){
+      adjustment = repeat === 0 ? 1 : 3;
+      QuidStore.rerunPhase(false);
     }
     QuidStore.changePhase(adjustment);
   },

@@ -12,7 +12,7 @@ var currentState = {
   //white paper data
   movesRemaining: 180,
   score: 0,
-  bankBalance:  0,
+  bankBalance: 0,
   phase: 1,
   repeat: 0, //tracks if level is repeated (when higher office declined)
   nextGoal: 50000,
@@ -112,8 +112,12 @@ QuidStore.changeHelperCount = function(token){
   this.emitChange();
 };
 
-QuidStore.rerunPhase = function(){
-  currentState.repeat++;
+QuidStore.rerunPhase = function(doAdd){
+  if (doAdd){
+    currentState.repeat++;
+  } else {
+    currentState.repeat = 0;
+  }
 }
 
 QuidStore.completeMove = function(rowPos, colPos){
@@ -529,10 +533,11 @@ QuidStore.changePhase = function(phaseShift){
   var phase,
     phaseData,
     coords;
-
+  // console.log('phaseShift: ' + phaseShift);
   currentState.phase = currentState.phase + phaseShift;
   phase = currentState.phase;
   phaseData = Utils.getPhaseData(phase);
+  // console.log(phaseData);
   //change every election
   currentState.movesRemaining = phaseData.moves;
   currentState.nextGoal = phaseData.goal;
@@ -545,6 +550,7 @@ QuidStore.changePhase = function(phaseShift){
   coords = Utils.handleBoardChange(currentState.electedOffice);
   currentState.board.rows = coords[0];
   currentState.board.columns = coords[1];
+  this.emitChange();
 };
 
 export default QuidStore;
