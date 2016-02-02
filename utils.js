@@ -62,17 +62,17 @@ var Utils = {
 
   getPhaseData: function(phase){
     var phaseMap = {
-      1: { moves: 180, goal: 125000, end: "a lowly regional consultant for OilOnU, making a meager $75,000/yr.", msg: ""},
-      2: { moves: 145, goal: 105000, end: "a mid-level special projects consultant for the oil lobby, making only $88,500/yr.",
+      1: { moves: 180, goal: 50000, end: "a lowly regional consultant for OilOnU, making a meager $75,000/yr.", msg: ""},
+      2: { moves: 145, goal: 65000, end: "a mid-level special projects consultant for the oil lobby, making only $88,500/yr.",
         msg: "Nice work! But this time you'll face a primary challenger. Prove you can help Big Oil more than Ollie 'Oilcan' Derricks can." },
-      3: { moves: 45, goal: 35000, end: "a consultant in OilOnU's state office. At $100,000/yr, you'll be fine, buddy.",
+      3: { moves: 45, goal: 30000, end: "a consultant in OilOnU's state office. At $100,000/yr, you'll be fine, buddy.",
         msg: "You greased 'Oilcan' Derricks for the primary win! Now put the pedal to the petrol and nab the general election."},
-      4: { moves: 145, goal: 200000, end: "a consultant. Pack your bags! You're moving to OilCanU's national headquarters. $110,000/yr",
+      4: { moves: 145, goal: 80000, end: "a consultant. Pack your bags! You're moving to OilCanU's national headquarters. $110,000/yr",
         msg: "You've held your seat. Looks like Derricks is back for a tougher challenge, though. Has he got a bigger lobby in his pocket, or is he just glad to see you?"},
-      5: { moves: 45, goal: 50000, end: "a consultant, whatever that is. You'll 'work' remote and net $120K/yr.",
+      5: { moves: 45, goal: 55000, end: "a consultant, whatever that is. You'll 'work' remote and net $120K/yr.",
         msg: "You won the nomination! Other party's actually putting up a challenge, but nothing you can't handle."},
       6: { moves: 180, goal: 125000, end: "a consultant, or in other words, you give an opinion once in a while. No, it's not a giveaway. I'm sure your opinion's probably worth $150K/yr.",
-        msg: "You're in for another term as State Delegate ... incumbency looks good on you! You can stick around for as long as you like now.", repeat: 0},
+        msg: "You're in for another term as State Delegate ... incumbency looks good on you! You can stick around for as long as you like now."},
       7: { moves: 180, goal: 125000, end: "a national consultant with OilCanU. You don't even have to do anything but give an opinion. Which is worth $150,000.",
         msg: "Nothing wrong with using your high profile as a State Delegate to highlight your candidacy for State Senate."},
       8: { moves: 315, goal: 125000, end: "an OilCanU consultant, for $150,000. If you'd rather stay closer to home, CattleProd Corp offered you a spot in their regional office, but only for $95K/yr.",
@@ -86,7 +86,7 @@ var Utils = {
       12: { moves: 360, goal: 125000, end: "a chief executive of special projects for AgriVat Industries. First special project is a conference in the Bahamas, so better get flying. $205K/yr.",
         msg: "You get a high-fructose high-five! You're secure in your State Senate office. No challengers on the horizon. How sweet it is..."},
       13: { moves: 360, goal: 125000, end: "a consultant for the oil lobby, for $150K. AND a consulting job with CattleProd Corp, for $110/yr. Don't worry, neither job requires much attention.",
-        msg: "I suppose it's easy to get comfortable here. Just keep your lobbyists happy, and they'll keep your war chest fat.", repeat: 0},
+        msg: "I suppose it's easy to get comfortable here. Just keep your lobbyists happy, and they'll keep your war chest fat."},
       14: { moves: 130, goal: 125000, end: "a consultant. A couple jobs, actually: one with the oil lobby, another with agribusiness. Each pays $150K/yr, and you can do both. All you need to do is offer your opinion or advice once in a while.",
         msg: "Your race to become a US Rep begins with a primary showdown against incumbent Aimee 'Deadeye' Dixon. Do what you can in the State Senate for the gun lobby if you want to hit national office."},
       15: { moves: 50, goal: 125000, end: "a special executive. It's a position AgriVat just created. It'll pay $225K/yr, plus bonuses.",
@@ -129,10 +129,9 @@ var Utils = {
     return phaseMap[phase];
   },
 
-  progressGame: function(currentState, moves) {
-    var gamePhase = currentState.gamePhase,
-        movesRemaining = currentState.movesRemaining,
-        progressionMap = {
+  progressGame: function(phase, moves) {
+    var data,
+      progressionMap = {
           1: {
             160: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'con1'],
@@ -173,7 +172,12 @@ var Utils = {
             }
           }
         };
-    return progressionMap[currentState][moves];
+    data = progressionMap[phase][moves];
+    if (typeof data === 'undefined'){
+      return false;
+    } else {
+      return data;
+    }
   },
 
   setElectedOffice: function(phase, currentOffice) {
@@ -191,14 +195,17 @@ var Utils = {
     }
   },
 
-  setElectionChoice: function(phase) {
+  setElectionChoice: function(phase, repeat) {
     var advMsgMap = {
       5: 'Would you like to run for State Senate?',
       6: 'NOW would you like to run for State Senate?',
       12: 'How would you like to go to DC? Want to run for US Rep?',
       13: 'Want to go to DC now? The US Congress awaits...',
-      18: 'Want to challenge X for that Senate seat?',
-      19: 'Want to challenge Y for his Senate seat?'
+      19: {
+        0: 'Want to challenge X for that Senate seat?',
+        1: 'Want to challenge Y for his Senate seat?',
+        2: 'none'
+      }
     };
     if (typeof advMsgMap[phase] === 'undefined'){
       return 'none';

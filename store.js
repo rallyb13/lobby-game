@@ -14,7 +14,8 @@ var currentState = {
   score: 0,
   bankBalance:  0,
   phase: 1,
-  nextGoal: 125000,
+  repeat: 0, //tracks if level is repeated (when higher office declined)
+  nextGoal: 50000,
   electedOffice: 'State Delegate',
   message: 'Click any unoccupied square in the grid to place the next item. Match 3 to make more valuable items.',
   advanceQuestion: false, //true when phase change should prompt choice of office advancement
@@ -111,6 +112,10 @@ QuidStore.changeHelperCount = function(token){
   this.emitChange();
 };
 
+QuidStore.rerunPhase = function(){
+  currentState.repeat++;
+}
+
 QuidStore.completeMove = function(rowPos, colPos){
   var token = currentState.stagedToken,
     moves = currentState.movesRemaining,
@@ -134,7 +139,7 @@ QuidStore.completeMove = function(rowPos, colPos){
     currentState.newMessage = true; //TODO: move to message!
   } else if (moves === currentState.trigger) {
     progressionData = Utils.progressGame(currentState.phase, moves);
-    if (typeof progressionData !== 'undefined'){
+    if (progressionData !== false){
       currentState.tokensArray = progressionData.tokens;
       currentState.message = progressionData.msg;
       currentState.trigger = progressionData.nextTrigger;

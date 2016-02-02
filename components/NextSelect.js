@@ -3,15 +3,18 @@ import QuidStore from '../store';
 
 var NextSelect = React.createClass({
   render: function(){
-    var restart = <button style={this.styles.button} onClick={this.restart}> Restart </button>,
-      choice = <div><button>Advance</button><button>Stay</button></div>,
-      // phase = this.props.phase,
+    var advMsg = this.props.advMsg,
       displayButton;
 
     if (this.props.gameOver) {
-      displayButton = restart;
+      displayButton = <button style={this.styles.button} onClick={this.restart}> Restart </button>;
     } else {
-      displayButton = choice;
+      displayButton = <div>
+          <button> Higher Office! </button>
+          <button onClick={this.refuseAdvance} > Am Comfy Here </button>
+          <div>{advMsg}</div>
+        </div>;
+      //TODO: handle message for this choice!
     }
     return(
       <div style={this.styles.container} >
@@ -20,9 +23,25 @@ var NextSelect = React.createClass({
     );
   },
 
-  restart: function(){
+  restart: function() {
     document.clear();
     location.reload();
+  },
+
+  refuseAdvance: function(){
+    var phase = this.props.phase,
+      adjustment;
+
+    if (phase === 5 || phase === 12){
+      adjustment = 1;
+    } else if (phase === 6 || phase === 13) {
+      adjustment = 0;
+      QuidStore.rerunPhase();
+    } else if (phase === 19){
+      adjustment = -1
+      QuidStore.rerunPhase();
+    }
+    QuidStore.changePhase(adjustment);
   },
 
   styles: {
