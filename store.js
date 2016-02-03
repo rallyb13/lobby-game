@@ -139,9 +139,7 @@ QuidStore.completeMove = function(rowPos, colPos){
 
   //update move count, handle phase/move-triggered events
   currentState.movesRemaining--;
-  if (moves === 0){
-    currentState.newMessage = true; //TODO: move to message!
-  } else if (moves === currentState.trigger) {
+  if (moves === currentState.trigger) {
     progressionData = Utils.progressGame(currentState.phase, moves);
     if (progressionData !== false){
       currentState.tokensArray = progressionData.tokens;
@@ -149,7 +147,7 @@ QuidStore.completeMove = function(rowPos, colPos){
       currentState.trigger = progressionData.nextTrigger;
       currentState.newMessage = true;
     }
-  } else {
+  } else if (moves !== currentState.trigger && moves !== 0){
     currentState.newMessage = false;
   }
 
@@ -544,6 +542,7 @@ QuidStore.changePhase = function(phaseShift){
 
   //change more often (tokensArray also, but not on phase change)
   currentState.message = phaseData.msg;
+  currentState.newMessage = true;
 
   //changes less often
   currentState.electedOffice = Utils.setElectedOffice(phase, currentState.electedOffice);

@@ -3,21 +3,20 @@ import Utils from '../utils';
 
 var Message = React.createClass({
   render: function(){
-    var msg = this.props.alert ?
-        <p style={this.styles.alert}> {this.props.message} </p> :
-        <p>{this.props.message}</p>,
-      end = this.props.gameOver,
-      showMsg;
+    var end = this.props.gameOver,
+      msg;
 
     if (end){
-      showMsg = <p style={this.styles.alert}> {this.endGame(end)} </p>
+      msg = <p style={this.styles.alert}> {this.endGame(end)} </p>
+    } else if (this.props.alert) {
+      msg = <p style={this.styles.alert}> {this.props.message} </p>
     } else {
-      showMsg = msg;
+      msg = <p>{this.props.message}</p>
     }
 
     return (
       <div>
-        {showMsg}
+        {msg}
       </div>
     );
   },
