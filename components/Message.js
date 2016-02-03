@@ -7,12 +7,10 @@ var Message = React.createClass({
         <p style={this.styles.alert}> {this.props.message} </p> :
         <p>{this.props.message}</p>,
       end = this.props.gameOver,
-      endMsg,
       showMsg;
 
     if (end){
-      endMsg = this.endGame(end),
-      showMsg = <p style={this.styles.alert}> {endMsg} </p>
+      showMsg = <p style={this.styles.alert}> {this.endGame(end)} </p>
     } else {
       showMsg = msg;
     }
