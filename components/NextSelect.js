@@ -7,14 +7,13 @@ var NextSelect = React.createClass({
       displayButton;
 
     if (this.props.gameOver) {
-      displayButton = <button style={this.styles.button} onClick={this.restart}> Restart </button>;
+      displayButton = <button style={this.styles.restart} onClick={this.restart}> Restart </button>;
     } else {
-      displayButton = <div>
-          <button onClick={this.acceptAdvance} > Higher Office! </button>
-          <button onClick={this.refuseAdvance} > Am Comfy Here </button>
+      displayButton = <div style={this.styles.choice}>
           <div>{advMsg}</div>
+          <button style={this.styles.buttons} onClick={this.acceptAdvance} > Higher Office! </button>
+          <button style={this.styles.buttons} onClick={this.refuseAdvance} > Am Comfy Here </button>
         </div>;
-      //TODO: handle message for this choice!
     }
     return(
       <div style={this.styles.container} >
@@ -72,9 +71,16 @@ var NextSelect = React.createClass({
       margin: '15px',
       padding: '5px'
     },
-    button: {
+    restart: {
       margin: '25% 0 0 35%',
       padding: '5%'
+    },
+    choice: {
+      margin: '10% 0 0 5%',
+      padding: '5%'
+    },
+    buttons: {
+      margin: '1% 2% 0 0'
     }
   }
 });
