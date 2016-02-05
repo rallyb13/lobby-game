@@ -19675,6 +19675,10 @@
 
 	var _store2 = _interopRequireDefault(_store);
 
+	var _utils = __webpack_require__(161);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
 	var _Bench = __webpack_require__(163);
 
 	var _Bench2 = _interopRequireDefault(_Bench);
@@ -19683,11 +19687,15 @@
 
 	var _Grid2 = _interopRequireDefault(_Grid);
 
-	var _Scoreboard = __webpack_require__(217);
+	var _NextSelect = __webpack_require__(217);
+
+	var _NextSelect2 = _interopRequireDefault(_NextSelect);
+
+	var _Scoreboard = __webpack_require__(218);
 
 	var _Scoreboard2 = _interopRequireDefault(_Scoreboard);
 
-	var _Staging = __webpack_require__(224);
+	var _Staging = __webpack_require__(225);
 
 	var _Staging2 = _interopRequireDefault(_Staging);
 
@@ -19710,6 +19718,20 @@
 	  },
 
 	  render: function render() {
+	    var isGameOver = this.isGameOver(),
+	        repeat = this.state.repeat % 3,
+	        advMsg = 'none',
+	        nextBit;
+
+	    if (this.state.movesRemaining === 0) {
+	      advMsg = this.handleElection(repeat);
+	    }
+
+	    if (isGameOver || advMsg !== 'none') {
+	      nextBit = _react2.default.createElement(_NextSelect2.default, { gameOver: isGameOver, advMsg: advMsg, phase: this.state.phase, repeat: repeat });
+	    } else {
+	      nextBit = _react2.default.createElement(_Staging2.default, { stagedToken: this.state.stagedToken, gameOver: isGameOver });
+	    }
 	    return _react2.default.createElement(
 	      'div',
 	      null,
@@ -19721,24 +19743,50 @@
 	          { style: this.styles.gameTitle },
 	          'Quid: The Game of Outrageous Political Shenanigans'
 	        ),
-	        _react2.default.createElement(_Bench2.default, { helpers: this.state.helpers }),
+	        _react2.default.createElement(_Bench2.default, { helpers: this.state.helpers, poweringUp: this.state.helperChange }),
 	        _react2.default.createElement(
 	          'div',
 	          { style: this.styles.panel },
 	          _react2.default.createElement(
 	            'div',
 	            null,
-	            _react2.default.createElement(_Staging2.default, { stagedToken: this.state.stagedToken })
+	            nextBit
 	          ),
-	          _react2.default.createElement(_Scoreboard2.default, { state: this.state })
+	          _react2.default.createElement(_Scoreboard2.default, { state: this.state, gameOver: isGameOver })
 	        ),
-	        _react2.default.createElement(_Grid2.default, { board: this.state.board })
+	        _react2.default.createElement(_Grid2.default, { board: this.state.board, stagedToken: this.state.stagedToken, megaPossCoords: this.state.megaPossCoords, toPowerUp: this.state.createPowerUp, gameOver: isGameOver })
 	      )
 	    );
 	  },
 
 	  onChange: function onChange() {
 	    this.setState(_store2.default.getCurrentState());
+	  },
+
+	  isGameOver: function isGameOver() {
+	    if (_store2.default.findTokenCoords('').length > 0) {
+	      if (this.state.bankBalance >= 0) {
+	        return false;
+	      } else {
+	        return 'bank';
+	      }
+	    } else {
+	      return 'board';
+	    }
+	  },
+
+	  handleElection: function handleElection(repeat) {
+	    var phase = this.state.phase,
+	        advMsg = _utils2.default.setElectionChoice(phase);
+
+	    _store2.default.deposit(-this.state.nextGoal);
+	    if (phase === 19) {
+	      advMsg = advMsg[repeat];
+	    }
+	    if (advMsg === 'none') {
+	      _store2.default.changePhase(1);
+	    }
+	    return advMsg;
 	  },
 
 	  styles: {
@@ -19785,9 +19833,11 @@
 	  score: 0,
 	  bankBalance: 0,
 	  phase: 1,
-	  nextGoal: 125000,
+	  repeat: 0, //tracks if level is repeated (when higher office declined)
+	  nextGoal: 50000,
 	  electedOffice: 'State Delegate',
 	  message: 'Click any unoccupied square in the grid to place the next item. Match 3 to make more valuable items.',
+	  advanceQuestion: false, //true when phase change should prompt choice of office advancement
 	  trigger: 160, //move # at which message will change
 	  newMessage: true, //only true at first appearance of new message
 	  //special token quick refs
@@ -19800,7 +19850,8 @@
 	  freeze: 0, //number of moves con1 tokens frozen for
 	  helpers: {
 	    'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 0, 'con5': 0
-	  }
+	  },
+	  helperChange: false
 	};
 
 	QuidStore.setupBoard = function () {
@@ -19821,15 +19872,15 @@
 	  for (var i = 0; i < startingTokens.length; i++) {
 	    var x = Math.floor(Math.random() * rows),
 	        y = Math.floor(Math.random() * columns);
-	    currentState.board.grid[x][y] = startingTokens[i];
+	    this.setToken(startingTokens[i], x, y);
 	  }
 
 	  //eliminate pre-matched tokens
 	  for (var i = 0; i < rows; i++) {
 	    for (var j = 0; j < columns; j++) {
-	      token = currentState.board.grid[i][j];
+	      token = this.getToken(i, j);
 	      if (token !== '' && this.cardinalCheck(token, i, j).length >= 2) {
-	        currentState.board.grid[i][j] = '';
+	        this.setToken('', i, j);
 	      }
 	    }
 	  }
@@ -19851,41 +19902,12 @@
 	  return currentState;
 	};
 
-	QuidStore.isEligible = function (rowPos, colPos) {
-	  var staged = currentState.stagedToken,
-	      isEmpty = currentState.board.grid[rowPos][colPos] === '',
-	      validForMega = currentState.megaPossCoords,
-	      stringCoords;
-
-	  if (staged === 'mega') {
-	    if (isEmpty) {
-	      stringCoords = [rowPos, colPos];
-	      stringCoords = JSON.stringify(stringCoords);
-	      return validForMega.indexOf(stringCoords) !== -1;
-	    } else {
-	      return false;
-	    }
-	  } else if (staged === 'pork') {
-	    return !isEmpty;
-	  } else {
-	    return isEmpty;
-	  }
+	QuidStore.getToken = function (rowPos, colPos) {
+	  return currentState.board.grid[rowPos][colPos];
 	};
 
-	QuidStore.isAboutToGo = function (rowPos, colPos) {
-	  var fives = currentState.createPowerUp,
-	      i;
-
-	  if (fives.length === 0) {
-	    return false;
-	  } else {
-	    for (i = 0; i < fives.length; i++) {
-	      if (rowPos === fives[i][0] && colPos === fives[i][1]) {
-	        return true;
-	      }
-	    }
-	    return false;
-	  }
+	QuidStore.setToken = function (token, rowPos, colPos) {
+	  currentState.board.grid[rowPos][colPos] = token;
 	};
 
 	QuidStore.useAppeasement = function (token) {
@@ -19896,31 +19918,59 @@
 	  this.emitChange();
 	};
 
-	QuidStore.usePowerUp = function (token) {
-	  var type = token.slice(0, 3),
-	      cons;
+	QuidStore.deposit = function (num) {
+	  currentState.bankBalance = currentState.bankBalance + num;
+	};
 
-	  if (type === 'oil') {
-	    currentState.bankBalance = currentState.bankBalance + 25000;
-	  } else if (type === 'agr') {
-	    currentState.freeze = currentState.freeze + 10;
-	  } else if (type === 'mil') {
-	    cons = this.findTokenCoords('con1');
-	    this.clearMatches(cons);
-	  } else {
-	    currentState.bankBalance = currentState.bankBalance + 250000;
-	  }
+	QuidStore.freezeCons = function () {
+	  currentState.freeze = currentState.freeze + 10;
+	};
+
+	QuidStore.changeHelperCount = function (token) {
 	  currentState.helpers[token]--;
 	  this.emitChange();
 	};
 
+	QuidStore.rerunPhase = function (doAdd) {
+	  if (doAdd) {
+	    currentState.repeat++;
+	  } else {
+	    currentState.repeat = 0;
+	  }
+	};
+
 	QuidStore.completeMove = function (rowPos, colPos) {
 	  var token = currentState.stagedToken,
-	      moves = currentState.movesRemaining,
-	      swarm = false,
-	      progressionData;
+	      swarm = false;
 
-	  //handle placement of tokens
+	  this.placeCorrectToken(token, rowPos, colPos);
+	  this.updateMoveCount();
+
+	  //handle special token removal
+	  if (currentState.createPowerUp.length !== 0) {
+	    this.removeTopLevelTokens();
+	  } else {
+	    currentState.helperChange = false;
+	  }
+	  if (currentState.appeasements.length !== 0) {
+	    this.checkAppeasements();
+	    this.removeConstituents(token, rowPos, colPos);
+	  }
+
+	  //handle constituents
+	  if (currentState.appeasements.length + 3 < currentState.levelFives.length && currentState.movesRemaining % 7 === 1) {
+	    swarm = true;
+	  }
+	  this.moveConstituents(rowPos, colPos, swarm);
+
+	  this.setNextToken();
+	  if (token.slice(3, 4) === '5') {
+	    this.addTopLevelToken(token, rowPos, colPos);
+	  }
+	  this.emitChange();
+	};
+
+	QuidStore.placeCorrectToken = function (token, rowPos, colPos) {
 	  if (token === 'mega') {
 	    token = this.convertMega(rowPos, colPos);
 	  } else if (token === 'pork') {
@@ -19929,48 +19979,27 @@
 	    this.addAppeasement(token, rowPos, colPos);
 	  }
 	  token = this.handleMatches(token, rowPos, colPos);
-	  currentState.board.grid[rowPos][colPos] = token;
+	  this.setToken(token, rowPos, colPos);
+	};
 
-	  //update move count, handle phase/move-triggered events
+	QuidStore.updateMoveCount = function () {
+	  var moves = currentState.movesRemaining,
+	      progressionData;
+
 	  currentState.movesRemaining--;
-	  if (moves === 0) {
-	    this.handleElection();
-	    currentState.newMessage = true;
-	  } else if (moves === currentState.trigger) {
+
+	  //handle triggered/phase-change events
+	  if (moves === currentState.trigger) {
 	    progressionData = _utils2.default.progressGame(currentState.phase, moves);
-	    if (typeof progressionData !== 'undefined') {
+	    if (progressionData !== false) {
 	      currentState.tokensArray = progressionData.tokens;
 	      currentState.message = progressionData.msg;
 	      currentState.trigger = progressionData.nextTrigger;
 	      currentState.newMessage = true;
 	    }
-	  } else {
+	  } else if (moves !== currentState.trigger && moves !== 0) {
 	    currentState.newMessage = false;
 	  }
-
-	  //handle special token removal
-	  if (currentState.createPowerUp.length !== 0) {
-	    this.removeTopLevelTokens();
-	  }
-	  if (currentState.appeasements.length !== 0) {
-	    this.checkAppeasements();
-	    this.removeConstituents(token, rowPos, colPos);
-	  }
-
-	  //check game end, proceed to automatic actions
-	  if (this.isGameOver()) {
-	    this.endGame('board');
-	  } else {
-	    if (currentState.appeasements.length + 3 < currentState.levelFives.length && currentState.movesRemaining % 7 === 1) {
-	      swarm = true;
-	    }
-	    this.moveConstituents(rowPos, colPos, swarm);
-	    this.setNextToken();
-	    if (token.slice(3, 4) === '5') {
-	      this.addTopLevelToken(token, rowPos, colPos);
-	    }
-	  }
-	  this.emitChange();
 	};
 
 	QuidStore.checkMegaValid = function () {
@@ -19994,7 +20023,7 @@
 	    for (var i = 0; i < neighbors.length; i++) {
 	      rowPos = neighbors[i][0];
 	      colPos = neighbors[i][1];
-	      token = currentState.board.grid[rowPos][colPos];
+	      token = me.getToken(rowPos, colPos);
 	      if (token !== '' && token.slice(0, 3) !== 'con' && token.slice(3) !== '5') {
 	        //might already have a pair...
 	        if (me.cardinalCheck(token, rowPos, colPos).length > 0) {
@@ -20059,7 +20088,7 @@
 	    checkRow = possibleMatches[i][0];
 	    checkCol = possibleMatches[i][1];
 
-	    if (currentState.board.grid[checkRow][checkCol] === token) {
+	    if (this.getToken(checkRow, checkCol) === token) {
 	      matchCoords.push([checkRow, checkCol]);
 	    }
 	  }
@@ -20101,9 +20130,9 @@
 	          newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
 	          newRowPos = newCoords[0];
 	          newColPos = newCoords[1];
-	          currentState.board.grid[newRowPos][newColPos] = 'con1';
+	          this.setToken('con1', newRowPos, newColPos);
 	          if (!swarm) {
-	            currentState.board.grid[x][y] = '';
+	            this.setToken('', x, y);
 	          }
 	        }
 	      }
@@ -20122,7 +20151,7 @@
 	    toClearCoords = me.cardinalCheck('con1', app[0], app[1]);
 	    me.clearMatches(toClearCoords);
 	  });
-	  currentState.board.grid[rowPos][colPos] = token;
+	  this.setToken(token, rowPos, colPos);
 	};
 
 	QuidStore.addAppeasement = function (token, rowPos, colPos) {
@@ -20157,7 +20186,7 @@
 	  var newToken = _utils2.default.getTokenData(token, 'nextDown');
 
 	  currentState.appeasements.splice(index, 1);
-	  currentState.board.grid[rowPos][colPos] = newToken;
+	  this.setToken(newToken, rowPos, colPos);
 
 	  if (newToken !== '') {
 	    this.addAppeasement(newToken, rowPos, colPos);
@@ -20194,7 +20223,7 @@
 
 	QuidStore.removeTopLevelTokens = function () {
 	  var coords = currentState.createPowerUp,
-	      token = currentState.board.grid[coords[0][0]][coords[0][1]],
+	      token = this.getToken(coords[0][0], coords[0][1]),
 	      powerUp = token.slice(0, 3) + '6',
 	      stringCoords,
 	      index;
@@ -20207,6 +20236,7 @@
 	  });
 	  currentState.createPowerUp = [];
 	  currentState.helpers[powerUp]++;
+	  currentState.helperChange = powerUp;
 	  currentState.score = currentState.score + 555;
 	};
 
@@ -20274,7 +20304,7 @@
 
 	QuidStore.clearMatches = function (matches) {
 	  for (var i = 0; i < matches.length; i++) {
-	    currentState.board.grid[matches[i][0]][matches[i][1]] = '';
+	    this.setToken('', matches[i][0], matches[i][1]);
 	  }
 	};
 
@@ -20282,11 +20312,14 @@
 	  var points = 0,
 	      money = 0,
 	      bigMatchFactor = 1;
+
 	  if (count < 2 && isRecursive !== true) {
 	    points = _utils2.default.getTokenData(token, 'pts');
 	    money = _utils2.default.getTokenData(token, 'val');
 	  } else if (count >= 2) {
-	    bigMatchFactor = bigMatchFactor + count * 0.75;
+	    if (count !== 2 && _utils2.default.getTokenData(token, 'nextUp') !== 'final') {
+	      bigMatchFactor = count === 2 ? 1 : 1 + count * 0.75;
+	    }
 	    points = _utils2.default.getTokenData(token, 'mPts');
 	    points = Math.round(points * bigMatchFactor);
 	    money = _utils2.default.getTokenData(token, 'mVal');
@@ -20314,65 +20347,33 @@
 	        stringCoords = JSON.stringify(pork);
 	        index = currentState.porkOn.indexOf(stringCoords);
 	        currentState.porkOn.splice(index, 1);
-	        currentState.board.grid[pork[0]][pork[1]] = '';
+	        this.setToken('', pork[0], pork[1]);
 	      });
 	    }
 	  });
 	};
 
-	QuidStore.handleElection = function () {
-	  currentState.bankBalance = currentState.bankBalance - currentState.nextGoal;
-	  if (currentState.bankBalance < 0) {
-	    this.endGame('election');
-	  } else {
-	    currentState.phase++;
-	    this.changePhase(currentState.phase);
-	  }
-	};
+	QuidStore.changePhase = function (phaseShift) {
+	  var phase, phaseData, coords;
 
-	//TODO: all of these Utils maps need to be filled out for whole game
-	QuidStore.changePhase = function (phase) {
-	  var phaseData = _utils2.default.getPhaseData(phase),
-	      coords;
+	  currentState.phase = currentState.phase + phaseShift;
+	  phase = currentState.phase;
+	  phaseData = _utils2.default.getPhaseData(phase);
+
 	  //change every election
 	  currentState.movesRemaining = phaseData.moves;
 	  currentState.nextGoal = phaseData.goal;
 
 	  //change more often (tokensArray also, but not on phase change)
 	  currentState.message = phaseData.msg;
+	  currentState.newMessage = true;
 
 	  //changes less often
 	  currentState.electedOffice = _utils2.default.setElectedOffice(phase, currentState.electedOffice);
 	  coords = _utils2.default.handleBoardChange(currentState.electedOffice);
 	  currentState.board.rows = coords[0];
 	  currentState.board.columns = coords[1];
-	};
-
-	QuidStore.isGameOver = function () {
-	  var board = currentState.board,
-	      gameOver = true;
-
-	  for (var i = 0; i < board.rows; i++) {
-	    for (var j = 0; j < board.columns; j++) {
-	      if (board.grid[i][j] === '') {
-	        gameOver = false;
-	        return gameOver;
-	      }
-	    }
-	  }
-	  return gameOver;
-	};
-
-	//TODO: Button to restart game needs to replace stagedToken?
-	QuidStore.endGame = function (failType) {
-	  var reason = 'Game Over.';
-	  if (failType === 'board') {
-	    reason = reason + ' Talk about gridlock!';
-	  } else if (failType === 'election') {
-	    reason = reason + ' People can be bought, just not always by you.';
-	  }
-	  currentState.stagedToken = '';
-	  currentState.message = reason;
+	  this.emitChange();
 	};
 
 	exports.default = QuidStore;
@@ -20397,94 +20398,128 @@
 	      'oil2': { nextUp: 'oil3', pts: 10, mPts: 45, val: 200, mVal: 500, priority: 18 },
 	      'oil3': { nextUp: 'oil4', pts: 25, mPts: 95, val: 300, mVal: 1000, priority: 17 },
 	      'oil4': { nextUp: 'oil5', pts: 50, mPts: 195, val: 400, mVal: 2500, priority: 16 },
-	      'oil5': { nextUp: 'final', pts: 100, mPts: 0, val: 500, mVal: 0 },
+	      'oil5': { nextUp: 'final', pts: 100, mPts: 100, val: 500, mVal: 500 },
 
 	      'agr1': { nextUp: 'agr2', pts: 50, mPts: 205, val: 600, mVal: 2000, priority: 14 },
 	      'agr2': { nextUp: 'agr3', pts: 100, mPts: 500, val: 700, mVal: 2500, priority: 13 },
 	      'agr3': { nextUp: 'agr4', pts: 150, mPts: 750, val: 800, mVal: 3000, priority: 12 },
 	      'agr4': { nextUp: 'agr5', pts: 200, mPts: 1000, val: 900, mVal: 4321, priority: 11 },
-	      'agr5': { nextUp: 'final', pts: 250, mPts: 0, val: 1000, mVal: 0 },
+	      'agr5': { nextUp: 'final', pts: 250, mPts: 250, val: 1000, mVal: 1000 },
 
 	      'mil1': { nextUp: 'mil2', pts: 200, mPts: 500, val: 1100, mVal: 4400, priority: 9 },
 	      'mil2': { nextUp: 'mil3', pts: 400, mPts: 1000, val: 1200, mVal: 4995, priority: 8 },
 	      'mil3': { nextUp: 'mil4', pts: 600, mPts: 1500, val: 1300, mVal: 5555, priority: 7 },
 	      'mil4': { nextUp: 'mil5', pts: 800, mPts: 2000, val: 1400, mVal: 7500, priority: 6 },
-	      'mil5': { nextUp: 'final', pts: 1000, mPts: 0, val: 1500, mVal: 0 },
+	      'mil5': { nextUp: 'final', pts: 1000, mPts: 1000, val: 1500, mVal: 1500 },
 
 	      'fin1': { nextUp: 'fin2', pts: 1111, mPts: 2222, val: 1600, mVal: 7500, priority: 4 },
 	      'fin2': { nextUp: 'fin3', pts: 1333, mPts: 2995, val: 1700, mVal: 8500, priority: 3 },
 	      'fin3': { nextUp: 'fin4', pts: 1555, mPts: 3500, val: 1800, mVal: 9500, priority: 2 },
 	      'fin4': { nextUp: 'fin5', pts: 1777, mPts: 5000, val: 1900, mVal: 10001, priority: 1 },
-	      'fin5': { nextUp: 'final', pts: 1999, mPts: 0, val: 2000, mVal: 0 },
+	      'fin5': { nextUp: 'final', pts: 1999, mPts: 1999, val: 2000, mVal: 2000 },
 
 	      'con1': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
-	      'con2': { nextUp: 'final', pts: 7, mPts: 0, val: -100, mVal: 0, dMin: 25, dMax: 40, nextDown: '' },
-	      'con3': { nextUp: 'final', pts: 8, mPts: 0, val: -1000, mVal: 0, dMin: 25, dMax: 45, nextDown: 'con4' },
+	      'con2': { nextUp: 'final', pts: 7, mPts: 7, val: -100, mVal: -100, dMin: 25, dMax: 40, nextDown: '' },
+	      'con3': { nextUp: 'final', pts: 8, mPts: 8, val: -1000, mVal: -1000, dMin: 25, dMax: 45, nextDown: 'con4' },
 	      'con4': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0, dMin: 25, dMax: 45, nextDown: '' },
-	      'con5': { nextUp: 'final', pts: 9, mPts: 0, val: -5000, mVal: 0, dMin: 35, dMax: 55, nextDown: 'con6' },
+	      'con5': { nextUp: 'final', pts: 9, mPts: 9, val: -5000, mVal: -5000, dMin: 35, dMax: 55, nextDown: 'con6' },
 	      'con6': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0, dMin: 35, dMax: 60, nextDown: 'con7' },
 	      'con7': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0, dMin: 35, dMax: 70, nextDown: '' },
 	      'mega': { nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
-	      'pork': { nextUp: 'final', pts: 666, mPts: 0, val: 666, mVal: 0 }
+	      'pork': { nextUp: 'final', pts: 666, mPts: 666, val: 666, mVal: 666 }
 	    };
 	    return tokenMap[token][attribute];
 	  },
 
-	  handleColors: function handleColors(tokenGroup, attribute) {
+	  handleColors: function handleColors(tokenGroup, attribute, selected) {
 	    var colorMap = {
 	      'oil': { color: 'gray', bColor: 'black', hover: 'black' },
 	      'agr': { color: 'green', bColor: 'yellow', hover: 'yellow' },
 	      'mil': { color: 'black', bColor: 'red', hover: 'red' },
 	      'fin': { color: 'yellow', bColor: 'green', hover: 'green' },
 	      '': { color: '#4B5043', bColor: '#A4BD99', hover: '#fff' },
+	      'meg': { color: '#4B5043', bColor: '#A4BD99', hover: '#fff' },
 	      'con': { color: 'red', bColor: 'blue', hover: 'blue' },
 	      'por': { color: 'red', bColor: 'pink', hover: 'pink' }
 	    };
-	    return colorMap[tokenGroup][attribute];
+	    if (selected === true) {
+	      return 'magenta';
+	    } else {
+	      return colorMap[tokenGroup][attribute];
+	    }
 	  },
 
 	  getPhaseData: function getPhaseData(phase) {
 	    var phaseMap = {
-	      1: { moves: 180, goal: 125000, msg: "" },
-	      2: { moves: 145, goal: 105000, msg: "Congratulations on your win, but this time you'll face a primary challenge. And in this district, that's the tougher race!" },
-	      3: { moves: 45, goal: 35000, msg: "Whew! Pete Pandurin put up a tough challenge. He'll be back, but right now, you'd better focus on the general!" },
-	      4: { moves: 145, goal: 200000, msg: "You've held your seat, but Pete's back, and he really wants your seat. He's already started raising money for ad buys..." },
-	      5: { moves: 45, goal: 50000, msg: "You're our nominee! Other party's actually putting up a challenge, but nothing you can't handle." },
-	      6: { moves: 180, goal: 125000, msg: "Welcome to another term in the State House of Delegates. Incumbency has really set in, so you could probably stay here forever if you wanted to.", repeat: 0 },
-	      7: { moves: 180, goal: 125000, msg: '' },
-	      8: { moves: 315, goal: 125000, msg: '' },
-	      9: { moves: 45, goal: 125000, msg: '' },
-	      10: { moves: 315, goal: 125000, msg: '' },
-	      11: { moves: 45, goal: 125000, msg: '' },
-	      12: { moves: 360, goal: 125000, msg: '' },
-	      13: { moves: 360, goal: 125000, msg: '', repeat: 0 },
-	      14: { moves: 130, goal: 125000, msg: '' },
-	      15: { moves: 50, goal: 125000, msg: '' },
-	      16: { moves: 155, goal: 125000, msg: '' },
-	      17: { moves: 75, goal: 125000, msg: '' },
-	      18: { moves: 155, goal: 125000, msg: '' },
-	      19: { moves: 75, goal: 125000, msg: '' },
-	      20: { moves: 155, goal: 125000, msg: '' },
-	      21: { moves: 75, goal: 125000, msg: '' },
-	      22: { moves: 155, goal: 125000, msg: '' },
-	      23: { moves: 75, goal: 125000, msg: '' },
-	      24: { moves: 615, goal: 125000, msg: '' },
-	      25: { moves: 75, goal: 125000, msg: '' },
-	      26: { moves: 690, goal: 125000, msg: '' },
-	      27: { moves: 615, goal: 125000, msg: '' },
-	      28: { moves: 75, goal: 125000, msg: '' },
-	      29: { moves: 690, goal: 125000, msg: '' },
-	      30: { moves: 615, goal: 125000, msg: '' },
-	      31: { moves: 75, goal: 125000, msg: '' },
-	      32: { moves: 690, goal: 125000, msg: '' }
+	      1: { moves: 180, goal: 50000, end: "a lowly regional consultant for OilOnU, making a meager $75,000/yr.", msg: "" },
+	      2: { moves: 145, goal: 65000, end: "a mid-level special projects consultant for the oil lobby, making only $88,500/yr.",
+	        msg: "Nice work! But this time you'll face a primary challenger. Prove you can help Big Oil more than Ollie 'Oilcan' Derricks can." },
+	      3: { moves: 45, goal: 30000, end: "a consultant in OilOnU's state office. At $100,000/yr, you'll be fine, buddy.",
+	        msg: "You greased 'Oilcan' Derricks for the primary win! Now put the pedal to the petrol and nab the general election." },
+	      4: { moves: 145, goal: 80000, end: "a consultant. Pack your bags! You're moving to OilCanU's national headquarters. $110,000/yr",
+	        msg: "You've held your seat. Looks like Derricks is back for a tougher challenge, though. Has he got a bigger lobby in his pocket, or is he just glad to see you?" },
+	      5: { moves: 45, goal: 55000, end: "a consultant, whatever that is. You'll 'work' remote and net $120K/yr.",
+	        msg: "You won the nomination! Other party's actually putting up a challenge, but nothing you can't handle." },
+	      6: { moves: 180, goal: 125000, end: "a consultant, or in other words, you give an opinion once in a while. No, it's not a giveaway. I'm sure your opinion's probably worth $150K/yr.",
+	        msg: "You're in for another term as State Delegate ... incumbency looks good on you! You can stick around for as long as you like now." },
+	      7: { moves: 180, goal: 125000, end: "a national consultant with OilCanU. You don't even have to do anything but give an opinion. Which is worth $150,000.",
+	        msg: "Nothing wrong with using your high profile as a State Delegate to highlight your candidacy for State Senate." },
+	      8: { moves: 315, goal: 125000, end: "an OilCanU consultant, for $150,000. If you'd rather stay closer to home, CattleProd Corp offered you a spot in their regional office, but only for $95K/yr.",
+	        msg: "Congrats, State Senator. Give agribusiness a leg up, and they'll send a fatty paycheck to help you out." },
+	      9: { moves: 45, goal: 125000, end: "a lobbyist with Cornyland. You'll make $115K/yr easy, but that's not counting bonuses, or your expense account.",
+	        msg: "You made it through the primary, but WHOA, here comes a tough general election! You're gonna have to put the 'aggro' in Big Agro." },
+	      10: { moves: 315, goal: 125000, end: "a CattleProd Corporation consultant in their state office, making $175K/yr.",
+	        msg: "Re-elected to State Senate! Some small fries are lining up against you for the next primary--but you're the two-term incumbent." },
+	      11: { moves: 45, goal: 125000, end: "a CattleProd Corporation consultant, at $175K/yr, though OilCanU wants to offer you a spot, too. Maybe you could do even 'conult' for both?",
+	        msg: "Big Agro helped you slaughter your primary opponents. Now you just have to sweet-talk your way through the general." },
+	      12: { moves: 360, goal: 125000, end: "a chief executive of special projects for AgriVat Industries. First special project is a conference in the Bahamas, so better get flying. $205K/yr.",
+	        msg: "You get a high-fructose high-five! You're secure in your State Senate office. No challengers on the horizon. How sweet it is..." },
+	      13: { moves: 360, goal: 125000, end: "a consultant for the oil lobby, for $150K. AND a consulting job with CattleProd Corp, for $110/yr. Don't worry, neither job requires much attention.",
+	        msg: "I suppose it's easy to get comfortable here. Just keep your lobbyists happy, and they'll keep your war chest fat." },
+	      14: { moves: 130, goal: 125000, end: "a consultant. A couple jobs, actually: one with the oil lobby, another with agribusiness. Each pays $150K/yr, and you can do both. All you need to do is offer your opinion or advice once in a while.",
+	        msg: "Your race to become a US Rep begins with a primary showdown against incumbent Aimee 'Deadeye' Dixon. Do what you can in the State Senate for the gun lobby if you want to hit national office." },
+	      15: { moves: 50, goal: 125000, end: "a special executive. It's a position AgriVat just created. It'll pay $225K/yr, plus bonuses.",
+	        msg: "You shot down 'Deadeye' and won the primary! Now, with help from the defense industry, you can shock and awe the voters into giving you the seat." },
+	      16: { moves: 155, goal: 125000, end: "a consultant with OilCanU for $150K. AND a mid-level executive with AgriVat, for $160K/yr. They're both fine with you doing both, just show up at whichever office whenever you feel like.",
+	        msg: "Mission Accomplished, Representative! Uh-oh, but 'Deadeye' Dixon says she'll be back for her seat." },
+	      17: { moves: 75, goal: 125000, end: "a LockLoadMartyr consultant, for $250K/yr. Also, the oil lobby wants to consult with you every now and then, for $10,000/hr.",
+	        msg: "Congrats, you won the party nomination. You should have no trouble gunning down the other party in the general, thanks to your firearms lobby friends." },
+	      18: { moves: 155, goal: 125000, end: "an industry expert and professional consultant with the National Ricochet Association. You can make $225K/yr, plus $15,000 for each speaking gig.",
+	        msg: "You've been re-elected to the House, but here comes another primary, and it's a deadly one! Make sure you go in with plenty of firepower!" },
+	      19: { moves: 75, goal: 125000, end: "a professional consultant with the National Ricochet Association, $225K/yr. Also, they're planning a series of conventions. Can you prepare a speech? You'll get $16,000 each time you give it.",
+	        msg: "Odds are good that you'll splatter another challenger this election. No need to bring out the big guns. Though, hey, it's a free country." },
+	      20: { moves: 155, goal: 125000, end: "a national consultant for LockLoadMartyr for $275K/yr. Also, the National Ricochet Association wants to pay you $17,500 per speaking gig, so maybe it's time for a victory lap after all.",
+	        msg: "It'll be tough to unseat longtime Senator Rich Brigand this primary--he's got a lot of financial sector money behind him. Show the Big Banks you've got the Powerballs!" },
+	      21: { moves: 75, goal: 125000, end: "an Agrivat consultant, for $225K per year. Also a LockLoadMartyr consultant, for another $125K/yr.",
+	        msg: "Whew! Your big gamble of a primary challenge paid off, but winning the general will still be difficult. Cut some regulations to help the banking lobby grow, grow, grow!" },
+	      22: { moves: 155, goal: 125000, end: "a lobbyist for oil...and a lobbyist for agribusiness. Each pays $150K/yr. Also, the military/industrial lobby would like you to give some speeches, at $20K-a-pop.",
+	        msg: "With Peter Pandurin retiring, there's no incumbent, making this an unexpectedly easy primary. All you need to do is get interest from Big Banks. You'll give them a great ROI, that's for sure." },
+	      23: { moves: 75, goal: 125000, end: "a LockLoadMartyr executive, for $350K/yr (starting salary).",
+	        msg: "You won the primary, but this'll be your toughest general election yet! You'll need a ton of cash. Help the financial industry until you're Too Big To Fail!" },
+	      24: { moves: 615, goal: 125000, end: "a LockLoadMartyr executive, for $350K/yr (starting salary). And a confidential signing bonus...",
+	        msg: "Keep doing intimate favors for the Big Banks. They'll thank you in the morning." },
+	      25: { moves: 75, goal: 125000, end: "a lobbyist for the National Ricochet Association, and another as a lobbyist for LockLoadMartyr. Each pays $200K/yr. Neither requires you to go in to work much.",
+	        msg: "Nice job in the primary. You have to persevere though the general election. Scratch the Big Banks' backs and they'll scratch yours ... or just give you lots of money." },
+	      26: { moves: 690, goal: 125000, end: "a financial consultant, for $350K/yr. Also, the weapons manufacturing lobby wants you to consult for them, for $150K/yr. Yes, you can do both.",
+	        msg: "Well, looks like you don't even have a primary challenger this time! The party thinks you're just too important to lose. And the financial sector agrees!" },
+	      27: { moves: 615, goal: 125000, end: "an executive at Bank Of Insolvancy, for $400K/yr (starting salary), plus quarterly bonuses.",
+	        msg: "" },
+	      28: { moves: 75, goal: 125000, end: "a FineGamble Financial consultant. You'll make half a mil per year (which doesn't include the quarterly bonuses).",
+	        msg: "" },
+	      29: { moves: 690, goal: 125000, end: "an executive at Bank Of Insolvancy, for $400K/yr (starting salary), plus quarterly bonuses. Also, the oil and gun lobbies want to pay you $100K/yr each, for 'vital'/(occasional) consulting.",
+	        msg: "" },
+	      30: { moves: 615, goal: 125000, end: "a FineGamble Financial consultant. You'll make half a mil per year (which doesn't include the quarterly bonuses). Lobbying firms in three other industries will also pay you occasional (6-figure) special consulting fees.",
+	        msg: "" },
+	      31: { moves: 75, goal: 125000, end: "a FineGamble Financial executive, for $750K/yr (starting salary), plus bonuses. An easy enough job that will leave you time to collect 6-figure consulting fees from other lobbying friends, er, firms.",
+	        msg: "" },
+	      32: { moves: 690, goal: 125000, end: "a consultant with FineGamble Financial, for half a mil every year (starting salary), plus bonuses. Also a consult with LockLoadMartyr for another quarter mil. You can still do special consulting with other firms, for a $100K fee each.",
+	        msg: "" }
 	    };
 	    return phaseMap[phase];
 	  },
 
-	  //TODO: refactor for only for mid-phase messages
-	  progressGame: function progressGame(currentState, moves) {
-	    var gamePhase = currentState.gamePhase,
-	        movesRemaining = currentState.movesRemaining,
+	  progressGame: function progressGame(phase, moves) {
+	    var data,
 	        progressionMap = {
 	      1: {
 	        160: {
@@ -20526,7 +20561,12 @@
 	        }
 	      }
 	    };
-	    return progressionMap[currentState][moves];
+	    data = progressionMap[phase][moves];
+	    if (typeof data === 'undefined') {
+	      return false;
+	    } else {
+	      return data;
+	    }
 	  },
 
 	  setElectedOffice: function setElectedOffice(phase, currentOffice) {
@@ -20541,6 +20581,25 @@
 	      return currentOffice;
 	    } else {
 	      return electedOfficeMap[phase];
+	    }
+	  },
+
+	  setElectionChoice: function setElectionChoice(phase, repeat) {
+	    var advMsgMap = {
+	      5: 'Would you like to run for State Senate?',
+	      6: 'NOW would you like to run for State Senate?',
+	      12: 'How would you like to go to DC? Want to run for US Rep?',
+	      13: 'Want to go to DC now? The US Congress awaits...',
+	      19: {
+	        0: 'Want to challenge X for that Senate seat?',
+	        1: 'Want to challenge Y for his Senate seat?',
+	        2: 'none'
+	      }
+	    };
+	    if (typeof advMsgMap[phase] === 'undefined') {
+	      return 'none';
+	    } else {
+	      return advMsgMap[phase];
 	    }
 	  },
 
@@ -20930,7 +20989,7 @@
 	      powerUp = token.slice(3, 4) === '6';
 	      count = helpers[token];
 	      if (count > 0) {
-	        seats.push(_react2.default.createElement(_BenchSeat2.default, { token: token, count: count, powerUp: powerUp, key: i }));
+	        seats.push(_react2.default.createElement(_BenchSeat2.default, { token: token, count: count, powerUp: powerUp, selected: this.props.poweringUp === token, key: i }));
 	      }
 	    }
 
@@ -20989,7 +21048,9 @@
 
 	  render: function render() {
 	    var powerUp = this.props.powerUp,
+	        selected = this.props.selected,
 	        tokenGroup = this.props.token.slice(0, 3);
+
 	    return _react2.default.cloneElement(_react2.default.createElement(
 	      'div',
 	      { onClick: this.useHelper },
@@ -21004,7 +21065,7 @@
 	    ), { style: {
 	        float: this.pickSide(powerUp),
 	        color: _utils2.default.handleColors(tokenGroup, 'color'),
-	        backgroundColor: _utils2.default.handleColors(tokenGroup, 'bColor'),
+	        backgroundColor: _utils2.default.handleColors(tokenGroup, 'bColor', selected),
 	        width: '60px',
 	        height: '60px',
 	        display: 'inline-block',
@@ -21018,7 +21079,7 @@
 	    var token = this.props.token;
 
 	    if (this.props.powerUp) {
-	      _store2.default.usePowerUp(token);
+	      this.usePowerUp(token);
 	    } else {
 	      _store2.default.useAppeasement(token);
 	    }
@@ -21026,6 +21087,23 @@
 
 	  pickSide: function pickSide(powerUp) {
 	    return powerUp ? 'left' : 'right';
+	  },
+
+	  usePowerUp: function usePowerUp(token) {
+	    var type = token.slice(0, 3),
+	        cons;
+
+	    if (type === 'oil') {
+	      _store2.default.deposit(25000);
+	    } else if (type === 'agr') {
+	      _store2.default.freezeCons();
+	    } else if (type === 'mil') {
+	      cons = _store2.default.findTokenCoords('con1');
+	      _store2.default.clearMatches(cons);
+	    } else {
+	      _store2.default.deposit(250000);
+	    }
+	    _store2.default.changeHelperCount(token);
 	  }
 	});
 
@@ -21190,13 +21268,15 @@
 	        rowNum = this.props.board.rows,
 	        colNum = this.props.board.columns,
 	        count = 0,
+	        token,
 	        i,
 	        j;
 
 	    for (i = 0; i < rowNum; i++) {
 	      for (j = 0; j < colNum; j++) {
 	        count++;
-	        squares.push(_react2.default.createElement(_GridSquare2.default, { rowPos: i, colPos: j, token: this.props.board.grid[i][j], eligible: this.checkDrop(i, j), aboutToGo: this.checkUplift(i, j), key: count }));
+	        token = this.props.board.grid[i][j];
+	        squares.push(_react2.default.createElement(_GridSquare2.default, { rowPos: i, colPos: j, token: token, eligible: this.checkDrop(i, j, token), aboutToGo: this.checkUplift(i, j), key: count, gameOver: this.props.gameOver }));
 	      }
 	    }
 
@@ -21207,12 +21287,41 @@
 	    );
 	  },
 
-	  checkDrop: function checkDrop(rowPos, colPos) {
-	    return _store2.default.isEligible(rowPos, colPos);
+	  checkDrop: function checkDrop(rowPos, colPos, token) {
+	    var staged = this.props.stagedToken,
+	        isEmpty = token === '',
+	        validForMega = this.props.megaPossCoords,
+	        stringCoords;
+
+	    if (staged === 'mega') {
+	      if (isEmpty) {
+	        stringCoords = [rowPos, colPos];
+	        stringCoords = JSON.stringify(stringCoords);
+	        return validForMega.indexOf(stringCoords) !== -1;
+	      } else {
+	        return false;
+	      }
+	    } else if (staged === 'pork') {
+	      return !isEmpty;
+	    } else {
+	      return isEmpty;
+	    }
 	  },
 
 	  checkUplift: function checkUplift(rowPos, colPos) {
-	    return _store2.default.isAboutToGo(rowPos, colPos);
+	    var fives = this.props.toPowerUp,
+	        i;
+
+	    if (fives.length === 0) {
+	      return false;
+	    } else {
+	      for (i = 0; i < fives.length; i++) {
+	        if (rowPos === fives[i][0] && colPos === fives[i][1]) {
+	          return true;
+	        }
+	      }
+	      return false;
+	    }
 	  },
 
 	  styles: {
@@ -21269,14 +21378,14 @@
 
 	  render: function render() {
 	    var tokenGroup = this.props.token.slice(0, 3),
-	        aboutToGo = this.props.aboutToGo;
+	        selected = this.props.aboutToGo;
 	    return _react2.default.cloneElement(_react2.default.createElement(
 	      'div',
 	      { onClick: this.placeToken },
 	      _react2.default.createElement(_Token2.default, { symbol: this.props.token })
 	    ), { style: {
 	        color: _utils2.default.handleColors(tokenGroup, 'color'),
-	        backgroundColor: this.handleAboutToGo(aboutToGo, tokenGroup),
+	        backgroundColor: _utils2.default.handleColors(tokenGroup, 'bColor', selected),
 	        ':hover': { backgroundColor: _utils2.default.handleColors(tokenGroup, 'hover') },
 	        height: '16.29%',
 	        width: '16.66%',
@@ -21290,16 +21399,8 @@
 	  },
 
 	  placeToken: function placeToken() {
-	    if (this.props.eligible) {
+	    if (this.props.eligible && !this.props.gameOver) {
 	      _store2.default.completeMove(this.props.rowPos, this.props.colPos);
-	    }
-	  },
-
-	  handleAboutToGo: function handleAboutToGo(selected, tokenGroup) {
-	    if (selected) {
-	      return 'magenta';
-	    } else {
-	      return _utils2.default.handleColors(tokenGroup, 'bColor');
 	    }
 	  }
 	});
@@ -24682,27 +24783,153 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Message = __webpack_require__(218);
+	var _store = __webpack_require__(160);
+
+	var _store2 = _interopRequireDefault(_store);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var NextSelect = _react2.default.createClass({
+	  displayName: 'NextSelect',
+
+	  render: function render() {
+	    var advMsg = this.props.advMsg,
+	        displayButton;
+
+	    if (this.props.gameOver) {
+	      displayButton = _react2.default.createElement(
+	        'button',
+	        { style: this.styles.restart, onClick: this.restart },
+	        ' Restart '
+	      );
+	    } else {
+	      displayButton = _react2.default.createElement(
+	        'div',
+	        { style: this.styles.choice },
+	        _react2.default.createElement(
+	          'div',
+	          null,
+	          advMsg
+	        ),
+	        _react2.default.createElement(
+	          'button',
+	          { style: this.styles.buttons, onClick: this.acceptAdvance },
+	          ' Higher Office! '
+	        ),
+	        _react2.default.createElement(
+	          'button',
+	          { style: this.styles.buttons, onClick: this.refuseAdvance },
+	          ' Am Comfy Here '
+	        )
+	      );
+	    }
+	    return _react2.default.createElement(
+	      'div',
+	      { style: this.styles.container },
+	      displayButton
+	    );
+	  },
+
+	  restart: function restart() {
+	    document.clear();
+	    location.reload();
+	  },
+
+	  refuseAdvance: function refuseAdvance() {
+	    var phase = this.props.phase,
+	        adjustment;
+
+	    if (phase === 5 || phase === 12) {
+	      adjustment = 1;
+	    } else if (phase === 6 || phase === 13) {
+	      adjustment = 0;
+	      _store2.default.rerunPhase(true);
+	    } else if (phase === 19) {
+	      adjustment = -1;
+	      _store2.default.rerunPhase(true);
+	    }
+	    _store2.default.changePhase(adjustment);
+	  },
+
+	  acceptAdvance: function acceptAdvance(phase, repeat) {
+	    var phase = this.props.phase,
+	        repeat = this.props.repeat,
+	        adjustment;
+
+	    if (phase === 5 || phase === 12) {
+	      adjustment = 2;
+	    } else if (phase === 6 || phase === 13) {
+	      adjustment = 1;
+	      _store2.default.rerunPhase(false);
+	    } else if (phase === 19) {
+	      adjustment = repeat === 0 ? 1 : 3;
+	      _store2.default.rerunPhase(false);
+	    }
+	    _store2.default.changePhase(adjustment);
+	  },
+
+	  styles: {
+	    container: {
+	      backgroundColor: 'white',
+	      border: '5px double #000',
+	      borderRadius: '100%',
+	      height: '150px',
+	      display: 'block',
+	      position: 'relative',
+	      margin: '15px',
+	      padding: '5px'
+	    },
+	    restart: {
+	      margin: '25% 0 0 35%',
+	      padding: '5%'
+	    },
+	    choice: {
+	      margin: '10% 0 0 5%',
+	      padding: '5%'
+	    },
+	    buttons: {
+	      margin: '1% 2% 0 0'
+	    }
+	  }
+	});
+
+	exports.default = NextSelect;
+
+/***/ },
+/* 218 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Message = __webpack_require__(219);
 
 	var _Message2 = _interopRequireDefault(_Message);
 
-	var _Score = __webpack_require__(219);
+	var _Score = __webpack_require__(220);
 
 	var _Score2 = _interopRequireDefault(_Score);
 
-	var _Bank = __webpack_require__(220);
+	var _Bank = __webpack_require__(221);
 
 	var _Bank2 = _interopRequireDefault(_Bank);
 
-	var _Office = __webpack_require__(221);
+	var _Office = __webpack_require__(222);
 
 	var _Office2 = _interopRequireDefault(_Office);
 
-	var _MoveCounter = __webpack_require__(222);
+	var _MoveCounter = __webpack_require__(223);
 
 	var _MoveCounter2 = _interopRequireDefault(_MoveCounter);
 
-	var _NextGoal = __webpack_require__(223);
+	var _NextGoal = __webpack_require__(224);
 
 	var _NextGoal2 = _interopRequireDefault(_NextGoal);
 
@@ -24723,7 +24950,7 @@
 	      _react2.default.createElement(
 	        'div',
 	        { style: this.styles.bodyBoard },
-	        _react2.default.createElement(_Message2.default, { alert: this.props.state.newMessage, message: this.props.state.message }),
+	        _react2.default.createElement(_Message2.default, { alert: this.props.state.newMessage, message: this.props.state.message, phase: this.props.state.phase, gameOver: this.props.gameOver }),
 	        _react2.default.createElement(_Score2.default, { score: this.props.state.score }),
 	        _react2.default.createElement(_Bank2.default, { bankBalance: this.props.state.bankBalance }),
 	        _react2.default.createElement(_Office2.default, { electedOffice: this.props.state.electedOffice }),
@@ -24758,7 +24985,7 @@
 	exports.default = Scoreboard;
 
 /***/ },
-/* 218 */
+/* 219 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24771,29 +24998,61 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _utils = __webpack_require__(161);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Message = _react2.default.createClass({
 	  displayName: 'Message',
 
 	  render: function render() {
-	    var msg = this.props.alert ? _react2.default.createElement(
-	      'p',
-	      { style: this.styles.alert },
-	      ' ',
-	      this.props.message,
-	      ' '
-	    ) : _react2.default.createElement(
-	      'p',
-	      null,
-	      this.props.message
-	    );
+	    var end = this.props.gameOver,
+	        msg;
+
+	    if (end) {
+	      msg = _react2.default.createElement(
+	        'p',
+	        { style: this.styles.alert },
+	        ' ',
+	        this.endGame(end),
+	        ' '
+	      );
+	    } else if (this.props.alert) {
+	      msg = _react2.default.createElement(
+	        'p',
+	        { style: this.styles.alert },
+	        ' ',
+	        this.props.message,
+	        ' '
+	      );
+	    } else {
+	      msg = _react2.default.createElement(
+	        'p',
+	        null,
+	        this.props.message
+	      );
+	    }
 
 	    return _react2.default.createElement(
 	      'div',
 	      null,
 	      msg
 	    );
+	  },
+
+	  endGame: function endGame(failType) {
+	    var reason = 'Game Over. ',
+	        newLife = _utils2.default.getPhaseData(this.props.phase).end;
+
+	    if (failType === 'board') {
+	      reason = reason + 'Talk about gridlock!';
+	    } else if (failType === 'bank') {
+	      reason = reason + 'Votes can be bought, just not always by you.';
+	    }
+	    reason = reason + " Fortunately, someone found you a new job, as " + newLife;
+	    return reason;
 	  },
 
 	  styles: {
@@ -24807,7 +25066,7 @@
 	exports.default = Message;
 
 /***/ },
-/* 219 */
+/* 220 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24847,7 +25106,7 @@
 	exports.default = Score;
 
 /***/ },
-/* 220 */
+/* 221 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24886,7 +25145,7 @@
 	exports.default = Bank;
 
 /***/ },
-/* 221 */
+/* 222 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24921,7 +25180,7 @@
 	exports.default = Office;
 
 /***/ },
-/* 222 */
+/* 223 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24956,7 +25215,7 @@
 	exports.default = MoveCounter;
 
 /***/ },
-/* 223 */
+/* 224 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24995,7 +25254,7 @@
 	exports.default = NextGoal;
 
 /***/ },
-/* 224 */
+/* 225 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -25012,31 +25271,37 @@
 
 	var _Token2 = _interopRequireDefault(_Token);
 
+	var _utils = __webpack_require__(161);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Staging = _react2.default.createClass({
 		displayName: 'Staging',
 
 		render: function render() {
-			return _react2.default.createElement(
-				'div',
-				{ style: this.styles.stagingArea },
-				_react2.default.createElement(_Token2.default, { symbol: this.props.stagedToken })
-			);
-		},
+			var tokenGroup = this.props.stagedToken.slice(0, 3),
+			    tokenDiv = _react2.default.createElement(_Token2.default, { symbol: this.props.stagedToken }),
+			    gameOver = this.props.gameOver,
+			    toStage = gameOver ? _react2.default.createElement('p', null) : tokenDiv;
 
-		styles: {
-			stagingArea: {
-				color: 'white',
-				margin: '15px',
-				padding: '5px',
-				backgroundColor: '#065C27',
-				border: '5px double #000',
-				borderRadius: '100%',
-				height: '150px',
-				display: 'block',
-				position: 'relative'
-			}
+			return _react2.default.cloneElement(_react2.default.createElement(
+				'div',
+				null,
+				toStage
+			), { style: {
+					color: _utils2.default.handleColors(tokenGroup, 'color'),
+					backgroundColor: _utils2.default.handleColors(tokenGroup, 'bColor'),
+					margin: '15px',
+					padding: '5px',
+					border: '5px double #000',
+					borderRadius: '100%',
+					height: '150px',
+					display: 'block',
+					position: 'relative'
+				}
+			});
 		}
 	});
 
