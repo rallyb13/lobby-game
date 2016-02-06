@@ -122,10 +122,34 @@ QuidStore.rerunPhase = function(doAdd){
 
 QuidStore.completeMove = function(rowPos, colPos){
   var token = currentState.stagedToken,
-    swarm = false;
+    moves = currentState.movesRemaining,
+    swarm = false,
+    progressionData;
 
-  this.placeCorrectToken(token, rowPos, colPos);
-  this.updateMoveCount();
+  //handle placement of tokens
+  if (token === 'mega'){
+    token = this.convertMega(rowPos, colPos);
+  } else if (token === 'pork'){
+    currentState.porkOn.push( JSON.stringify([rowPos, colPos]) );
+  } else if (token.slice(0,3) === 'con' && token !== 'con1'){
+    this.addAppeasement(token, rowPos, colPos);
+  }
+  token = this.handleMatches(token, rowPos, colPos);
+  this.setToken(token, rowPos, colPos);
+
+  //update move count, handle phase/move-triggered events
+  currentState.movesRemaining--;
+  if (moves === currentState.trigger) {
+    progressionData = Utils.progressGame(currentState.phase, moves);
+    if (progressionData !== false){
+      currentState.tokensArray = progressionData.tokens;
+      currentState.message = progressionData.msg;
+      currentState.trigger = progressionData.nextTrigger;
+      currentState.newMessage = true;
+    }
+  } else if (moves !== currentState.trigger && moves !== 0){
+    currentState.newMessage = false;
+  }
 
   //handle special token removal
   if (currentState.createPowerUp.length !== 0){
@@ -150,38 +174,6 @@ QuidStore.completeMove = function(rowPos, colPos){
   }
   this.emitChange();
 };
-
-QuidStore.placeCorrectToken = function(token, rowPos, colPos){
-  if (token === 'mega'){
-    token = this.convertMega(rowPos, colPos);
-  } else if (token === 'pork'){
-    currentState.porkOn.push( JSON.stringify([rowPos, colPos]) );
-  } else if (token.slice(0,3) === 'con' && token !== 'con1'){
-    this.addAppeasement(token, rowPos, colPos);
-  }
-  token = this.handleMatches(token, rowPos, colPos);
-  this.setToken(token, rowPos, colPos);
-};
-
-QuidStore.updateMoveCount = function(){
-  var moves = currentState.movesRemaining,
-    progressionData;
-
-  currentState.movesRemaining--;
-
-  //handle triggered/phase-change events
-  if (moves === currentState.trigger) {
-    progressionData = Utils.progressGame(currentState.phase, moves);
-    if (progressionData !== false){
-      currentState.tokensArray = progressionData.tokens;
-      currentState.message = progressionData.msg;
-      currentState.trigger = progressionData.nextTrigger;
-      currentState.newMessage = true;
-    }
-  } else if (moves !== currentState.trigger && moves !== 0){
-    currentState.newMessage = false;
-  }
-}
 
 QuidStore.checkMegaValid = function(){
     var blanks = this.findTokenCoords(''),
@@ -539,11 +531,11 @@ QuidStore.changePhase = function(phaseShift){
   var phase,
     phaseData,
     coords;
-
+  // console.log('phaseShift: ' + phaseShift);
   currentState.phase = currentState.phase + phaseShift;
   phase = currentState.phase;
   phaseData = Utils.getPhaseData(phase);
-
+  // console.log(phaseData);
   //change every election
   currentState.movesRemaining = phaseData.moves;
   currentState.nextGoal = phaseData.goal;
