@@ -162,13 +162,20 @@ var Utils = {
           2: {
             115: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1', 'con1', 'mega'],
-              msg: "Guy named Pete something-or-other is challenging you for the nomination. We're gonna need to spend more on the primary than the general!",
+              msg: "You know what gerrymandering really means? It means we're gonna need to spend more on the primary than the general!",
               nextTrigger: 72
             },
             72: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'con1', 'mega'],
               msg: "Don't worry about election laws that say money raised is earmarked as for this election or that one. This is what super-PACs are for. Rolling money on through election cycles is just one of many ways we winners buck the system.",
               nextTrigger: 33
+            }
+          },
+          3: {
+            33: {
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1' 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
+              msg: "Once you do enough back-scratching, you can just pick up the phone and call in a favor. Those power-ups are really helpful when it's down to the wire.",
+              nextTrigger: 365 //TODO: this will change!
             }
           }
         };
