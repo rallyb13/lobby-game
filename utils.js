@@ -114,17 +114,17 @@ var Utils = {
       26: { moves: 690, goal: 125000, end: "a financial consultant, for $350K/yr. Also, the weapons manufacturing lobby wants you to consult for them, for $150K/yr. Yes, you can do both.",
         msg: "Well, looks like you don't even have a primary challenger this time! The party thinks you're just too important to lose. And the financial sector agrees!"},
       27: { moves: 615, goal: 125000, end: "an executive at Bank Of Insolvancy, for $400K/yr (starting salary), plus quarterly bonuses.",
-        msg: ""},
+        msg: "Another election in the (money) bag! Now on to the next one. You have a few primary challengers, but don't worry--they're as weak as a local bank."},
       28: { moves: 75, goal: 125000, end: "a FineGamble Financial consultant. You'll make half a mil per year (which doesn't include the quarterly bonuses).",
-        msg: ""},
+        msg: "You won the primary, but you've got a difficult general election ahead. Better build up Big Bank support!"},
       29: { moves: 690, goal: 125000, end: "an executive at Bank Of Insolvancy, for $400K/yr (starting salary), plus quarterly bonuses. Also, the oil and gun lobbies want to pay you $100K/yr each, for 'vital'/(occasional) consulting.",
-        msg: ""},
+        msg: "Kudos on your re-election. Now you don't even have a challenger in the next primary! Guess you can take this one to the bank (oh ho ho)."},
       30: { moves: 615, goal: 125000, end: "a FineGamble Financial consultant. You'll make half a mil per year (which doesn't include the quarterly bonuses). Lobbying firms in three other industries will also pay you occasional (6-figure) special consulting fees.",
-        msg: ""},
+        msg: "Well, Senator, looks like you've got a challenger in the pirmary. But she's actually refused to take any money from lobbyists! This shouldn't be a tough win."},
       31: { moves: 75, goal: 125000, end: "a FineGamble Financial executive, for $750K/yr (starting salary), plus bonuses. An easy enough job that will leave you time to collect 6-figure consulting fees from other lobbying friends, er, firms.",
-        msg: ""},
+        msg: "Your old friend Rob M. Blynde is back again to challenge you for the seat. He's got serious support from Big Pharma and Tobacco, so I guess we'll find out who has the better friends."},
       32: { moves: 690, goal: 125000, end: "a consultant with FineGamble Financial, for half a mil every year (starting salary), plus bonuses. Also a consult with LockLoadMartyr for another quarter mil. You can still do special consulting with other firms, for a $100K fee each.",
-        msg: ""}
+        msg: "Gulp! You're in for the fight of your life. Your opponent, a serious 'reform candidate,' has a ton of popular support and is calling you out. Time to prove to America that, in the end, special interests always win!"}
     }
     return phaseMap[phase];
   },
@@ -175,7 +175,28 @@ var Utils = {
             33: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1' 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
               msg: "Once you do enough back-scratching, you can just pick up the phone and call in a favor. Those power-ups are really helpful when it's down to the wire.",
-              nextTrigger: 365 //TODO: this will change!
+              nextTrigger: 461 //TODO: this will change!
+            }
+          },
+          27: {
+            461: {
+              tokens: ['oil1', 'agr1', 'fin1', 'fin1', 'mil1', 'mil1', 'mega', 'mega', 'con'],
+              msg: "Budget Crisis! During this special session, you'll only have low level tokens to work with. Use the extra time in Washington to make more speeches (megaphones) than usual.",
+              nextTrigger: 459,
+              moveChange: 40
+            },
+            459: {
+              tokens: ['oil1', 'agr1', 'mil1', 'mil2', 'mil2', 'fin1', 'fin2', 'fin2', 'fin3', 'mega', 'pork', 'con', 'con'],
+              msg: "The special session's over and the budget crisis has been patched up, for now. With the holidays over and the next session starting, things will slowly be getting back to normal...",
+              nextTrigger: 155 //TODO: this will change!
+            }
+          },
+          30: {
+            155: {
+              tokens: ['oil1', 'oil2', 'agr1', 'agr2', 'mil1', 'mil2', 'mil2', 'mil3', 'fin1', 'fin1', 'fin2', 'fin2', 'fin3', 'fin3', 'fin4' 'con', 'con', 'con', 'mega', 'mega', 'pork', 'pork'],
+              msg: "Government shutdown knocked some days off the legislative calendar! Better make up for it, espeically when the big banks are counting on you!",
+              nextTrigger: 777, //TODO: this will change!
+              moveChange: -23
             }
           }
         };
@@ -204,14 +225,14 @@ var Utils = {
 
   setElectionChoice: function(phase, repeat) {
     var advMsgMap = {
-      5: 'Would you like to run for State Senate?',
-      6: 'NOW would you like to run for State Senate?',
-      12: 'How would you like to go to DC? Want to run for US Rep?',
+      5: "Want to run for State Senate? With no real competition to face in the primary, this could be your moment to climb...",
+      6: 'NOW would you like to run for State Senate? ',
+      12: "You're destined for great things. The US House of Representatives is calling your name. Will you run?",
       13: 'Want to go to DC now? The US Congress awaits...',
       19: {
-        0: 'Want to challenge X for that Senate seat?',
-        1: 'Want to challenge Y for his Senate seat?',
-        2: 'none'
+        0: "Want to challenge X for that Senate seat?",
+        1: "Want to challenge Y for his Senate seat?",
+        2: "none"
       }
     };
     if (typeof advMsgMap[phase] === 'undefined'){
