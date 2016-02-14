@@ -173,27 +173,27 @@ var Utils = {
           },
           3: {
             33: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1' 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
               msg: "Once you do enough back-scratching, you can just pick up the phone and call in a favor. Those power-ups are really helpful when it's down to the wire.",
               nextTrigger: 461 //TODO: this will change!
             }
           },
           27: {
             461: {
-              tokens: ['oil1', 'agr1', 'fin1', 'fin1', 'mil1', 'mil1', 'mega', 'mega', 'con'],
+              tokens: ['oil1', 'agr1', 'fin1', 'fin1', 'mil1', 'mil1', 'mega', 'mega', 'con1'],
               msg: "Budget Crisis! During this special session, you'll only have low level tokens to work with. Use the extra time in Washington to make more speeches (megaphones) than usual.",
               nextTrigger: 459,
               moveChange: 40
             },
             459: {
-              tokens: ['oil1', 'agr1', 'mil1', 'mil2', 'mil2', 'fin1', 'fin2', 'fin2', 'fin3', 'mega', 'pork', 'con', 'con'],
+              tokens: ['oil1', 'agr1', 'mil1', 'mil2', 'mil2', 'fin1', 'fin2', 'fin2', 'fin3', 'mega', 'pork', 'con1', 'con1'],
               msg: "The special session's over and the budget crisis has been patched up, for now. With the holidays over and the next session starting, things will slowly be getting back to normal...",
               nextTrigger: 155 //TODO: this will change!
             }
           },
           30: {
             155: {
-              tokens: ['oil1', 'oil2', 'agr1', 'agr2', 'mil1', 'mil2', 'mil2', 'mil3', 'fin1', 'fin1', 'fin2', 'fin2', 'fin3', 'fin3', 'fin4' 'con', 'con', 'con', 'mega', 'mega', 'pork', 'pork'],
+              tokens: ['oil1', 'oil2', 'agr1', 'agr2', 'mil1', 'mil2', 'mil2', 'mil3', 'fin1', 'fin1', 'fin2', 'fin2', 'fin3', 'fin3', 'fin4', 'con1', 'con1', 'con1', 'mega', 'mega', 'pork', 'pork'],
               msg: "Government shutdown knocked some days off the legislative calendar! Better make up for it, espeically when the big banks are counting on you!",
               nextTrigger: 777, //TODO: this will change!
               moveChange: -23
