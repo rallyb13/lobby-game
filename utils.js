@@ -124,7 +124,8 @@ var Utils = {
       31: { moves: 75, goal: 125000, end: "a FineGamble Financial executive, for $750K/yr (starting salary), plus bonuses. An easy enough job that will leave you time to collect 6-figure consulting fees from other lobbying friends, er, firms.",
         msg: "Your old friend Rob M. Blynde is back again to challenge you for the seat. He's got serious support from Big Pharma and Tobacco, so I guess we'll find out who has the better friends."},
       32: { moves: 690, goal: 125000, end: "a consultant with FineGamble Financial, for half a mil every year (starting salary), plus bonuses. Also a consult with LockLoadMartyr for another quarter mil. You can still do special consulting with other firms, for a $100K fee each.",
-        msg: "Gulp! You're in for the fight of your life. Your opponent, a serious 'reform candidate,' has a ton of popular support and is calling you out. Time to prove to America that, in the end, special interests always win!"}
+        msg: "Gulp! You're in for the fight of your life. Your opponent, a serious 'reform candidate,' has a ton of popular support and is calling you out. Time to prove to America that, in the end, special interests always win!"},
+      33: { moves: 1, goal: 0, end: "Good game, Mr. President.", msg: "YOU WIN! In fact, you've been such a friend to so many lobbyists, that a group of them got together and decided to install you as President of the United States of America. Feel free to keep playing the game, Mr. President, but you've already won it all!"}
     }
     return phaseMap[phase];
   },

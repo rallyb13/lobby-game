@@ -166,7 +166,12 @@ QuidStore.nextMove = function(){
     progressionData,
     moveChange;
 
-  currentState.movesRemaining--;
+  if (currentState.phase <= 32){
+    currentState.movesRemaining--;
+  } else {
+    currentState.movesRemaining++;
+  }
+
   if (moves === currentState.trigger) {
     progressionData = Utils.progressGame(currentState.phase, moves);
     if (progressionData !== false){

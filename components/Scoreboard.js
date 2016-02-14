@@ -16,7 +16,7 @@ var Scoreboard = React.createClass({
           <Score score={this.props.state.score} />
           <Bank bankBalance={this.props.state.bankBalance} />
           <Office electedOffice={this.props.state.electedOffice} />
-          <MoveCounter movesRemaining={this.props.state.movesRemaining} />
+          <MoveCounter movesRemaining={this.props.state.movesRemaining} phase={this.props.state.phase}/>
           <NextGoal nextGoal={this.props.state.nextGoal} />
         </div>
       </div>
