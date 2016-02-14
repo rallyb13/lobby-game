@@ -122,9 +122,7 @@ QuidStore.rerunPhase = function(doAdd){
 
 QuidStore.completeMove = function(rowPos, colPos){
   var token = currentState.stagedToken,
-    moves = currentState.movesRemaining,
-    swarm = false,
-    progressionData;
+    swarm = false;
 
   //handle placement of tokens
   if (token === 'mega'){
@@ -137,19 +135,7 @@ QuidStore.completeMove = function(rowPos, colPos){
   token = this.handleMatches(token, rowPos, colPos);
   this.setToken(token, rowPos, colPos);
 
-  //update move count, handle phase/move-triggered events
-  currentState.movesRemaining--;
-  if (moves === currentState.trigger) {
-    progressionData = Utils.progressGame(currentState.phase, moves);
-    if (progressionData !== false){
-      currentState.tokensArray = progressionData.tokens;
-      currentState.message = progressionData.msg;
-      currentState.trigger = progressionData.nextTrigger;
-      currentState.newMessage = true;
-    }
-  } else if (moves !== currentState.trigger && moves !== 0){
-    currentState.newMessage = false;
-  }
+  this.nextMove();
 
   //handle special token removal
   if (currentState.createPowerUp.length !== 0){
@@ -158,7 +144,7 @@ QuidStore.completeMove = function(rowPos, colPos){
     currentState.helperChange = false;
   }
   if (currentState.appeasements.length !==0){
-    this.checkAppeasements();
+    this.checkAppeasements(false);
     this.removeConstituents(token, rowPos, colPos);
   }
 
@@ -173,6 +159,32 @@ QuidStore.completeMove = function(rowPos, colPos){
     this.addTopLevelToken(token, rowPos, colPos);
   }
   this.emitChange();
+};
+
+QuidStore.nextMove = function(){
+  var moves = currentState.movesRemaining,
+    progressionData,
+    moveChange;
+
+  currentState.movesRemaining--;
+  if (moves === currentState.trigger) {
+    progressionData = Utils.progressGame(currentState.phase, moves);
+    if (progressionData !== false){
+      currentState.tokensArray = progressionData.tokens;
+      currentState.message = progressionData.msg;
+      currentState.trigger = progressionData.nextTrigger;
+      currentState.newMessage = true;
+      moveChange = progressionData.moveChange;
+      if (typeof moveChange !== 'undefined'){
+        currentState.movesRemaining = currentState.movesRemaining + moveChange;
+        if (moveChange < 0 && currentState.appeasements.length > 0){
+          this.checkAppeasements(true);
+        }
+      }
+    }
+  } else if (moves !== currentState.trigger && moves !== 0){
+    currentState.newMessage = false;
+  }
 };
 
 QuidStore.checkMegaValid = function(){
@@ -342,15 +354,17 @@ QuidStore.addAppeasement = function(token, rowPos, colPos){
   currentState.appeasements.push( [rowPos, colPos, token, moveTrigger, phaseTrigger] );
 };
 
-QuidStore.checkAppeasements = function(){
+QuidStore.checkAppeasements = function(special){
   var appeasements = currentState.appeasements,
     phase = currentState.phase,
     move = currentState.movesRemaining,
     indexes = [],
+    isTarget,
     i;
 
   for (i = appeasements.length - 1; i >= 0; i--){
-    if(appeasements[i][4] === phase && appeasements[i][3] === move){
+    isTarget = special ? (appeasements[i][3] >= move) : (appeasements[i][3] === move);
+    if(appeasements[i][4] === phase && isTarget){
       this.removeAppeasement(i, appeasements[i][0], appeasements[i][1], appeasements[i][2]);
     }
   }
@@ -358,7 +372,6 @@ QuidStore.checkAppeasements = function(){
 
 QuidStore.removeAppeasement = function(index, rowPos, colPos, token){
   var newToken = Utils.getTokenData(token, 'nextDown');
-
   currentState.appeasements.splice(index, 1);
   this.setToken(newToken, rowPos, colPos);
 
@@ -531,11 +544,10 @@ QuidStore.changePhase = function(phaseShift){
   var phase,
     phaseData,
     coords;
-  // console.log('phaseShift: ' + phaseShift);
   currentState.phase = currentState.phase + phaseShift;
   phase = currentState.phase;
   phaseData = Utils.getPhaseData(phase);
-  // console.log(phaseData);
+
   //change every election
   currentState.movesRemaining = phaseData.moves;
   currentState.nextGoal = phaseData.goal;
