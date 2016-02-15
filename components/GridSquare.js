@@ -2,7 +2,6 @@ import React from 'react';
 import QuidStore from '../store';
 import Utils from '../utils';
 import Token from './Token';
-import Radium from 'radium';
 
 var GridSquare = React.createClass({
 
@@ -10,14 +9,13 @@ var GridSquare = React.createClass({
     var tokenGroup = this.props.token.slice(0,3),
       selected = this.props.aboutToGo;
     return React.cloneElement(
-      <div onClick={this.placeToken} >
+      <div className={this.props.eligible ? "grid-square" : ''} onClick={this.placeToken} >
         <Token symbol={this.props.token} />
       </div>,
       { style:
         {
           color : Utils.handleColors(tokenGroup, 'color'),
           backgroundColor: Utils.handleColors(tokenGroup, 'bColor', selected),
-          ':hover': {backgroundColor: Utils.handleColors(tokenGroup, 'hover')},
           height: '16.29%',
           width: '16.66%',
           display: 'inline-block',
@@ -37,4 +35,4 @@ var GridSquare = React.createClass({
   }
 });
 
-export default Radium(GridSquare);
+export default GridSquare;
