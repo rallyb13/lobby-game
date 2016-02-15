@@ -6,7 +6,7 @@ var currentState = {
   board: {
     rows: 6, columns: 6, grid: []
   },
-  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2','oil2', 'con1'],
+  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2','oil2', 'con1', 'pork'],
   stagedToken: 'oil1',
   holdToken: false,
   //white paper data
