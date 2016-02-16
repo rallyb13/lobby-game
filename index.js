@@ -19825,7 +19825,7 @@
 	  board: {
 	    rows: 6, columns: 6, grid: []
 	  },
-	  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'con1'],
+	  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'con1', 'pork'],
 	  stagedToken: 'oil1',
 	  holdToken: false,
 	  //white paper data
@@ -20446,7 +20446,7 @@
 	      'agr': { color: 'green', bColor: 'yellow' },
 	      'mil': { color: 'black', bColor: 'red' },
 	      'fin': { color: 'yellow', bColor: 'green' },
-	      '': { color: '#4B5043' },
+	      '': { color: '#4B5043', bColor: '#A4BD99' },
 	      'meg': { color: '#4B5043', bColor: '#A4BD99' },
 	      'con': { color: 'red', bColor: 'blue' },
 	      'por': { color: 'red', bColor: 'pink' }
