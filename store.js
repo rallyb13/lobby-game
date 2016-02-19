@@ -6,7 +6,7 @@ var currentState = {
   board: {
     rows: 6, columns: 6, grid: []
   },
-  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2','oil2', 'con1', 'pork'],
+  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2','oil2', 'con1'],
   stagedToken: 'oil1',
   holdToken: false,
   //white paper data
@@ -129,6 +129,7 @@ QuidStore.completeMove = function(rowPos, colPos){
     token = this.convertMega(rowPos, colPos);
   } else if (token === 'pork'){
     currentState.porkOn.push( JSON.stringify([rowPos, colPos]) );
+    console.log(currentState.porkOn);
   } else if (token.slice(0,3) === 'con' && token !== 'con1'){
     this.addAppeasement(token, rowPos, colPos);
   }
@@ -530,7 +531,7 @@ QuidStore.handlePork = function(matches, rowPos, colPos){
     porkers,
     stringCoords,
     index;
-
+  console.log('got here');
   matches.push([rowPos, colPos]);
   matches.forEach( function(match) {
     porkers = me.cardinalCheck('pork', match[0], match[1]);
@@ -539,7 +540,7 @@ QuidStore.handlePork = function(matches, rowPos, colPos){
         stringCoords = JSON.stringify(pork);
         index = currentState.porkOn.indexOf(stringCoords);
         currentState.porkOn.splice(index, 1);
-        this.setToken('', pork[0], pork[1]);
+        me.setToken('', pork[0], pork[1]);
       });
     }
   });
