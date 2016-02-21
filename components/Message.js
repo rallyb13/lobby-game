@@ -37,7 +37,9 @@ var Message = React.createClass({
   styles: {
     alert: {
       fontWeight: 700,
-      color: 'maroon'
+      color: 'white',
+      backgroundColor: 'maroon',
+      padding: '2px'
     }
   }
 });
