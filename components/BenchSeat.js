@@ -7,12 +7,13 @@ var BenchSeat = React.createClass({
   render: function(){
     var powerUp = this.props.powerUp,
       selected = this.props.selected,
-      tokenGroup = this.props.token.slice(0,3);
+      tokenGroup = this.props.token.slice(0,3),
+      count = powerUp ? this.props.count : " ";
 
     return React.cloneElement(
       <div onClick={this.useHelper}>
         <Token symbol={this.props.token} />
-        <span style={{color:'white'}}> {this.props.count} </span>
+        <span style={{color:'white'}}> {count} </span>
       </div>,
       { style:
         {
