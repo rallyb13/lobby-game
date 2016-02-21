@@ -58,7 +58,7 @@ var BenchSeat = React.createClass({
     } else {
       QuidStore.deposit(250000);
     }
-    QuidStore.changeHelperCount(token);
+    QuidStore.changeHelperCount(token, true);
   }
 });
 

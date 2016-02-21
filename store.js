@@ -107,8 +107,12 @@ QuidStore.freezeCons = function(){
   currentState.freeze = currentState.freeze + 10;
 };
 
-QuidStore.changeHelperCount = function(token){
-  currentState.helpers[token]--;
+QuidStore.changeHelperCount = function(token, removal){
+  if(removal){
+    currentState.helpers[token]--;
+  } else {
+    currentState.helpers[token]++;
+  }
   this.emitChange();
 };
 
@@ -129,7 +133,6 @@ QuidStore.completeMove = function(rowPos, colPos){
     token = this.convertMega(rowPos, colPos);
   } else if (token === 'pork'){
     currentState.porkOn.push( JSON.stringify([rowPos, colPos]) );
-    console.log(currentState.porkOn);
   } else if (token.slice(0,3) === 'con' && token !== 'con1'){
     this.addAppeasement(token, rowPos, colPos);
   }
@@ -531,7 +534,7 @@ QuidStore.handlePork = function(matches, rowPos, colPos){
     porkers,
     stringCoords,
     index;
-  console.log('got here');
+
   matches.push([rowPos, colPos]);
   matches.forEach( function(match) {
     porkers = me.cardinalCheck('pork', match[0], match[1]);
@@ -550,9 +553,16 @@ QuidStore.changePhase = function(phaseShift){
   var phase,
     phaseData,
     coords;
+
   currentState.phase = currentState.phase + phaseShift;
   phase = currentState.phase;
   phaseData = Utils.getPhaseData(phase);
+
+  if (phase === 8){
+    this.changeHelperCount('con3', false);
+  } else if (phase === 16){
+    this.changeHelperCount('con5', false);
+  }
 
   //change every election
   currentState.movesRemaining = phaseData.moves;
