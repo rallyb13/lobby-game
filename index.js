@@ -19825,7 +19825,7 @@
 	  board: {
 	    rows: 6, columns: 6, grid: []
 	  },
-	  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'con1', 'pork'],
+	  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'con1'],
 	  stagedToken: 'oil1',
 	  holdToken: false,
 	  //white paper data
@@ -19926,8 +19926,12 @@
 	  currentState.freeze = currentState.freeze + 10;
 	};
 
-	QuidStore.changeHelperCount = function (token) {
-	  currentState.helpers[token]--;
+	QuidStore.changeHelperCount = function (token, removal) {
+	  if (removal) {
+	    currentState.helpers[token]--;
+	  } else {
+	    currentState.helpers[token]++;
+	  }
 	  this.emitChange();
 	};
 
@@ -20357,7 +20361,7 @@
 	        stringCoords = JSON.stringify(pork);
 	        index = currentState.porkOn.indexOf(stringCoords);
 	        currentState.porkOn.splice(index, 1);
-	        this.setToken('', pork[0], pork[1]);
+	        me.setToken('', pork[0], pork[1]);
 	      });
 	    }
 	  });
@@ -20365,9 +20369,16 @@
 
 	QuidStore.changePhase = function (phaseShift) {
 	  var phase, phaseData, coords;
+
 	  currentState.phase = currentState.phase + phaseShift;
 	  phase = currentState.phase;
 	  phaseData = _utils2.default.getPhaseData(phase);
+
+	  if (phase === 8) {
+	    this.changeHelperCount('con3', false);
+	  } else if (phase === 16) {
+	    this.changeHelperCount('con5', false);
+	  }
 
 	  //change every election
 	  currentState.movesRemaining = phaseData.moves;
@@ -21087,7 +21098,8 @@
 	  render: function render() {
 	    var powerUp = this.props.powerUp,
 	        selected = this.props.selected,
-	        tokenGroup = this.props.token.slice(0, 3);
+	        tokenGroup = this.props.token.slice(0, 3),
+	        count = powerUp ? this.props.count : " ";
 
 	    return _react2.default.cloneElement(_react2.default.createElement(
 	      'div',
@@ -21097,7 +21109,7 @@
 	        'span',
 	        { style: { color: 'white' } },
 	        ' ',
-	        this.props.count,
+	        count,
 	        ' '
 	      )
 	    ), { style: {
@@ -21141,7 +21153,7 @@
 	    } else {
 	      _store2.default.deposit(250000);
 	    }
-	    _store2.default.changeHelperCount(token);
+	    _store2.default.changeHelperCount(token, true);
 	  }
 	});
 
@@ -21729,7 +21741,9 @@
 	  styles: {
 	    alert: {
 	      fontWeight: 700,
-	      color: 'maroon'
+	      color: 'white',
+	      backgroundColor: 'maroon',
+	      padding: '2px'
 	    }
 	  }
 	});
