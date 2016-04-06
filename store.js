@@ -10,10 +10,10 @@ var currentState = {
   stagedToken: 'oil1',
   holdToken: false,
   //white paper data
-  movesRemaining: 180,
+  movesRemaining: 5,
   score: 0,
-  bankBalance: 0,
-  phase: 1,
+  bankBalance: 50000,
+  phase: 7,
   repeat: 0, //tracks if level is repeated (when higher office declined)
   nextGoal: 50000,
   electedOffice: 'State Delegate',
@@ -552,7 +552,8 @@ QuidStore.handlePork = function(matches, rowPos, colPos){
 QuidStore.changePhase = function(phaseShift){
   var phase,
     phaseData,
-    coords;
+    coords,
+    newSquares;
 
   currentState.phase = currentState.phase + phaseShift;
   phase = currentState.phase;
@@ -575,8 +576,15 @@ QuidStore.changePhase = function(phaseShift){
   //changes less often
   currentState.electedOffice = Utils.setElectedOffice(phase, currentState.electedOffice);
   coords = Utils.handleBoardChange(currentState.electedOffice);
-  currentState.board.rows = coords[0];
-  currentState.board.columns = coords[1];
+  if (currentState.board.rows !== coords[0] || currentState.board.columns !== coords[1]){
+    currentState.board.rows = coords[0];
+    currentState.board.columns = coords[1];
+    newSquares = this.findTokenCoords(undefined);
+    newSquares.forEach( function(ns){
+      this.setToken('', ns[0], ns[1]);
+    });
+    console.log(currentState.board);
+  }
   this.emitChange();
 };
 
