@@ -34,17 +34,19 @@ var Token = React.createClass({
     });
 
     return (
-      <div style={this.styles.token}><span className={symbolClass}></span></div>
+      <div style={this.styles.token} className="token">
+          <img style={this.styles.img} alt={symbolClass} src={symbolClass ? `../assets/icons/` + symbolClass + '.jpg' : ''} />
+      </div>
     );
   },
 
   styles: {
      token: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      fontSize: '50px'
+    },
+
+     img: {
+       fontSize: '10px',
+       maxWidth: '100px'
      }
   }
 
