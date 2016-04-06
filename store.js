@@ -10,14 +10,15 @@ var currentState = {
   stagedToken: 'oil1',
   holdToken: false,
   //white paper data
-  movesRemaining: 5,
+  movesRemaining: 180,
   score: 0,
-  bankBalance: 50000,
-  phase: 7,
+  bankBalance: 0,
+  phase: 1,
   repeat: 0, //tracks if level is repeated (when higher office declined)
   nextGoal: 50000,
   electedOffice: 'State Delegate',
   message: 'Click any unoccupied square in the grid to place the next item. Match 3 to make more valuable items.',
+  advMsg: 'none',
   advanceQuestion: false, //true when phase change should prompt choice of office advancement
   trigger: 160, //move # at which message will change
   newMessage: true, //only true at first appearance of new message
@@ -176,7 +177,10 @@ QuidStore.nextMove = function(){
     currentState.movesRemaining++;
   }
 
-  if (moves === currentState.trigger) {
+  if (moves === 0){
+    this.handleElection(currentState.repeat % 3);
+  }
+  else if (moves === currentState.trigger) {
     progressionData = Utils.progressGame(currentState.phase, moves);
     if (progressionData !== false){
       currentState.tokensArray = progressionData.tokens;
@@ -550,7 +554,8 @@ QuidStore.handlePork = function(matches, rowPos, colPos){
 };
 
 QuidStore.changePhase = function(phaseShift){
-  var phase,
+  var me = this,
+    phase,
     phaseData,
     coords,
     newSquares;
@@ -581,11 +586,24 @@ QuidStore.changePhase = function(phaseShift){
     currentState.board.columns = coords[1];
     newSquares = this.findTokenCoords(undefined);
     newSquares.forEach( function(ns){
-      this.setToken('', ns[0], ns[1]);
+      me.setToken('', ns[0], ns[1]);
     });
-    console.log(currentState.board);
   }
   this.emitChange();
+};
+
+QuidStore.handleElection = function(repeat){
+  var phase = currentState.phase,
+    advMsg = Utils.setElectionChoice(phase);
+
+  this.deposit(-currentState.nextGoal);
+  if (phase === 19){
+    advMsg = advMsg[repeat];
+  }
+  if (advMsg === 'none'){
+    this.changePhase(1);
+  }
+  currentState.advMsg = advMsg;
 };
 
 export default QuidStore;

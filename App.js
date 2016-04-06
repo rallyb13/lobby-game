@@ -23,13 +23,8 @@ var App = React.createClass ({
 
   render(){
     var isGameOver = this.isGameOver(),
-      repeat = this.state.repeat % 3,
-      advMsg = 'none',
+      advMsg = this.state.advMsg,
       nextBit;
-
-    if(this.state.movesRemaining === 0){
-      advMsg = this.handleElection(repeat);
-    }
 
     if (isGameOver || advMsg !== 'none' ){
       nextBit = <NextSelect gameOver={isGameOver} advMsg={advMsg} phase={this.state.phase} repeat={repeat} />;
@@ -65,20 +60,6 @@ var App = React.createClass ({
     } else {
       return 'board';
     }
-  },
-
-  handleElection: function(repeat){
-    var phase = this.state.phase,
-      advMsg = Utils.setElectionChoice(phase);
-
-    QuidStore.deposit(-this.state.nextGoal);
-    if(phase === 19){
-      advMsg = advMsg[repeat];
-    }
-    if (advMsg === 'none'){
-      QuidStore.changePhase(1);
-    }
-    return advMsg;
   },
 
   styles: {
