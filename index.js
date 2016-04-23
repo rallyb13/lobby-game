@@ -19719,13 +19719,8 @@
 
 	  render: function render() {
 	    var isGameOver = this.isGameOver(),
-	        repeat = this.state.repeat % 3,
-	        advMsg = 'none',
+	        advMsg = this.state.advMsg,
 	        nextBit;
-
-	    if (this.state.movesRemaining === 0) {
-	      advMsg = this.handleElection(repeat);
-	    }
 
 	    if (isGameOver || advMsg !== 'none') {
 	      nextBit = _react2.default.createElement(_NextSelect2.default, { gameOver: isGameOver, advMsg: advMsg, phase: this.state.phase, repeat: repeat });
@@ -19773,20 +19768,6 @@
 	    } else {
 	      return 'board';
 	    }
-	  },
-
-	  handleElection: function handleElection(repeat) {
-	    var phase = this.state.phase,
-	        advMsg = _utils2.default.setElectionChoice(phase);
-
-	    _store2.default.deposit(-this.state.nextGoal);
-	    if (phase === 19) {
-	      advMsg = advMsg[repeat];
-	    }
-	    if (advMsg === 'none') {
-	      _store2.default.changePhase(1);
-	    }
-	    return advMsg;
 	  },
 
 	  styles: {
@@ -19837,6 +19818,7 @@
 	  nextGoal: 50000,
 	  electedOffice: 'State Delegate',
 	  message: 'Click any unoccupied square in the grid to place the next item. Match 3 to make more valuable items.',
+	  advMsg: 'none',
 	  advanceQuestion: false, //true when phase change should prompt choice of office advancement
 	  trigger: 160, //move # at which message will change
 	  newMessage: true, //only true at first appearance of new message
@@ -19995,7 +19977,9 @@
 	    currentState.movesRemaining++;
 	  }
 
-	  if (moves === currentState.trigger) {
+	  if (moves === 0) {
+	    this.handleElection(currentState.repeat % 3);
+	  } else if (moves === currentState.trigger) {
 	    progressionData = _utils2.default.progressGame(currentState.phase, moves);
 	    if (progressionData !== false) {
 	      currentState.tokensArray = progressionData.tokens;
@@ -20368,7 +20352,11 @@
 	};
 
 	QuidStore.changePhase = function (phaseShift) {
-	  var phase, phaseData, coords;
+	  var me = this,
+	      phase,
+	      phaseData,
+	      coords,
+	      newSquares;
 
 	  currentState.phase = currentState.phase + phaseShift;
 	  phase = currentState.phase;
@@ -20391,9 +20379,29 @@
 	  //changes less often
 	  currentState.electedOffice = _utils2.default.setElectedOffice(phase, currentState.electedOffice);
 	  coords = _utils2.default.handleBoardChange(currentState.electedOffice);
-	  currentState.board.rows = coords[0];
-	  currentState.board.columns = coords[1];
+	  if (currentState.board.rows !== coords[0] || currentState.board.columns !== coords[1]) {
+	    currentState.board.rows = coords[0];
+	    currentState.board.columns = coords[1];
+	    newSquares = this.findTokenCoords(undefined);
+	    newSquares.forEach(function (ns) {
+	      me.setToken('', ns[0], ns[1]);
+	    });
+	  }
 	  this.emitChange();
+	};
+
+	QuidStore.handleElection = function (repeat) {
+	  var phase = currentState.phase,
+	      advMsg = _utils2.default.setElectionChoice(phase);
+
+	  this.deposit(-currentState.nextGoal);
+	  if (phase === 19) {
+	    advMsg = advMsg[repeat];
+	  }
+	  if (advMsg === 'none') {
+	    this.changePhase(1);
+	  }
+	  currentState.advMsg = advMsg;
 	};
 
 	exports.default = QuidStore;
