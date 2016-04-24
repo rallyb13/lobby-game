@@ -248,7 +248,7 @@ var Utils = {
       boardMap = {
         'State Delegate': {rows: 6, columns: 6},
         'State Senator': {rows: 6, columns: 7},
-        'Congressperson': {rows: 7, columns: 7},
+        'US Representative': {rows: 7, columns: 7},
         'Junior Senator': {rows: 7, columns: 8},
         'Senior Senator': {rows: 8, columns: 8}
       };

@@ -123,6 +123,14 @@ QuidStore.rerunPhase = function(doAdd){
   } else {
     currentState.repeat = 0;
   }
+};
+
+QuidStore.handleNewSquares = function(){
+  var newSquares = this.findTokenCoords(undefined),
+    me = this;
+  newSquares.forEach( function(ns){
+    me.setToken('', ns[0], ns[1]);
+  });
 }
 
 QuidStore.completeMove = function(rowPos, colPos){
@@ -554,11 +562,9 @@ QuidStore.handlePork = function(matches, rowPos, colPos){
 };
 
 QuidStore.changePhase = function(phaseShift){
-  var me = this,
-    phase,
+  var phase,
     phaseData,
-    coords,
-    newSquares;
+    coords;
 
   currentState.phase = currentState.phase + phaseShift;
   phase = currentState.phase;
@@ -581,13 +587,14 @@ QuidStore.changePhase = function(phaseShift){
   //changes less often
   currentState.electedOffice = Utils.setElectedOffice(phase, currentState.electedOffice);
   coords = Utils.handleBoardChange(currentState.electedOffice);
-  if (currentState.board.rows !== coords[0] || currentState.board.columns !== coords[1]){
+  if (currentState.board.rows !== coords[0]){
     currentState.board.rows = coords[0];
+    currentState.board.grid.push([]);
+    this.handleNewSquares();
+  }
+  if (currentState.board.columns !== coords[1]){
     currentState.board.columns = coords[1];
-    newSquares = this.findTokenCoords(undefined);
-    newSquares.forEach( function(ns){
-      me.setToken('', ns[0], ns[1]);
-    });
+    this.handleNewSquares();
   }
   this.emitChange();
 };

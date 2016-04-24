@@ -16,7 +16,7 @@ var Grid = React.createClass({
       for (j=0; j < colNum; j++) {
         count++;
         token = this.props.board.grid[i][j];
-        squares.push(<GridSquare rowPos={i} colPos={j} token={token} eligible={this.checkDrop(i, j, token)} aboutToGo={this.checkUplift(i, j)} key={count} gameOver={this.props.gameOver}/>);
+        squares.push(<GridSquare rowPos={i} colPos={j} token={token} eligible={this.checkDrop(i, j, token)} aboutToGo={this.checkUplift(i, j)} key={count} gameOver={this.props.gameOver} board={this.props.board} />);
       }
     }
 
