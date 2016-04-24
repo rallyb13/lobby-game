@@ -19,15 +19,13 @@ var GridSquare = React.createClass({
         {
           color : Utils.handleColors(tokenGroup, 'color'),
           backgroundColor: Utils.handleColors(tokenGroup, 'bColor', selected),
-          // height: '16.29%',
-          height: this.handleHeight(rowCount),
-          // width: '16.66%',
-          width: this.handleWidth(colCount),
+          height: this.handlePercentage(rowCount),
+          width: this.handlePercentage(colCount),
           display: 'inline-block',
           position: 'relative',
           marginBottom: '-4px',
-          minHeight: '85px',
-          minWidth: '85px'
+          minHeight: '77.5px',
+          minWidth: '77.5px'
         }
       }
     );
@@ -39,24 +37,9 @@ var GridSquare = React.createClass({
     }
   },
 
-  handleWidth(count){
-    if (count === 6){
-      return '16.66%';
-    } else if (count === 7){
-      return '14.28%';
-    } else {
-      return '12.49%';
-    }
-  },
-
-  handleHeight(count){
-    if(count===6){
-      return '16.29%';
-    } else if (count === 7){
-      return '13.92%';
-    } else {
-      return '12.18%';
-    }
+  handlePercentage(count){
+    var percentages = { 6: '16.66%', 7: '14.28%', 8: '12.49%'}
+    return percentages[count];
   }
 });
 

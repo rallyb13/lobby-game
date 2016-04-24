@@ -249,8 +249,8 @@ var Utils = {
         'State Delegate': {rows: 6, columns: 6},
         'State Senator': {rows: 6, columns: 7},
         'US Representative': {rows: 7, columns: 7},
-        'Junior Senator': {rows: 7, columns: 8},
-        'Senior Senator': {rows: 8, columns: 8}
+        'US Senator (Junior)': {rows: 7, columns: 8},
+        'US Senator (Senior)': {rows: 8, columns: 8}
       };
     dimensions.push(boardMap[electedOffice].rows);
     dimensions.push(boardMap[electedOffice].columns);
