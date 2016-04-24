@@ -36,6 +36,7 @@ var currentState = {
   helperChange: false
 };
 
+//sets board at beginning of game, with randomly-set tokens included (SINGLE USE--not used for board resize)
 QuidStore.setupBoard = function () {
   var rows = currentState.board.rows,
     columns = currentState.board.columns,
@@ -68,6 +69,13 @@ QuidStore.setupBoard = function () {
   }
 };
 
+//
+//
+//******** CORE FUNCTIONS FOR NOTIFYING CHANGE OF & PASSING OF STATE OBJECT
+//
+//
+
+//Emit change to notify top level App.js of state change
 QuidStore.emitChange = function() {
   this.emit(CHANGE_EVENT);
 };
@@ -84,14 +92,24 @@ QuidStore.getCurrentState = function(){
   return currentState;
 };
 
+//
+//
+//************** STATE CHANGE HELPER FUNCTIONS
+//
+//
+
+//helper fn to return token placed at specific GridSquare by coordinates
 QuidStore.getToken = function (rowPos, colPos){
   return currentState.board.grid[rowPos][colPos];
 };
 
+//helper fn to change token at a specific GridSquare by coordinates
 QuidStore.setToken = function (token, rowPos, colPos){
   currentState.board.grid[rowPos][colPos] = token;
 };
 
+//helper fn to make selected appeasement token the next staged token
+//emits its own change as this does NOT trigger a move completion
 QuidStore.useAppeasement = function(token){
   if (currentState.holdToken === false){
     currentState.holdToken = currentState.stagedToken;
@@ -100,14 +118,19 @@ QuidStore.useAppeasement = function(token){
   this.emitChange();
 };
 
+//helper fn to update bank bankBalance
 QuidStore.deposit = function(num){
   currentState.bankBalance = currentState.bankBalance + num;
 };
 
+//helper fn to intiate a 10-move hiatus from constituents moving on move completion
+//triggered by use of 'agr' powerUp
 QuidStore.freezeCons = function(){
   currentState.freeze = currentState.freeze + 10;
 };
 
+//helper fn to update the bench with powerUps upon earning/using them
+//emits its own change as this is not considered a game "move"
 QuidStore.changeHelperCount = function(token, removal){
   if(removal){
     currentState.helpers[token]--;
@@ -117,6 +140,7 @@ QuidStore.changeHelperCount = function(token, removal){
   this.emitChange();
 };
 
+//helper fn to handle special case of NOT advancing game phase when player opts not to run for higher office
 QuidStore.rerunPhase = function(doAdd){
   if (doAdd){
     currentState.repeat++;
@@ -125,14 +149,97 @@ QuidStore.rerunPhase = function(doAdd){
   }
 };
 
+//when match is made, resets to empty squares all tokens matched-to (newly matched token appears where match-making token placed)
+QuidStore.clearMatches = function(matches){
+  for (var i = 0; i < matches.length; i++){
+    this.setToken('', matches[i][0], matches[i][1]);
+  }
+};
+
+//
+//
+//************ INDEXING FUNCTIONS TO HELP GAME LOGIC FUNCTIONALITY REFERENCING BOARD/COORDINATE DATA
+//
+//
+
+//indexing fn setting new squares to empty string upon their creation at board resize
 QuidStore.handleNewSquares = function(){
   var newSquares = this.findTokenCoords(undefined),
     me = this;
   newSquares.forEach( function(ns){
     me.setToken('', ns[0], ns[1]);
   });
-}
+};
 
+//indexing fn in helping find matches by first returning coordinates of all valid neighboring spaces
+//key here is that GridSquares along border only return true/on-the-board coords
+QuidStore.getAdjacents = function(rowPos, colPos){
+  var adjacents = [],
+    board = currentState.board;
+
+  if (rowPos > 0){
+    adjacents.push([rowPos-1, colPos]);
+  }
+  if (colPos > 0){
+    adjacents.push([rowPos, colPos-1]);
+  }
+  if (rowPos + 1 < board.rows){
+    adjacents.push([rowPos+1, colPos]);
+  }
+  if (colPos + 1 < board.columns){
+    adjacents.push([rowPos, colPos+1])
+  }
+  return adjacents;
+};
+
+//indexing fn to check what tokens are bordering specific GridSquares (relies on getAdjacents)
+QuidStore.cardinalCheck = function(token, rowPos, colPos){
+  var possibleMatches = this.getAdjacents(rowPos, colPos),
+    matchCoords = [],
+    checkRow,
+    checkCol,
+    squareToken,
+    i;
+
+  for (i = 0; i < possibleMatches.length; i++){
+    checkRow = possibleMatches[i][0];
+    checkCol = possibleMatches[i][1];
+
+    if (this.getToken(checkRow,checkCol) === token) {
+      matchCoords.push([checkRow, checkCol]);
+    }
+  }
+  return matchCoords;
+};
+
+//indexing fn find all coordinates where a specific type of token exists
+//useful check for constituents (to move them all), for empty spaces (valid move checks & game continuation), etc.
+QuidStore.findTokenCoords = function(token){
+  var board = currentState.board,
+    array = [],
+    currentConsCoords = [];
+
+  for (var i=0; i < board.rows; i++) {
+    for (var j = 0; j < board.columns; j++){
+      if (board.grid[i][j] === token){
+        array.push(i);
+        array.push(j);
+        currentConsCoords.push(array);
+      }
+      array = [];
+    }
+  }
+  return currentConsCoords;
+};
+
+//
+//
+//************* CORE GAME LOGIC FUNCTIONALITY
+//
+//
+
+//after user selects GridSquare for available token, most of the game logic takes place here
+//placing tokens (including handling matches), moving constituents, updating White Paper (w/ related actions) all checked/initated here
 QuidStore.completeMove = function(rowPos, colPos){
   var token = currentState.stagedToken,
     swarm = false;
@@ -174,6 +281,9 @@ QuidStore.completeMove = function(rowPos, colPos){
   this.emitChange();
 };
 
+//called by complete move, handles move countdown:
+//checks for next trigger (of msg & token selection changes) && for end of countdown (which triggers phase change)
+//also has special logic for late-in-game surprise changes to move counter (and handles appeasement tokens on board at the time)
 QuidStore.nextMove = function(){
   var moves = currentState.movesRemaining,
     progressionData,
@@ -208,6 +318,8 @@ QuidStore.nextMove = function(){
   }
 };
 
+//only used when megaphone is staged token: evaluates all spaces on board where placement could complete a match
+//stores locations and corresponding token-to-be-matched into state, so that board will not allow placement elsewhere
 QuidStore.checkMegaValid = function(){
     var blanks = this.findTokenCoords(''),
     neighbors = [],
@@ -263,62 +375,7 @@ QuidStore.checkMegaValid = function(){
   currentState.megaPossTokens = comboOptions;
 };
 
-QuidStore.getAdjacents = function(rowPos, colPos){
-  var adjacents = [],
-    board = currentState.board;
-
-  if (rowPos > 0){
-    adjacents.push([rowPos-1, colPos]);
-  }
-  if (colPos > 0){
-    adjacents.push([rowPos, colPos-1]);
-  }
-  if (rowPos + 1 < board.rows){
-    adjacents.push([rowPos+1, colPos]);
-  }
-  if (colPos + 1 < board.columns){
-    adjacents.push([rowPos, colPos+1])
-  }
-  return adjacents;
-};
-
-QuidStore.cardinalCheck = function(token, rowPos, colPos){
-  var possibleMatches = this.getAdjacents(rowPos, colPos),
-    matchCoords = [],
-    checkRow,
-    checkCol,
-    squareToken,
-    i;
-
-  for (i = 0; i < possibleMatches.length; i++){
-    checkRow = possibleMatches[i][0];
-    checkCol = possibleMatches[i][1];
-
-    if (this.getToken(checkRow,checkCol) === token) {
-      matchCoords.push([checkRow, checkCol]);
-    }
-  }
-  return matchCoords;
-};
-
-QuidStore.findTokenCoords = function(token){
-  var board = currentState.board,
-    array = [],
-    currentConsCoords = [];
-
-  for (var i=0; i < board.rows; i++) {
-    for (var j = 0; j < board.columns; j++){
-      if (board.grid[i][j] === token){
-        array.push(i);
-        array.push(j);
-        currentConsCoords.push(array);
-      }
-      array = [];
-    }
-  }
-  return currentConsCoords;
-};
-
+//as part of completing a move, the constituents each take a single step (if they can) in a random direction
 QuidStore.moveConstituents = function(rowPos, colPos, swarm) {
   var currentConsCoords = this.findTokenCoords('con1'),
     emptyCoords = [],
@@ -349,6 +406,8 @@ QuidStore.moveConstituents = function(rowPos, colPos, swarm) {
   }
 };
 
+//whenever constituents come in contact with appeasement tokens at completion of one move,
+//they disappear from the board on completion of next move
 QuidStore.removeConstituents = function(token, rowPos, colPos){
   var appeasements = currentState.appeasements,
     me = this,
@@ -361,6 +420,9 @@ QuidStore.removeConstituents = function(token, rowPos, colPos){
   this.setToken(token, rowPos, colPos);
 };
 
+//places appeasement token on board for a random number of moves
+//adds removal time into state object
+//this function is also used for higher level appeasement token "decay" (as each decay-state is actually considered a separate token data-wise)
 QuidStore.addAppeasement = function(token, rowPos, colPos){
   var min = Utils.getTokenData(token, 'dMin'),
     max = Utils.getTokenData(token, 'dMax'),
@@ -375,6 +437,7 @@ QuidStore.addAppeasement = function(token, rowPos, colPos){
   currentState.appeasements.push( [rowPos, colPos, token, moveTrigger, phaseTrigger] );
 };
 
+//when appeasement tokens are in use, this checks removal times and calls for removal as appropriate
 QuidStore.checkAppeasements = function(special){
   var appeasements = currentState.appeasements,
     phase = currentState.phase,
@@ -391,6 +454,8 @@ QuidStore.checkAppeasements = function(special){
   }
 };
 
+//removes appeasement from board
+//for higher level appeasements, also calls addAppeasement fn for next decay-state token
 QuidStore.removeAppeasement = function(index, rowPos, colPos, token){
   var newToken = Utils.getTokenData(token, 'nextDown');
   currentState.appeasements.splice(index, 1);
@@ -401,6 +466,9 @@ QuidStore.removeAppeasement = function(index, rowPos, colPos, token){
   }
 };
 
+//randomly selects the next staged token from the current array of those available
+//handles user selecting appeasement by "holding" token that had been selected, to bring it back next
+//checks megaphone token validity and recursively sets a new token when there are none
 QuidStore.setNextToken = function(){
   var tokens = currentState.tokensArray,
     valStrings = [];
@@ -420,6 +488,8 @@ QuidStore.setNextToken = function(){
   }
 };
 
+//records the creation of each un-matchable 5th-in-series token
+//if this is 5th of that specific token, notifies state of their coords for removal/reward triggers
 QuidStore.addTopLevelToken = function(token, rowPos, colPos){
   var stringCoords = JSON.stringify([rowPos, colPos]),
     sameTokenCoords = this.findTokenCoords(token);
@@ -429,6 +499,8 @@ QuidStore.addTopLevelToken = function(token, rowPos, colPos){
   }
 };
 
+//removes a 5-set of un-matchable 5th-in-series tokens (from both board and state's record of top level tokens on board)
+//updates powerUp count in state, creating reward
 QuidStore.removeTopLevelTokens = function(){
   var coords = currentState.createPowerUp,
     token = this.getToken(coords[0][0], coords[0][1]),
@@ -448,6 +520,10 @@ QuidStore.removeTopLevelTokens = function(){
   currentState.score = currentState.score + 555;
 }
 
+//returns token megaphone (wild card) should be (always one that triggers a matching action)
+//key here is selecting the correct token if there are multiple match possibilities
+//if unrelated matches are involved, highest-value token should be selected,
+//but if recursive matching can take place with related tokens, lowest-value token in chain should be selected
 QuidStore.convertMega = function(rowPos, colPos){
     var possTokensMap = currentState.megaPossTokens,
       tokensMap = currentState.megaPossCoords,
@@ -473,6 +549,10 @@ QuidStore.convertMega = function(rowPos, colPos){
   }
 };
 
+//core logic of CHECKING for match: will return token valid match creates or (when no match made) original token
+//TODO: should check for match be separate function (returns orig token OR calls a matching fn that can return match)?
+//removes matched-to tokens from board and handles recursive matching
+//since score/bank balance earned is tied in to how match is made, calls for update of those from here
 QuidStore.handleMatches = function(token, rowPos, colPos, isRecursive){
   var matchCoords = this.cardinalCheck(token, rowPos, colPos),
     moreCoords = [],
@@ -510,12 +590,8 @@ QuidStore.handleMatches = function(token, rowPos, colPos, isRecursive){
   }
 };
 
-QuidStore.clearMatches = function(matches){
-  for (var i = 0; i < matches.length; i++){
-    this.setToken('', matches[i][0], matches[i][1]);
-  }
-};
-
+//called from within hanldeMatch fn, calculates appropriate score/bank balance boost
+//TODO: refactor to use helper fns
 QuidStore.handleScoreboard =function(count, token, isRecursive) {
   var points = 0,
     money = 0,
@@ -541,6 +617,8 @@ QuidStore.handleScoreboard =function(count, token, isRecursive) {
   currentState.bankBalance = currentState.bankBalance + money;
 };
 
+//when pork tokens are on the board && match has been made:
+//each matched token checks if a pork token is adjacent and removes it if so
 QuidStore.handlePork = function(matches, rowPos, colPos){
   var me = this,
     porkers,
@@ -561,6 +639,9 @@ QuidStore.handlePork = function(matches, rowPos, colPos){
   });
 };
 
+//core game functionality: called if game continues at moves reaching zero/bank balance checked
+//many changes to game situation are changed by this "level up" and so triggered here
+//at office change, board resize takes place
 QuidStore.changePhase = function(phaseShift){
   var phase,
     phaseData,
@@ -599,6 +680,8 @@ QuidStore.changePhase = function(phaseShift){
   this.emitChange();
 };
 
+//when moves hit 0 left, checks bank balance to determine if game continues
+//handles setting higher office election choices at specific phases
 QuidStore.handleElection = function(repeat){
   var phase = currentState.phase,
     advMsg = Utils.setElectionChoice(phase);
