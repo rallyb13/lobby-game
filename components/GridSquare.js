@@ -31,12 +31,14 @@ var GridSquare = React.createClass({
     );
   },
 
+  //passes coordinates selected for (eligible) stagedToken placement, initiates completeMove state changes
   placeToken: function(){
     if (this.props.eligible && !this.props.gameOver) {
       QuidStore.completeMove(this.props.rowPos, this.props.colPos);
     }
   },
 
+  //handles size of GridSquare, determined by how many rows/cols board has
   handlePercentage(count){
     var percentages = { 6: '16.66%', 7: '14.28%', 8: '12.49%'}
     return percentages[count];

@@ -8,6 +8,7 @@ import Scoreboard from './components/Scoreboard';
 import Staging from './components/Staging';
 
 var App = React.createClass ({
+  //creates current board with randomly selected starting tokens and sets game-starting state object
   componentWillMount: function () {
     QuidStore.setupBoard();
     this.setState(QuidStore.getCurrentState());
@@ -46,10 +47,13 @@ var App = React.createClass ({
     );
   },
 
+  //when state object change is emitted, resets state so that changes can be filtered to appropriate components
   onChange: function() {
     this.setState(QuidStore.getCurrentState());
   },
 
+  //checks that board is not full and bank balance is still positive
+  //TODO: change check to only check bank balance at moves === 0
   isGameOver: function(){
     if (QuidStore.findTokenCoords('').length > 0){
       if (this.state.bankBalance >= 0){

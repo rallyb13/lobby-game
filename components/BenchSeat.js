@@ -30,6 +30,7 @@ var BenchSeat = React.createClass({
     );
   },
 
+  //delegates appropriate action for powerUp vs. appeasement selection
   useHelper: function(){
     var token = this.props.token;
 
@@ -40,10 +41,12 @@ var BenchSeat = React.createClass({
     }
   },
 
+  //sorts powerUps left, appeasements right
   pickSide: function(powerUp){
     return powerUp ? 'left' : 'right';
   },
 
+  //delegates powerUp actions by category to QuidStore helper fn, decrements powerUps available
   usePowerUp: function(token){
     var type = token.slice(0,3),
       cons;

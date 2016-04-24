@@ -21,6 +21,7 @@ var Message = React.createClass({
     );
   },
 
+  //displays message when game ends, based on circumstance (election vs. full board) && phase achieved
   endGame: function(failType){
     var reason = 'Game Over. ',
       newLife = Utils.getPhaseData(this.props.phase).end;

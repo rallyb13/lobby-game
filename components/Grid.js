@@ -27,6 +27,9 @@ var Grid = React.createClass({
     );
   },
 
+  //checks stagedToken eligibility to be passed down as props to GridSquare
+  //mostly just a check of isEmpty (or !isEmpty for pork),
+  //but megaphone must be checked against eligibility list already made by store, passed as props
   checkDrop: function(rowPos, colPos, token){
     var staged = this.props.stagedToken,
       isEmpty = token === '',
@@ -48,6 +51,7 @@ var Grid = React.createClass({
     }
   },
 
+  //pass style change to selected GridSquares when triggered by presence of data in toPowerUp props
   checkUplift: function(rowPos, colPos){
     var fives = this.props.toPowerUp,
       i;
