@@ -123,6 +123,10 @@ QuidStore.deposit = function(num){
   currentState.bankBalance = currentState.bankBalance + num;
 };
 
+QuidStore.score = function(num){
+  currentState.score = currentState.score + num;
+};
+
 //helper fn to intiate a 10-move hiatus from constituents moving on move completion
 //triggered by use of 'agr' powerUp
 QuidStore.freezeCons = function(){
@@ -591,7 +595,6 @@ QuidStore.handleMatches = function(token, rowPos, colPos, isRecursive){
 };
 
 //called from within hanldeMatch fn, calculates appropriate score/bank balance boost
-//TODO: refactor to use helper fns
 QuidStore.handleScoreboard =function(count, token, isRecursive) {
   var points = 0,
     money = 0,
@@ -613,8 +616,8 @@ QuidStore.handleScoreboard =function(count, token, isRecursive) {
       money = Math.round(money * 1.25);
     }
   }
-  currentState.score = currentState.score + points;
-  currentState.bankBalance = currentState.bankBalance + money;
+  this.score(points);
+  this.deposit(money);
 };
 
 //when pork tokens are on the board && match has been made:
