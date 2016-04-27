@@ -17,7 +17,7 @@ To earn money, you use your influence as a politician to do the bidding of your 
 
 On the 6 x 6 game board, place like objects together.
 3 of any like objects that touch (must be adjacent, not diagonal) will combine into a more valuable object.
-Oil drops become oil cans become derricks become refineries become pipelines. All of which means more money for you! And when you have enough highest-level objects (pipelines in the case of the oil lobby) on the board (you don't need to match those), you earn certain special favors (powerUps) that you can call in.
+Oil drops become oil cans become derricks become refineries become pipelines. All of which means more money for you! And when you have enough highest-level objects (pipelines in the case of the oil lobby) on the board (you don't need to match those), you earn certain special favors that you can call in.
 
 Unfortunately, the more successful you are, the more your constituents will get in your way.
 They'll start filling up your grid, potentially even swarming.

@@ -51,9 +51,9 @@ var Grid = React.createClass({
     }
   },
 
-  //pass style change to selected GridSquares when triggered by presence of data in toPowerUp props
+  //pass style change to selected GridSquares when triggered by presence of data in toFavor props
   checkUplift: function(rowPos, colPos){
-    var fives = this.props.toPowerUp,
+    var fives = this.props.toFavor,
       i;
 
     if (fives.length === 0){

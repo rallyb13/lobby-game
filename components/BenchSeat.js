@@ -5,10 +5,10 @@ import Utils from '../utils';
 
 var BenchSeat = React.createClass({
   render: function(){
-    var powerUp = this.props.powerUp,
+    var favor = this.props.favor,
       selected = this.props.selected,
       tokenGroup = this.props.token.slice(0,3),
-      count = powerUp ? this.props.count : " ";
+      count = favor ? this.props.count : " ";
 
     return React.cloneElement(
       <div onClick={this.useHelper}>
@@ -17,7 +17,7 @@ var BenchSeat = React.createClass({
       </div>,
       { style:
         {
-          float: this.pickSide(powerUp),
+          float: this.pickSide(favor),
           color: Utils.handleColors(tokenGroup, 'color'),
           backgroundColor: Utils.handleColors(tokenGroup, 'bColor', selected),
           width: '60px',
@@ -30,24 +30,24 @@ var BenchSeat = React.createClass({
     );
   },
 
-  //delegates appropriate action for powerUp vs. appeasement selection
+  //delegates appropriate action for favor vs. appeasement selection
   useHelper: function(){
     var token = this.props.token;
 
-    if (this.props.powerUp){
-      this.usePowerUp(token);
+    if (this.props.favor){
+      this.useFavor(token);
     } else {
       QuidStore.useAppeasement(token);
     }
   },
 
-  //sorts powerUps left, appeasements right
-  pickSide: function(powerUp){
-    return powerUp ? 'left' : 'right';
+  //sorts favors left, appeasements right
+  pickSide: function(favor){
+    return favor ? 'left' : 'right';
   },
 
-  //delegates powerUp actions by category to QuidStore helper fn, decrements powerUps available
-  usePowerUp: function(token){
+  //delegates favor actions by category to QuidStore helper fn, decrements favors available
+  useFavor: function(token){
     var type = token.slice(0,3),
       cons;
 

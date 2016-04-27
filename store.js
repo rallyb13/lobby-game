@@ -28,7 +28,7 @@ var currentState = {
   porkOn: [], //pork tokens on board
   appeasements: [], //appeasement tokens on board
   levelFives: [], //all level5 tokens on board
-  createPowerUp: [], //only has content if set about to be combined
+  createFavor: [], //only has content if set about to be combined
   freeze: 0, //number of moves con1 tokens frozen for
   helpers: {
     'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 0, 'con5': 0
@@ -128,12 +128,12 @@ QuidStore.score = function(num){
 };
 
 //helper fn to intiate a 10-move hiatus from constituents moving on move completion
-//triggered by use of 'agr' powerUp
+//triggered by use of 'agr' Favor
 QuidStore.freezeCons = function(){
   currentState.freeze = currentState.freeze + 10;
 };
 
-//helper fn to update the bench with powerUps upon earning/using them
+//helper fn to update the bench with favors upon earning/using them
 //emits its own change as this is not considered a game "move"
 QuidStore.changeHelperCount = function(token, removal){
   if(removal){
@@ -262,7 +262,7 @@ QuidStore.completeMove = function(rowPos, colPos){
   this.nextMove();
 
   //handle special token removal
-  if (currentState.createPowerUp.length !== 0){
+  if (currentState.createFavor.length !== 0){
     this.removeTopLevelTokens();
   } else {
     currentState.helperChange = false;
@@ -499,16 +499,16 @@ QuidStore.addTopLevelToken = function(token, rowPos, colPos){
     sameTokenCoords = this.findTokenCoords(token);
   currentState.levelFives.push(stringCoords);
   if (sameTokenCoords.length === 5){
-    currentState.createPowerUp = sameTokenCoords;
+    currentState.createFavor = sameTokenCoords;
   }
 };
 
 //removes a 5-set of un-matchable 5th-in-series tokens (from both board and state's record of top level tokens on board)
-//updates powerUp count in state, creating reward
+//updates favor count in state, creating reward
 QuidStore.removeTopLevelTokens = function(){
-  var coords = currentState.createPowerUp,
+  var coords = currentState.createFavor,
     token = this.getToken(coords[0][0], coords[0][1]),
-    powerUp = token.slice(0, 3) + '6',
+    Favor = token.slice(0, 3) + '6',
     stringCoords,
     index;
 
@@ -518,9 +518,9 @@ QuidStore.removeTopLevelTokens = function(){
     index = currentState.levelFives.indexOf(stringCoords);
     currentState.levelFives.splice(index, 1);
   });
-  currentState.createPowerUp = [];
-  currentState.helpers[powerUp]++;
-  currentState.helperChange = powerUp;
+  currentState.createFavor = [];
+  currentState.helpers[favor]++;
+  currentState.helperChange = favor;
   currentState.score = currentState.score + 555;
 }
 

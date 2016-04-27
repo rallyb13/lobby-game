@@ -41,7 +41,7 @@ var App = React.createClass ({
             <div>{nextBit}</div>
             <Scoreboard state={this.state} gameOver={isGameOver}/>
           </div>
-          <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toPowerUp={this.state.createPowerUp} gameOver={isGameOver}/>
+          <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver}/>
         </div>
       </div>
     );

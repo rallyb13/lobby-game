@@ -6,17 +6,17 @@ var Bench = React.createClass({
     var seats = [],
       helpers = this.props.helpers,
       tokens = Object.keys(helpers),
-      powerUp,
+      favor,
       token,
       count,
       i;
 
     for (i=0; i < tokens.length; i++){
       token = tokens[i];
-      powerUp = token.slice(3,4) === '6';
+      favor = token.slice(3,4) === '6';
       count = helpers[token];
       if (count > 0){
-        seats.push(<BenchSeat token={token} count={count} powerUp={powerUp} selected={this.props.poweringUp === token} key={i}/>);
+        seats.push(<BenchSeat token={token} count={count} favor={favor} selected={this.props.poweringUp === token} key={i}/>);
       }
     }
 
