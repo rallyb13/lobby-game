@@ -196,7 +196,7 @@ QuidStore.getAdjacents = function(rowPos, colPos){
   return adjacents;
 };
 
-//indexing fn to check what tokens are bordering specific GridSquares (relies on getAdjacents)
+//indexing fn to check for bordering GridSquares that share the same token, returns applicable coords
 QuidStore.cardinalCheck = function(token, rowPos, colPos){
   var possibleMatches = this.getAdjacents(rowPos, colPos),
     matchCoords = [],
@@ -553,8 +553,7 @@ QuidStore.convertMega = function(rowPos, colPos){
   }
 };
 
-//core logic of CHECKING for match: will return token valid match creates or (when no match made) original token
-//TODO: should check for match be separate function (returns orig token OR calls a matching fn that can return match)?
+//core logic of CHECKING for match: will return new token a valid match creates or (when no match made) original token
 //removes matched-to tokens from board and handles recursive matching
 //since score/bank balance earned is tied in to how match is made, calls for update of those from here
 QuidStore.handleMatches = function(token, rowPos, colPos, isRecursive){
