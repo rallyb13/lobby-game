@@ -23,12 +23,12 @@ var App = React.createClass ({
   },
 
   render(){
-    var isGameOver = this.isGameOver(),
-      advMsg = this.state.advMsg,
+    var advMsg = this.state.advMsg,
+      isGameOver = this.isGameOver(advMsg),
       nextBit;
 
     if (isGameOver || advMsg !== 'none' ){
-      nextBit = <NextSelect gameOver={isGameOver} advMsg={advMsg} phase={this.state.phase} repeat={repeat} />;
+      nextBit = <NextSelect gameOver={isGameOver} advMsg={advMsg} phase={this.state.phase} repeat={this.state.repeat} />;
     } else {
       nextBit = <Staging stagedToken={this.state.stagedToken} gameOver={isGameOver} />;
     }
@@ -52,17 +52,14 @@ var App = React.createClass ({
     this.setState(QuidStore.getCurrentState());
   },
 
-  //checks that board is not full and bank balance is still positive
-  //TODO: change check to only check bank balance at moves === 0
-  isGameOver: function(){
-    if (QuidStore.findTokenCoords('').length > 0){
-      if (this.state.bankBalance >= 0){
-        return false;
-      } else {
-        return 'bank';
-      }
-    } else {
+  //checks that board is not full and bank balance is still positive (at end of election cycle)
+  isGameOver: function(advMsg){
+    if (advMsg === 'bank'){
+      return advMsg;
+    } else if (QuidStore.findTokenCoords('').length === 0){
       return 'board';
+    } else {
+      return false;
     }
   },
 

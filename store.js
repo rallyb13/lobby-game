@@ -689,6 +689,12 @@ QuidStore.handleElection = function(repeat){
     advMsg = Utils.setElectionChoice(phase);
 
   this.deposit(-currentState.nextGoal);
+  if (currentState.bankBalance <= 0){
+    currentState.advMsg = 'bank';
+    this.emitChange();
+    return;
+  }
+
   if (phase === 19){
     advMsg = advMsg[repeat];
   }
