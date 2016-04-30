@@ -34,21 +34,10 @@ var Token = React.createClass({
     });
 
     return (
-      <div style={this.styles.token} className="token">
-          <img style={this.styles.img} alt={symbolClass} src={symbolClass ? `../assets/icons/` + symbolClass + '.png' : ''} />
+    <div style={{background: 'url(../assets/icons/' + symbolClass + '.png) no-repeat center/contain', minHeight: '77.5px'}}>
       </div>
     );
   },
-
-  styles: {
-     token: {
-    },
-
-     img: {
-       fontSize: '10px',
-       maxWidth: '100px'
-     }
-  }
 
 });
 

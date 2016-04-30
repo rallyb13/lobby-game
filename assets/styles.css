@@ -21,6 +21,3 @@ body {
 .grid-square:hover {
   background: #fff !important;
 }
-.token img[src=""] {
-   display: none;
-}

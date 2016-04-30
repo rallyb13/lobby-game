@@ -18,14 +18,14 @@ var GridSquare = React.createClass({
       { style:
         {
           color : Utils.handleColors(tokenGroup, 'color'),
-          backgroundColor: Utils.handleColors(tokenGroup, 'bColor', selected),
+          outlineColor: Utils.handleColors(tokenGroup, 'bColor', selected),
           height: this.handlePercentage(rowCount),
           width: this.handlePercentage(colCount),
           display: 'inline-block',
           position: 'relative',
           marginBottom: '-4px',
           minHeight: '77.5px',
-          minWidth: '77.5px'
+          minWidth: '77.5px',
         }
       }
     );
