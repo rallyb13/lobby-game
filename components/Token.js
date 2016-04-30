@@ -35,7 +35,7 @@ var Token = React.createClass({
 
     return (
       <div style={this.styles.token} className="token">
-          <img style={this.styles.img} alt={symbolClass} src={symbolClass ? `../assets/icons/` + symbolClass + '.jpg' : ''} />
+          <img style={this.styles.img} alt={symbolClass} src={symbolClass ? `../assets/icons/` + symbolClass + '.png' : ''} />
       </div>
     );
   },
