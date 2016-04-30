@@ -3,6 +3,9 @@
 
 var Utils = {
 
+  //token reference stores what each matches into, pts & bank earned on both setting and matching
+  //priority is used to select among options when megaphone placed at point of multiple matches
+  //appeasement tokens have data on cost, range of moves the token stays in place, and what token "decays" into
   getTokenData: function(token, attribute){
     var tokenMap = {
       'oil1': {nextUp: 'oil2', pts: 5, mPts: 20, val: 100, mVal: 250, priority: 19 },
@@ -42,6 +45,7 @@ var Utils = {
     return tokenMap[token][attribute];
   },
 
+  //token category reference for color & background color (and special selected case)
   handleColors: function(tokenGroup, attribute, selected){
     var colorMap = {
       'oil': {color: 'gray', bColor: 'black'},
@@ -60,6 +64,7 @@ var Utils = {
     }
   },
 
+  //phase reference for how many moves, bank balance needed to continue, msg to open new phase, and msg used for game ending at that level
   getPhaseData: function(phase){
     var phaseMap = {
       1: { moves: 180, goal: 50000, end: "a lowly regional consultant for OilOnU, making a meager $75,000/yr.", msg: ""},
@@ -130,6 +135,7 @@ var Utils = {
     return phaseMap[phase];
   },
 
+  //mid-phase reference to change message and token set (from which staged tokens are randomly drawn) and trigger for next mid-phase change
   progressGame: function(phase, moves) {
     var data,
       progressionMap = {
@@ -209,6 +215,7 @@ var Utils = {
     }
   },
 
+  //phase ref specifically for elected office changes
   setElectedOffice: function(phase, currentOffice) {
     var electedOfficeMap = {
           1: 'State Delegate',
@@ -224,6 +231,7 @@ var Utils = {
     }
   },
 
+  //phase ref specifically for messages that appear with choice of advancing to next phase/office or repeating last phase
   setElectionChoice: function(phase, repeat) {
     var advMsgMap = {
       5: "Want to run for State Senate? With no real competition to face in the primary, this could be your moment to climb...",
@@ -243,20 +251,22 @@ var Utils = {
     }
   },
 
+  //reference for board dimensions relating to each office
   handleBoardChange: function(electedOffice) {
     var dimensions = [],
       boardMap = {
         'State Delegate': {rows: 6, columns: 6},
         'State Senator': {rows: 6, columns: 7},
-        'Congressperson': {rows: 7, columns: 7},
-        'Junior Senator': {rows: 7, columns: 8},
-        'Senior Senator': {rows: 8, columns: 8}
+        'US Representative': {rows: 7, columns: 7},
+        'US Senator (Junior)': {rows: 7, columns: 8},
+        'US Senator (Senior)': {rows: 8, columns: 8}
       };
     dimensions.push(boardMap[electedOffice].rows);
     dimensions.push(boardMap[electedOffice].columns);
     return dimensions;
   },
 
+  //utility function to format number to appear with appropriate commas
   formatNum: function(num){
     var numString = num.toString(),
       charCount = numString.length,

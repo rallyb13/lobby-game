@@ -22,11 +22,13 @@ var NextSelect = React.createClass({
     );
   },
 
+  //resets state object and starts new game
   restart: function() {
     document.clear();
     location.reload();
   },
 
+  //handles choice of NOT running for next elected office, adjusting phase as needed
   refuseAdvance: function(){
     var phase = this.props.phase,
       adjustment;
@@ -43,6 +45,7 @@ var NextSelect = React.createClass({
     QuidStore.changePhase(adjustment);
   },
 
+  //handles choice of running for next elected office, adjusting phase as needed
   acceptAdvance: function(phase, repeat){
     var phase = this.props.phase,
       repeat = this.props.repeat,

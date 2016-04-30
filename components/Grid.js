@@ -16,7 +16,7 @@ var Grid = React.createClass({
       for (j=0; j < colNum; j++) {
         count++;
         token = this.props.board.grid[i][j];
-        squares.push(<GridSquare rowPos={i} colPos={j} token={token} eligible={this.checkDrop(i, j, token)} aboutToGo={this.checkUplift(i, j)} key={count} gameOver={this.props.gameOver}/>);
+        squares.push(<GridSquare rowPos={i} colPos={j} token={token} eligible={this.checkDrop(i, j, token)} aboutToGo={this.checkUplift(i, j)} key={count} gameOver={this.props.gameOver} board={this.props.board} />);
       }
     }
 
@@ -27,6 +27,9 @@ var Grid = React.createClass({
     );
   },
 
+  //checks stagedToken eligibility to be passed down as props to GridSquare
+  //mostly just a check of isEmpty (or !isEmpty for pork),
+  //but megaphone must be checked against eligibility list already made by store, passed as props
   checkDrop: function(rowPos, colPos, token){
     var staged = this.props.stagedToken,
       isEmpty = token === '',
@@ -48,8 +51,9 @@ var Grid = React.createClass({
     }
   },
 
+  //pass style change to selected GridSquares when triggered by presence of data in toFavor props
   checkUplift: function(rowPos, colPos){
-    var fives = this.props.toPowerUp,
+    var fives = this.props.toFavor,
       i;
 
     if (fives.length === 0){

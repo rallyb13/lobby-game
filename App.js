@@ -8,6 +8,7 @@ import Scoreboard from './components/Scoreboard';
 import Staging from './components/Staging';
 
 var App = React.createClass ({
+  //creates current board with randomly selected starting tokens and sets game-starting state object
   componentWillMount: function () {
     QuidStore.setupBoard();
     this.setState(QuidStore.getCurrentState());
@@ -22,17 +23,12 @@ var App = React.createClass ({
   },
 
   render(){
-    var isGameOver = this.isGameOver(),
-      repeat = this.state.repeat % 3,
-      advMsg = 'none',
+    var advMsg = this.state.advMsg,
+      isGameOver = this.isGameOver(advMsg),
       nextBit;
 
-    if(this.state.movesRemaining === 0){
-      advMsg = this.handleElection(repeat);
-    }
-
     if (isGameOver || advMsg !== 'none' ){
-      nextBit = <NextSelect gameOver={isGameOver} advMsg={advMsg} phase={this.state.phase} repeat={repeat} />;
+      nextBit = <NextSelect gameOver={isGameOver} advMsg={advMsg} phase={this.state.phase} repeat={this.state.repeat} />;
     } else {
       nextBit = <Staging stagedToken={this.state.stagedToken} gameOver={isGameOver} />;
     }
@@ -45,40 +41,26 @@ var App = React.createClass ({
             <div>{nextBit}</div>
             <Scoreboard state={this.state} gameOver={isGameOver}/>
           </div>
-          <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toPowerUp={this.state.createPowerUp} gameOver={isGameOver}/>
+          <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver}/>
         </div>
       </div>
     );
   },
 
+  //when state object change is emitted, resets state so that changes can be filtered to appropriate components
   onChange: function() {
     this.setState(QuidStore.getCurrentState());
   },
 
-  isGameOver: function(){
-    if (QuidStore.findTokenCoords('').length > 0){
-      if (this.state.bankBalance >= 0){
-        return false;
-      } else {
-        return 'bank';
-      }
-    } else {
+  //checks that board is not full and bank balance is still positive (at end of election cycle)
+  isGameOver: function(advMsg){
+    if (advMsg === 'bank'){
+      return advMsg;
+    } else if (QuidStore.findTokenCoords('').length === 0){
       return 'board';
+    } else {
+      return false;
     }
-  },
-
-  handleElection: function(repeat){
-    var phase = this.state.phase,
-      advMsg = Utils.setElectionChoice(phase);
-
-    QuidStore.deposit(-this.state.nextGoal);
-    if(phase === 19){
-      advMsg = advMsg[repeat];
-    }
-    if (advMsg === 'none'){
-      QuidStore.changePhase(1);
-    }
-    return advMsg;
   },
 
   styles: {
