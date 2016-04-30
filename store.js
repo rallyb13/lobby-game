@@ -8,7 +8,7 @@ var currentState = {
   },
   tokensArray: ['oil1', 'oil1', 'oil1', 'oil2','oil2', 'con1'],
   stagedToken: 'oil1',
-  holdToken: false,
+  holdTokens: [''],
   //white paper data
   movesRemaining: 180,
   score: 0,
@@ -111,9 +111,7 @@ QuidStore.setToken = function (token, rowPos, colPos){
 //helper fn to make selected appeasement token the next staged token
 //emits its own change as this does NOT trigger a move completion
 QuidStore.useAppeasement = function(token){
-  if (currentState.holdToken === false){
-    currentState.holdToken = currentState.stagedToken;
-  }
+  currentState.holdTokens[0] = currentState.stagedToken;
   currentState.stagedToken = token;
   this.emitChange();
 };
@@ -477,11 +475,11 @@ QuidStore.setNextToken = function(){
   var tokens = currentState.tokensArray,
     valStrings = [];
 
-  if (currentState.holdToken === false){
+  if (currentState.holdTokens[0] === ''){
     currentState.stagedToken = tokens[Math.floor(Math.random() * tokens.length)];
   } else {
-    currentState.stagedToken = currentState.holdToken;
-    currentState.holdToken = false;
+    currentState.stagedToken = currentState.holdTokens[0];
+    currentState.holdTokens[0] = '';
   }
 
   if (currentState.stagedToken === 'mega'){
