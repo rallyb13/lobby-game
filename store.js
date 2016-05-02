@@ -7,8 +7,8 @@ var currentState = {
     rows: 6, columns: 6, grid: []
   },
   tokensArray: ['oil1', 'oil1', 'oil1', 'oil2','oil2', 'con1'],
-  stagedToken: 'oil1',
-  holdTokens: [''],
+  stagedToken: 'oil3',
+  holdTokens: ['', '', '', ''],
   //white paper data
   movesRemaining: 180,
   score: 0,

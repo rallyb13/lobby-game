@@ -5,6 +5,7 @@ import Bench from './components/Bench';
 import Grid from './components/Grid';
 import NextSelect from './components/NextSelect';
 import Scoreboard from './components/Scoreboard';
+import Holder from './components/Holder';
 import Staging from './components/Staging';
 
 var App = React.createClass ({
@@ -40,6 +41,9 @@ var App = React.createClass ({
           <div style={this.styles.panel}>
             <div>{nextBit}</div>
             <Scoreboard state={this.state} gameOver={isGameOver}/>
+            <Holder token={this.state.holdTokens[1]} />
+            <Holder token={this.state.holdTokens[2]} />
+            <Holder token={this.state.holdTokens[3]} />
           </div>
           <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver}/>
         </div>
