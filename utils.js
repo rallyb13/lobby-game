@@ -48,7 +48,7 @@ var Utils = {
   //token category reference for color & background color (and special selected case)
   handleColors: function(tokenGroup, attribute, selected){
     var colorMap = {
-      'oil': {color: 'gray', bColor: 'black'},
+      'oil': {color: 'gray', bColor: 'gray'},
       'agr': {color: 'green', bColor: 'yellow'},
       'mil': {color: 'black', bColor: 'red'},
       'fin': {color: 'yellow', bColor: 'green'},

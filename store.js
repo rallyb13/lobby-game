@@ -506,7 +506,7 @@ QuidStore.addTopLevelToken = function(token, rowPos, colPos){
 QuidStore.removeTopLevelTokens = function(){
   var coords = currentState.createFavor,
     token = this.getToken(coords[0][0], coords[0][1]),
-    Favor = token.slice(0, 3) + '6',
+    favor = token.slice(0, 3) + '6',
     stringCoords,
     index;
 
