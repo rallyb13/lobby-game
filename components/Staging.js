@@ -12,18 +12,18 @@ var Staging = React.createClass({
 
 		return React.cloneElement(
 			<div>
-				{toStage}
+			<div>
+				<p>Your Next Piece: </p> </div>
+				<div style={{width:'50%'}}> {toStage} </div>
 			</div>,
 			{ style: {
 					color: Utils.handleColors(tokenGroup, 'color'),
 					backgroundColor: Utils.handleColors(tokenGroup, 'bColor'),
-					margin: '15px',
-					padding: '5px',
+					padding: '0 5px 0 10px',
 					border: '5px double #000',
-					borderRadius: '100%',
-					height: '150px',
-					display: 'block',
-					position: 'relative'
+					display: 'flex',
+					flex: '0 0 auto',
+					alignItems: 'center'
 				}
 			}
 		);

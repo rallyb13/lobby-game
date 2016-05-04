@@ -6,7 +6,6 @@ import Grid from './components/Grid';
 import NextSelect from './components/NextSelect';
 import Scoreboard from './components/Scoreboard';
 import Holder from './components/Holder';
-import Staging from './components/Staging';
 
 var App = React.createClass ({
   //creates current board with randomly selected starting tokens and sets game-starting state object
@@ -25,21 +24,14 @@ var App = React.createClass ({
 
   render(){
     var advMsg = this.state.advMsg,
-      isGameOver = this.isGameOver(advMsg),
-      nextBit;
+        isGameOver = this.isGameOver(advMsg);
 
-    if (isGameOver || advMsg !== 'none' ){
-      nextBit = <NextSelect gameOver={isGameOver} advMsg={advMsg} phase={this.state.phase} repeat={this.state.repeat} />;
-    } else {
-      nextBit = <Staging stagedToken={this.state.stagedToken} gameOver={isGameOver} />;
-    }
     return (
       <div>
         <div style={{maxWidth:'900px', margin: '0 auto'}}>
           <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
           <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange}/>
           <div style={this.styles.panel}>
-            <div>{nextBit}</div>
             <Scoreboard state={this.state} gameOver={isGameOver}/>
             <Holder token={this.state.holdTokens[1]} />
             <Holder token={this.state.holdTokens[2]} />
