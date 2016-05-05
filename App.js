@@ -33,9 +33,9 @@ var App = React.createClass ({
           <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange}/>
           <div style={this.styles.panel}>
             <Scoreboard state={this.state} gameOver={isGameOver}/>
-            <Holder token={this.state.holdTokens[1]} />
-            <Holder token={this.state.holdTokens[2]} />
-            <Holder token={this.state.holdTokens[3]} />
+            <Holder token={this.state.holdTokens[1]} position={1} />
+            <Holder token={this.state.holdTokens[2]} position={2} />
+            <Holder token={this.state.holdTokens[3]} position={3} />
           </div>
           <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver}/>
         </div>

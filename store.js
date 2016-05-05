@@ -7,8 +7,8 @@ var currentState = {
     rows: 6, columns: 6, grid: []
   },
   tokensArray: ['oil1', 'oil1', 'oil1', 'oil2','oil2', 'con1'],
-  stagedToken: 'oil3',
-  holdTokens: ['', '', '', ''],
+  stagedToken: 'oil1',
+  holdTokens: ['', '', 'oil2', 'oil3'],
   //white paper data
   movesRemaining: 180,
   score: 0,
@@ -466,6 +466,13 @@ QuidStore.removeAppeasement = function(index, rowPos, colPos, token){
   if (newToken !== ''){
     this.addAppeasement(newToken, rowPos, colPos);
   }
+};
+
+QuidStore.holdTokenHere = function(position){
+  var toHold = currentState.stagedToken;
+  currentState.holdTokens[position] = toHold;
+  this.setNextToken();
+  this.emitChange();
 };
 
 //randomly selects the next staged token from the current array of those available
