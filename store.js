@@ -110,7 +110,7 @@ QuidStore.setToken = function (token, rowPos, colPos){
 
 //helper fn to make selected appeasement token the next staged token
 //emits its own change as this does NOT trigger a move completion
-QuidStore.useAppeasement = function(token){
+QuidStore.selectThisToken = function(token){
   currentState.holdTokens[0] = currentState.stagedToken;
   currentState.stagedToken = token;
   this.emitChange();
@@ -473,6 +473,11 @@ QuidStore.holdTokenHere = function(position){
   currentState.holdTokens[position] = toHold;
   this.setNextToken();
   this.emitChange();
+};
+
+QuidStore.useHeldToken = function(position, token){
+  currentState.holdTokens[position] = '';
+  this.selectThisToken(token);
 };
 
 //randomly selects the next staged token from the current array of those available

@@ -37,7 +37,7 @@ var BenchSeat = React.createClass({
     if (this.props.favor){
       this.useFavor(token);
     } else {
-      QuidStore.useAppeasement(token);
+      QuidStore.selectThisToken(token);
     }
   },
 
