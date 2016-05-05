@@ -8,7 +8,7 @@ var currentState = {
   },
   tokensArray: ['oil1', 'oil1', 'oil1', 'oil2','oil2', 'con1'],
   stagedToken: 'oil1',
-  holdTokens: ['', '', 'oil2', 'oil3'],
+  holdTokens: ['', '', '', ''],
   //white paper data
   movesRemaining: 180,
   score: 0,
@@ -257,6 +257,7 @@ QuidStore.completeMove = function(rowPos, colPos){
   token = this.handleMatches(token, rowPos, colPos);
   this.setToken(token, rowPos, colPos);
 
+  this.payForHolds();
   this.nextMove();
 
   //handle special token removal
@@ -468,6 +469,7 @@ QuidStore.removeAppeasement = function(index, rowPos, colPos, token){
   }
 };
 
+//moves staged token into token-holding spot by position, calls setNextToken
 QuidStore.holdTokenHere = function(position){
   var toHold = currentState.stagedToken;
   currentState.holdTokens[position] = toHold;
@@ -475,9 +477,19 @@ QuidStore.holdTokenHere = function(position){
   this.emitChange();
 };
 
+//clears the token from holding area, calls helper to set it as staged
 QuidStore.useHeldToken = function(position, token){
   currentState.holdTokens[position] = '';
   this.selectThisToken(token);
+};
+
+//checks the holdTokens data and adjusts bankBalance
+QuidStore.payForHolds = function(){
+  var first = currentState.holdTokens[1] === '' ? 0 : 10,
+      second = currentState.holdTokens[2] === '' ? 0 : 100,
+      third = currentState.holdTokens[3] === '' ? 0 : 1000,
+      cost = first + second + third;
+  this.deposit(-cost);
 };
 
 //randomly selects the next staged token from the current array of those available
