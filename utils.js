@@ -141,40 +141,50 @@ var Utils = {
       progressionMap = {
           1: {
             160: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'con1'],
-              msg: "Keep this up, and the oil lobby will keep your coffers stuffed. Though you may annoy some constituents...",
+              tokens: ['oil1', 'oil1', 'oil2'],
+              msg: "Oil cans make derricks, which make refineries, which make pipelines. Keep the oil flowing and their lobby will keep your coffers stuffed.",
               nextTrigger: 140
             },
             140: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'mega'],
-              msg: "Passing helpful legislation isn't the only way to help out your friendly lobbyists. Use your position of authority to give them a voice. The megaphone can be quite a wild card.",
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'con1'],
+              msg: "Keep an eye on your bank balance and how many legislative days you have left until your next election. If you can't raise the money in time, you'll be out of a job.",
               nextTrigger: 115
             },
             115: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'con1'],
-              msg: "Oil drops fill oil barrels... Legislate away restrictions on where we can drill! Refineries mean jobs. And those pipelines mean...plenty of profit to go around!",
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1'],
+              msg: "Your constituents may start to notice how much you're aiding the oil lobby. They do get in the way when upset. It costs legislative time and some of funding to publicize it, but try appeasing them with a park...before they SWARM!",
               nextTrigger: 82
             },
             82: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1', 'mega'],
-              msg: "Maybe you should build these constituents a park. It'll cost you money to publicize (and to, ah, speed up the process), but it might placate some of them awhile.",
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1'],
+              msg: "Don't worry about getting the pipelines together. Once you've made enough of them, you'll earn a favor, matched or not. But DO make sure to keep space on the board. Gridlock means game over.",
               nextTrigger: 44
             },
             44: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
-              msg: "Don't let those constituents get in the way of what you need to do for the people who pay your way! Come election time, money buys ads, and ads suppress turnout. And our party always wins this district (we carved it that way).",
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1'],
+              msg: "Of course, people forget what you did for them pretty fast. Each appeasement has a limited lifespan. Don't worry--lobbyists have better memories.",
               nextTrigger: 115
             }
           },
           2: {
             115: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1', 'con1', 'mega'],
-              msg: "You know what gerrymandering really means? It means we're gonna need to spend more on the primary than the general!",
-              nextTrigger: 72
+              tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1'],
+              msg: "That next goal is just for handling Ollie, but he's not the only one to worry about. Build up enough money to survive the general election that'll be right up behind it!",
+              nextTrigger: 98
             },
-            72: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'con1', 'mega'],
-              msg: "Don't worry about election laws that say money raised is earmarked as for this election or that one. This is what super-PACs are for. Rolling money on through election cycles is just one of many ways we winners buck the system.",
+            98: {
+              tokens: ['oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1'],
+              msg: "Don't worry about election laws that say money raised is earmarked for this election or that one. This is what super-PACs are for. Rolling money on through election cycles is just one of many ways we winners buck the system.",
+              nextTrigger: 63
+            },
+            63: {
+              tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1', 'mega'],
+              msg: "Passing helpful legislation isn't the only way to help out your friendly lobbyists. Use your position of authority to give them a voice. Use your megaphone as a wild card.",
+              nextTrigger: 17
+            },
+            17: {
+              tokens: ['oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
+              msg: "Those pipelines eventually add up to favors. An oil slick can clear the way for more development. Select the OIL favor, then click any square in the row you want emptied.",
               nextTrigger: 33
             }
           },

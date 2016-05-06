@@ -6,7 +6,7 @@ var currentState = {
   board: {
     rows: 6, columns: 6, grid: []
   },
-  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2','oil2', 'con1'],
+  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2'],
   stagedToken: 'oil1',
   holdTokens: ['', '', '', ''],
   //white paper data
@@ -17,7 +17,7 @@ var currentState = {
   repeat: 0, //tracks if level is repeated (when higher office declined)
   nextGoal: 50000,
   electedOffice: 'State Delegate',
-  message: 'Click any unoccupied square in the grid to place the next item. Match 3 to make more valuable items.',
+  message: 'Click any unoccupied square in the grid to place the next item. Match 3 oils drops to make an oil can...',
   advMsg: 'none',
   advanceQuestion: false, //true when phase change should prompt choice of office advancement
   trigger: 160, //move # at which message will change
