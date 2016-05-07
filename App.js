@@ -24,7 +24,18 @@ var App = React.createClass ({
 
   render(){
     var advMsg = this.state.advMsg,
-        isGameOver = this.isGameOver(advMsg);
+        isGameOver = this.isGameOver(advMsg),
+        holders = this.state.holdTokens,
+        allHolders = [],
+        i;
+
+    if (holders.length > 1){
+      for (i = 1; i < holders.length; i++){
+        allHolders.push( <Holder token={this.state.holdTokens[i]} position={i} /> );
+      }
+    } else {
+      allHolders.push ( <div></div> );
+    }
 
     return (
       <div>
@@ -33,9 +44,7 @@ var App = React.createClass ({
           <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange}/>
           <div style={this.styles.panel}>
             <Scoreboard state={this.state} gameOver={isGameOver}/>
-            <Holder token={this.state.holdTokens[1]} position={1} />
-            <Holder token={this.state.holdTokens[2]} position={2} />
-            <Holder token={this.state.holdTokens[3]} position={3} />
+            {allHolders}
           </div>
           <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver}/>
         </div>

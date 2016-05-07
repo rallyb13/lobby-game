@@ -10,7 +10,7 @@ import NextGoal from './NextGoal';
 var Scoreboard = React.createClass({
   render: function(){
     var advMsg = this.props.state.advMsg,
-      isGameOver = this.props.isGameOver, //isGameOver is only one set in App, not part of state object
+      isGameOver = this.props.gameOver, //isGameOver is only one set in App, not part of state object
       nextBit;
 
     if (isGameOver || advMsg !== 'none' ){
