@@ -192,7 +192,8 @@ var Utils = {
             33: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
               msg: "Once you do enough back-scratching, you can just pick up the phone and call in a favor. Those power-ups are really helpful when it's down to the wire.",
-              nextTrigger: 461 //TODO: this will change!
+              nextTrigger: 461, //TODO: this will change!
+              special: 'hold'
             }
           },
           27: {

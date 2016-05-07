@@ -8,7 +8,7 @@ var currentState = {
   },
   tokensArray: ['oil1', 'oil1', 'oil1', 'oil2'],
   stagedToken: 'oil1',
-  holdTokens: ['', '', '', ''],
+  holdTokens: [''],
   //white paper data
   movesRemaining: 180,
   score: 0,
@@ -308,6 +308,9 @@ QuidStore.nextMove = function(){
       currentState.message = progressionData.msg;
       currentState.trigger = progressionData.nextTrigger;
       currentState.newMessage = true;
+      if (progressionData.special === 'hold'){
+        currentState.holdTokens.push('');
+      }
       moveChange = progressionData.moveChange;
       if (typeof moveChange !== 'undefined'){
         currentState.movesRemaining = currentState.movesRemaining + moveChange;
@@ -485,10 +488,23 @@ QuidStore.useHeldToken = function(position, token){
 
 //checks the holdTokens data and adjusts bankBalance
 QuidStore.payForHolds = function(){
-  var first = currentState.holdTokens[1] === '' ? 0 : 10,
-      second = currentState.holdTokens[2] === '' ? 0 : 100,
-      third = currentState.holdTokens[3] === '' ? 0 : 1000,
-      cost = first + second + third;
+  var holds = currentState.holdTokens,
+    first = 0,
+    second = 0,
+    third = 0,
+    cost;
+
+  if (holds.length >= 2){
+    first = holds[1] === '' ? 0 : 10;
+  }
+  if (holds.length >= 3){
+    second = currentState.holdTokens[2] === '' ? 0 : 100;
+  }
+  if (holds.length === 4){
+    third = currentState.holdTokens[3] === '' ? 0 : 1000;
+  }
+
+  cost = first + second + third;
   this.deposit(-cost);
 };
 
