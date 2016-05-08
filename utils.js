@@ -193,15 +193,39 @@ var Utils = {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
               msg: "If the timing isn't working for you, bottle a project up in committee. Click the empty hold area below and your next token will be held there. Just click it again to select it for use. But it will cost $10 every legislative day you use the hold.",
               nextTrigger: 230, //TODO: this will change!
-              special: 'hold'
+              special: "hold"
             }
           },
           8: {
             230: {
               tokens: ['oil1', 'oil2', 'oil2', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'con1', 'con1', 'mega'],
               msg: "Parks clearly won't be enough. Consider a bigger project, like a library. It'll cost you more, but maybe it'll shut those pesky constituents up a little longer.",
+              nextTrigger: 299,
+              special: "appeasement"
+            }
+          },
+          10: {
+            299: {
+              tokens: ['oil1', 'oil2', 'oil3', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'agr2', 'agr2', 'agr2', 'agr2', 'agr3', 'con1', 'con1', 'con1', 'mega'],
+              msg: "Balancing two special interests gets complicated, and it'll only be crazier when you step onto the national scene. The second hold area charges $100 per legislative day, but it might be worth it.",
+              nextTrigger: 120,
+              special: "hold"
+            }
+          },
+          16: {
+            120: {
+              tokens: ['oil1', 'oil2', 'oil3', 'agr1', 'agr1', 'agr2', 'agr2', 'agr2', 'agr3', 'mil1', 'mil1', 'mil1', 'mil1', 'mil1', 'mil2', 'mil2', 'mil2', 'con1', 'con1', 'con1', 'mega', 'mega'],
+              msg: "Oh yeah, you could probably use your new powers as a national representative to builds some bridges or other infrastructure. That'll really distract those stupid voters! Ha ha haa!",
+              nextTrigger: 555,
+              special: "appeasement"
+            }
+          },
+          24: {
+            555: {
+              tokens: ['agr2', 'agr3', 'mil1', 'mil1', 'mil2', 'mil2', 'mil3', 'fin1', 'fin1', 'fin1', 'fin1', 'fin1', 'fin2', 'fin2', 'con1', 'con1', 'con1', 'mega', 'pork', 'pork'],
+              msg: "It costs big at $1000 a day, but when you really want to set things up right, you might just want this final hold area.",
               nextTrigger: 461,
-              special: 'appeasement'
+              special: "hold"
             }
           },
           27: {
