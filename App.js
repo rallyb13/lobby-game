@@ -27,16 +27,14 @@ var App = React.createClass ({
         isGameOver = this.isGameOver(advMsg),
         holders = this.state.holdTokens,
         allHolders = [],
-        key,
         i;
 
     if (holders.length > 1){
       for (i = 1; i < holders.length; i++){
-        key = 'holder' + i;
-        allHolders.push( <Holder token={this.state.holdTokens[i]} position={i} key={key} /> );
+        allHolders.push( <Holder token={this.state.holdTokens[i]} position={i} key={i} /> );
       }
     } else {
-      allHolders.push ( <div></div> );
+      allHolders.push ( <div key={0}></div> );
     }
 
     return (

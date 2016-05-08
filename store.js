@@ -310,7 +310,7 @@ QuidStore.nextMove = function(){
       currentState.newMessage = true;
       if (progressionData.special === 'hold'){
         currentState.holdTokens.push('');
-      } else if (progressionData.special = 'appeasement'){
+      } else if (progressionData.special === 'appeasement'){
         if (currentState.helpers['con3'] === 0){
           currentState.helpers['con3'] = 1;
         } else {
