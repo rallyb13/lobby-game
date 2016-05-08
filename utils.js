@@ -191,9 +191,17 @@ var Utils = {
           3: {
             33: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
-              msg: "Once you do enough back-scratching, you can just pick up the phone and call in a favor. Those power-ups are really helpful when it's down to the wire.",
-              nextTrigger: 461, //TODO: this will change!
+              msg: "If the timing isn't working for you, bottle a project up in committee. Click the empty hold area below and your next token will be held there. Just click it again to select it for use. But it will cost $10 every legislative day you use the hold.",
+              nextTrigger: 230, //TODO: this will change!
               special: 'hold'
+            }
+          },
+          8: {
+            230: {
+              tokens: ['oil1', 'oil2', 'oil2', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'con1', 'con1', 'mega'],
+              msg: "Parks clearly won't be enough. Consider a bigger project, like a library. It'll cost you more, but maybe it'll shut those pesky constituents up a little longer.",
+              nextTrigger: 461,
+              special: 'appeasement'
             }
           },
           27: {

@@ -310,6 +310,12 @@ QuidStore.nextMove = function(){
       currentState.newMessage = true;
       if (progressionData.special === 'hold'){
         currentState.holdTokens.push('');
+      } else if (progressionData.special = 'appeasement'){
+        if (currentState.helpers['con3'] === 0){
+          currentState.helpers['con3'] = 1;
+        } else {
+          currentState.helpers['con5'] = 1;
+        }
       }
       moveChange = progressionData.moveChange;
       if (typeof moveChange !== 'undefined'){
