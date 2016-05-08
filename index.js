@@ -20055,9 +20055,9 @@
 
 	var _Scoreboard2 = _interopRequireDefault(_Scoreboard);
 
-	var _Staging = __webpack_require__(184);
+	var _Holder = __webpack_require__(185);
 
-	var _Staging2 = _interopRequireDefault(_Staging);
+	var _Holder2 = _interopRequireDefault(_Holder);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -20081,13 +20081,20 @@
 	  render: function render() {
 	    var advMsg = this.state.advMsg,
 	        isGameOver = this.isGameOver(advMsg),
-	        nextBit;
+	        holders = this.state.holdTokens,
+	        allHolders = [],
+	        key,
+	        i;
 
-	    if (isGameOver || advMsg !== 'none') {
-	      nextBit = _react2.default.createElement(_NextSelect2.default, { gameOver: isGameOver, advMsg: advMsg, phase: this.state.phase, repeat: this.state.repeat });
+	    if (holders.length > 1) {
+	      for (i = 1; i < holders.length; i++) {
+	        key = 'holder' + i;
+	        allHolders.push(_react2.default.createElement(_Holder2.default, { token: this.state.holdTokens[i], position: i, key: key }));
+	      }
 	    } else {
-	      nextBit = _react2.default.createElement(_Staging2.default, { stagedToken: this.state.stagedToken, gameOver: isGameOver });
+	      allHolders.push(_react2.default.createElement('div', null));
 	    }
+
 	    return _react2.default.createElement(
 	      'div',
 	      null,
@@ -20103,12 +20110,8 @@
 	        _react2.default.createElement(
 	          'div',
 	          { style: this.styles.panel },
-	          _react2.default.createElement(
-	            'div',
-	            null,
-	            nextBit
-	          ),
-	          _react2.default.createElement(_Scoreboard2.default, { state: this.state, gameOver: isGameOver })
+	          _react2.default.createElement(_Scoreboard2.default, { state: this.state, gameOver: isGameOver }),
+	          allHolders
 	        ),
 	        _react2.default.createElement(_Grid2.default, { board: this.state.board, stagedToken: this.state.stagedToken, megaPossCoords: this.state.megaPossCoords, toFavor: this.state.createFavor, gameOver: isGameOver })
 	      )
@@ -20168,9 +20171,9 @@
 	  board: {
 	    rows: 6, columns: 6, grid: []
 	  },
-	  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'con1'],
+	  tokensArray: ['oil1', 'oil1', 'oil1', 'oil2'],
 	  stagedToken: 'oil1',
-	  holdToken: false,
+	  holdTokens: [''],
 	  //white paper data
 	  movesRemaining: 180,
 	  score: 0,
@@ -20179,7 +20182,7 @@
 	  repeat: 0, //tracks if level is repeated (when higher office declined)
 	  nextGoal: 50000,
 	  electedOffice: 'State Delegate',
-	  message: 'Click any unoccupied square in the grid to place the next item. Match 3 to make more valuable items.',
+	  message: 'Click any unoccupied square in the grid to place the next item. Match 3 oils drops to make an oil can...',
 	  advMsg: 'none',
 	  advanceQuestion: false, //true when phase change should prompt choice of office advancement
 	  trigger: 160, //move # at which message will change
@@ -20272,10 +20275,8 @@
 
 	//helper fn to make selected appeasement token the next staged token
 	//emits its own change as this does NOT trigger a move completion
-	QuidStore.useAppeasement = function (token) {
-	  if (currentState.holdToken === false) {
-	    currentState.holdToken = currentState.stagedToken;
-	  }
+	QuidStore.selectThisToken = function (token) {
+	  currentState.holdTokens[0] = currentState.stagedToken;
 	  currentState.stagedToken = token;
 	  this.emitChange();
 	};
@@ -20421,6 +20422,7 @@
 	  token = this.handleMatches(token, rowPos, colPos);
 	  this.setToken(token, rowPos, colPos);
 
+	  this.payForHolds();
 	  this.nextMove();
 
 	  //handle special token removal
@@ -20470,6 +20472,15 @@
 	      currentState.message = progressionData.msg;
 	      currentState.trigger = progressionData.nextTrigger;
 	      currentState.newMessage = true;
+	      if (progressionData.special === 'hold') {
+	        currentState.holdTokens.push('');
+	      } else if (progressionData.special = 'appeasement') {
+	        if (currentState.helpers['con3'] === 0) {
+	          currentState.helpers['con3'] = 1;
+	        } else {
+	          currentState.helpers['con5'] = 1;
+	        }
+	      }
 	      moveChange = progressionData.moveChange;
 	      if (typeof moveChange !== 'undefined') {
 	        currentState.movesRemaining = currentState.movesRemaining + moveChange;
@@ -20630,6 +20641,42 @@
 	  }
 	};
 
+	//moves staged token into token-holding spot by position, calls setNextToken
+	QuidStore.holdTokenHere = function (position) {
+	  var toHold = currentState.stagedToken;
+	  currentState.holdTokens[position] = toHold;
+	  this.setNextToken();
+	  this.emitChange();
+	};
+
+	//clears the token from holding area, calls helper to set it as staged
+	QuidStore.useHeldToken = function (position, token) {
+	  currentState.holdTokens[position] = '';
+	  this.selectThisToken(token);
+	};
+
+	//checks the holdTokens data and adjusts bankBalance
+	QuidStore.payForHolds = function () {
+	  var holds = currentState.holdTokens,
+	      first = 0,
+	      second = 0,
+	      third = 0,
+	      cost;
+
+	  if (holds.length >= 2) {
+	    first = holds[1] === '' ? 0 : 10;
+	  }
+	  if (holds.length >= 3) {
+	    second = currentState.holdTokens[2] === '' ? 0 : 100;
+	  }
+	  if (holds.length === 4) {
+	    third = currentState.holdTokens[3] === '' ? 0 : 1000;
+	  }
+
+	  cost = first + second + third;
+	  this.deposit(-cost);
+	};
+
 	//randomly selects the next staged token from the current array of those available
 	//handles user selecting appeasement by "holding" token that had been selected, to bring it back next
 	//checks megaphone token validity and recursively sets a new token when there are none
@@ -20637,11 +20684,11 @@
 	  var tokens = currentState.tokensArray,
 	      valStrings = [];
 
-	  if (currentState.holdToken === false) {
+	  if (currentState.holdTokens[0] === '') {
 	    currentState.stagedToken = tokens[Math.floor(Math.random() * tokens.length)];
 	  } else {
-	    currentState.stagedToken = currentState.holdToken;
-	    currentState.holdToken = false;
+	    currentState.stagedToken = currentState.holdTokens[0];
+	    currentState.holdTokens[0] = '';
 	  }
 
 	  if (currentState.stagedToken === 'mega') {
@@ -20668,7 +20715,7 @@
 	QuidStore.removeTopLevelTokens = function () {
 	  var coords = currentState.createFavor,
 	      token = this.getToken(coords[0][0], coords[0][1]),
-	      Favor = token.slice(0, 3) + '6',
+	      favor = token.slice(0, 3) + '6',
 	      stringCoords,
 	      index;
 
@@ -20923,13 +20970,13 @@
 	  //token category reference for color & background color (and special selected case)
 	  handleColors: function handleColors(tokenGroup, attribute, selected) {
 	    var colorMap = {
-	      'oil': { color: 'gray', bColor: 'black' },
+	      'oil': { color: 'black', bColor: 'gray' },
 	      'agr': { color: 'green', bColor: 'yellow' },
 	      'mil': { color: 'black', bColor: 'red' },
 	      'fin': { color: 'yellow', bColor: 'green' },
 	      '': { color: '#4B5043', bColor: '#A4BD99' },
 	      'meg': { color: '#4B5043', bColor: '#A4BD99' },
-	      'con': { color: 'red', bColor: 'blue' },
+	      'con': { color: 'white', bColor: 'blue' },
 	      'por': { color: 'red', bColor: 'pink' }
 	    };
 	    if (selected === true) {
@@ -21016,48 +21063,91 @@
 	        progressionMap = {
 	      1: {
 	        160: {
-	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'con1'],
-	          msg: "Keep this up, and the oil lobby will keep your coffers stuffed. Though you may annoy some constituents...",
+	          tokens: ['oil1', 'oil1', 'oil2'],
+	          msg: "Oil cans make derricks, which make refineries, which make pipelines. Keep the oil flowing and their lobby will keep your coffers stuffed.",
 	          nextTrigger: 140
 	        },
 	        140: {
-	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'mega'],
-	          msg: "Passing helpful legislation isn't the only way to help out your friendly lobbyists. Use your position of authority to give them a voice. The megaphone can be quite a wild card.",
+	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'con1'],
+	          msg: "Keep an eye on your bank balance and how many legislative days you have left until your next election. If you can't raise the money in time, you'll be out of a job.",
 	          nextTrigger: 115
 	        },
 	        115: {
-	          tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'con1'],
-	          msg: "Oil drops fill oil barrels... Legislate away restrictions on where we can drill! Refineries mean jobs. And those pipelines mean...plenty of profit to go around!",
+	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1'],
+	          msg: "Your constituents may start to notice how much you're aiding the oil lobby. They do get in the way when upset. It costs legislative time and some of funding to publicize it, but try appeasing them with a park...before they SWARM!",
 	          nextTrigger: 82
 	        },
 	        82: {
-	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1', 'mega'],
-	          msg: "Maybe you should build these constituents a park. It'll cost you money to publicize (and to, ah, speed up the process), but it might placate some of them awhile.",
+	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1'],
+	          msg: "Don't worry about getting the pipelines together. Once you've made enough of them, you'll earn a favor, matched or not. But DO make sure to keep space on the board. Gridlock means game over.",
 	          nextTrigger: 44
 	        },
 	        44: {
-	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
-	          msg: "Don't let those constituents get in the way of what you need to do for the people who pay your way! Come election time, money buys ads, and ads suppress turnout. And our party always wins this district (we carved it that way).",
+	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1'],
+	          msg: "Of course, people forget what you did for them pretty fast. Each appeasement has a limited lifespan. Don't worry--lobbyists have better memories.",
 	          nextTrigger: 115
 	        }
 	      },
 	      2: {
 	        115: {
-	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1', 'con1', 'mega'],
-	          msg: "You know what gerrymandering really means? It means we're gonna need to spend more on the primary than the general!",
-	          nextTrigger: 72
+	          tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1'],
+	          msg: "That next goal is just for handling Ollie, but he's not the only one to worry about. Build up enough money to survive the general election that'll be right up behind it!",
+	          nextTrigger: 98
 	        },
-	        72: {
-	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'con1', 'mega'],
-	          msg: "Don't worry about election laws that say money raised is earmarked as for this election or that one. This is what super-PACs are for. Rolling money on through election cycles is just one of many ways we winners buck the system.",
+	        98: {
+	          tokens: ['oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1'],
+	          msg: "Don't worry about election laws that say money raised is earmarked for this election or that one. This is what super-PACs are for. Rolling money on through election cycles is just one of many ways we winners buck the system.",
+	          nextTrigger: 63
+	        },
+	        63: {
+	          tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1', 'mega'],
+	          msg: "Passing helpful legislation isn't the only way to help out your friendly lobbyists. Use your position of authority to give them a voice. Use your megaphone as a wild card.",
+	          nextTrigger: 17
+	        },
+	        17: {
+	          tokens: ['oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
+	          msg: "Those pipelines eventually add up to favors. An oil slick can clear the way for more development. Select the OIL favor, then click any square in the row you want emptied.",
 	          nextTrigger: 33
 	        }
 	      },
 	      3: {
 	        33: {
 	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
-	          msg: "Once you do enough back-scratching, you can just pick up the phone and call in a favor. Those power-ups are really helpful when it's down to the wire.",
-	          nextTrigger: 461 //TODO: this will change!
+	          msg: "If the timing isn't working for you, bottle a project up in committee. Click the empty hold area below and your next token will be held there. Just click it again to select it for use. But it will cost $10 every legislative day you use the hold.",
+	          nextTrigger: 230, //TODO: this will change!
+	          special: "hold"
+	        }
+	      },
+	      8: {
+	        230: {
+	          tokens: ['oil1', 'oil2', 'oil2', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'con1', 'con1', 'mega'],
+	          msg: "Parks clearly won't be enough. Consider a bigger project, like a library. It'll cost you more, but maybe it'll shut those pesky constituents up a little longer.",
+	          nextTrigger: 299,
+	          special: "appeasement"
+	        }
+	      },
+	      10: {
+	        299: {
+	          tokens: ['oil1', 'oil2', 'oil3', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'agr2', 'agr2', 'agr2', 'agr2', 'agr3', 'con1', 'con1', 'con1', 'mega'],
+	          msg: "Balancing two special interests gets complicated, and it'll only be crazier when you step onto the national scene. The second hold area charges $100 per legislative day, but it might be worth it.",
+	          nextTrigger: 120,
+	          special: "hold"
+	        }
+	      },
+	      16: {
+	        120: {
+	          tokens: ['oil1', 'oil2', 'oil3', 'agr1', 'agr1', 'agr2', 'agr2', 'agr2', 'agr3', 'mil1', 'mil1', 'mil1', 'mil1', 'mil1', 'mil2', 'mil2', 'mil2', 'con1', 'con1', 'con1', 'mega', 'mega'],
+	          msg: "Oh yeah, you could probably use your new powers as a national representative to builds some bridges or other infrastructure. That'll really distract those stupid voters! Ha ha haa!",
+	          nextTrigger: 555,
+	          special: "appeasement"
+	        }
+	      },
+	      24: {
+	        555: {
+	          tokens: ['agr2', 'agr3', 'mil1', 'mil1', 'mil2', 'mil2', 'mil3', 'fin1', 'fin1', 'fin1', 'fin1', 'fin1', 'fin2', 'fin2', 'con1', 'con1', 'con1', 'mega', 'pork', 'pork'],
+	          msg: "It costs big at $1000 a day, but when you really want to set things up right, you might just want this final hold area.",
+	          nextTrigger: 461,
+	          special: "hold"
 	        }
 	      },
 	      27: {
@@ -21608,7 +21698,7 @@
 	    if (this.props.favor) {
 	      this.useFavor(token);
 	    } else {
-	      _store2.default.useAppeasement(token);
+	      _store2.default.selectThisToken(token);
 	    }
 	  },
 
@@ -21690,21 +21780,7 @@
 	      'icon-megaphone': this.props.symbol === 'mega'
 	    });
 
-	    return _react2.default.createElement(
-	      'div',
-	      { style: this.styles.token },
-	      _react2.default.createElement('span', { className: symbolClass })
-	    );
-	  },
-
-	  styles: {
-	    token: {
-	      position: 'absolute',
-	      top: '50%',
-	      left: '50%',
-	      transform: 'translate(-50%, -50%)',
-	      fontSize: '50px'
-	    }
+	    return _react2.default.createElement('div', { style: { background: 'url(../assets/icons/' + symbolClass + '.png) no-repeat center/contain', minHeight: '77.5px' } });
 	  }
 
 	});
@@ -21919,6 +21995,7 @@
 	    ), { style: {
 	        color: _utils2.default.handleColors(tokenGroup, 'color'),
 	        backgroundColor: _utils2.default.handleColors(tokenGroup, 'bColor', selected),
+	        outlineColor: _utils2.default.handleColors(tokenGroup, 'bColor', selected),
 	        height: this.handlePercentage(rowCount),
 	        width: this.handlePercentage(colCount),
 	        display: 'inline-block',
@@ -22089,27 +22166,31 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Message = __webpack_require__(178);
+	var _Staging = __webpack_require__(178);
+
+	var _Staging2 = _interopRequireDefault(_Staging);
+
+	var _Message = __webpack_require__(179);
 
 	var _Message2 = _interopRequireDefault(_Message);
 
-	var _Score = __webpack_require__(179);
+	var _Score = __webpack_require__(180);
 
 	var _Score2 = _interopRequireDefault(_Score);
 
-	var _Bank = __webpack_require__(180);
+	var _Bank = __webpack_require__(181);
 
 	var _Bank2 = _interopRequireDefault(_Bank);
 
-	var _Office = __webpack_require__(181);
+	var _Office = __webpack_require__(182);
 
 	var _Office2 = _interopRequireDefault(_Office);
 
-	var _MoveCounter = __webpack_require__(182);
+	var _MoveCounter = __webpack_require__(183);
 
 	var _MoveCounter2 = _interopRequireDefault(_MoveCounter);
 
-	var _NextGoal = __webpack_require__(183);
+	var _NextGoal = __webpack_require__(184);
 
 	var _NextGoal2 = _interopRequireDefault(_NextGoal);
 
@@ -22119,6 +22200,17 @@
 	  displayName: 'Scoreboard',
 
 	  render: function render() {
+	    var advMsg = this.props.state.advMsg,
+	        isGameOver = this.props.gameOver,
+	        //isGameOver is only one set in App, not part of state object
+	    nextBit;
+
+	    if (isGameOver || advMsg !== 'none') {
+	      nextBit = _react2.default.createElement(NextSelect, { gameOver: isGameOver, advMsg: advMsg, phase: this.props.state.phase, repeat: this.props.state.repeat });
+	    } else {
+	      nextBit = _react2.default.createElement(_Staging2.default, { stagedToken: this.props.state.stagedToken, gameOver: isGameOver });
+	    }
+
 	    return _react2.default.createElement(
 	      'div',
 	      { style: this.styles.scoreboard },
@@ -22130,7 +22222,8 @@
 	      _react2.default.createElement(
 	        'div',
 	        { style: this.styles.bodyBoard },
-	        _react2.default.createElement(_Message2.default, { alert: this.props.state.newMessage, message: this.props.state.message, phase: this.props.state.phase, gameOver: this.props.gameOver }),
+	        nextBit,
+	        _react2.default.createElement(_Message2.default, { alert: this.props.state.newMessage, message: this.props.state.message, phase: this.props.state.phase, gameOver: isGameOver }),
 	        _react2.default.createElement(_Score2.default, { score: this.props.state.score }),
 	        _react2.default.createElement(_Bank2.default, { bankBalance: this.props.state.bankBalance }),
 	        _react2.default.createElement(_Office2.default, { electedOffice: this.props.state.electedOffice }),
@@ -22138,6 +22231,17 @@
 	        _react2.default.createElement(_NextGoal2.default, { nextGoal: this.props.state.nextGoal })
 	      )
 	    );
+	  },
+
+	  //checks that board is not full and bank balance is still positive (at end of election cycle)
+	  isGameOver: function isGameOver(advMsg) {
+	    if (advMsg === 'bank') {
+	      return advMsg;
+	    } else if (QuidStore.findTokenCoords('').length === 0) {
+	      return 'board';
+	    } else {
+	      return false;
+	    }
 	  },
 
 	  styles: {
@@ -22166,6 +22270,75 @@
 
 /***/ },
 /* 178 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Token = __webpack_require__(172);
+
+	var _Token2 = _interopRequireDefault(_Token);
+
+	var _utils = __webpack_require__(168);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Staging = _react2.default.createClass({
+		displayName: 'Staging',
+
+
+		render: function render() {
+			var tokenGroup = this.props.stagedToken.slice(0, 3),
+			    tokenDiv = _react2.default.createElement(_Token2.default, { symbol: this.props.stagedToken }),
+			    gameOver = this.props.gameOver,
+			    toStage = gameOver ? _react2.default.createElement('p', null) : tokenDiv;
+
+			return _react2.default.cloneElement(_react2.default.createElement(
+				'div',
+				null,
+				_react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement(
+						'p',
+						null,
+						'Your Next Piece: '
+					),
+					' '
+				),
+				_react2.default.createElement(
+					'div',
+					{ style: { width: '50%' } },
+					' ',
+					toStage,
+					' '
+				)
+			), { style: {
+					color: _utils2.default.handleColors(tokenGroup, 'color'),
+					backgroundColor: _utils2.default.handleColors(tokenGroup, 'bColor'),
+					padding: '0 5px 0 10px',
+					border: '5px double #000',
+					display: 'flex',
+					flex: '0 0 auto',
+					alignItems: 'center'
+				}
+			});
+		}
+	});
+
+	exports.default = Staging;
+
+/***/ },
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22249,7 +22422,7 @@
 	exports.default = Message;
 
 /***/ },
-/* 179 */
+/* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22289,7 +22462,7 @@
 	exports.default = Score;
 
 /***/ },
-/* 180 */
+/* 181 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22328,7 +22501,7 @@
 	exports.default = Bank;
 
 /***/ },
-/* 181 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22363,7 +22536,7 @@
 	exports.default = Office;
 
 /***/ },
-/* 182 */
+/* 183 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22400,7 +22573,7 @@
 	exports.default = MoveCounter;
 
 /***/ },
-/* 183 */
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22439,13 +22612,13 @@
 	exports.default = NextGoal;
 
 /***/ },
-/* 184 */
+/* 185 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 
 	var _react = __webpack_require__(1);
@@ -22456,42 +22629,44 @@
 
 	var _Token2 = _interopRequireDefault(_Token);
 
-	var _utils = __webpack_require__(168);
+	var _store = __webpack_require__(167);
 
-	var _utils2 = _interopRequireDefault(_utils);
+	var _store2 = _interopRequireDefault(_store);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var Staging = _react2.default.createClass({
-		displayName: 'Staging',
+	var Holder = _react2.default.createClass({
+	  displayName: 'Holder',
 
+	  render: function render() {
+	    return _react2.default.createElement(
+	      'div',
+	      { style: this.styles.holdArea, onClick: this.toggleTokens },
+	      _react2.default.createElement(_Token2.default, { symbol: this.props.token })
+	    );
+	  },
 
-		render: function render() {
-			var tokenGroup = this.props.stagedToken.slice(0, 3),
-			    tokenDiv = _react2.default.createElement(_Token2.default, { symbol: this.props.stagedToken }),
-			    gameOver = this.props.gameOver,
-			    toStage = gameOver ? _react2.default.createElement('p', null) : tokenDiv;
+	  //handles either setting a token into hold area or removing it
+	  toggleTokens: function toggleTokens() {
+	    var token = this.props.token;
 
-			return _react2.default.cloneElement(_react2.default.createElement(
-				'div',
-				null,
-				toStage
-			), { style: {
-					color: _utils2.default.handleColors(tokenGroup, 'color'),
-					backgroundColor: _utils2.default.handleColors(tokenGroup, 'bColor'),
-					margin: '15px',
-					padding: '5px',
-					border: '5px double #000',
-					borderRadius: '100%',
-					height: '150px',
-					display: 'block',
-					position: 'relative'
-				}
-			});
-		}
+	    if (token === "") {
+	      _store2.default.holdTokenHere(this.props.position);
+	    } else {
+	      _store2.default.useHeldToken(this.props.position, token);
+	    }
+	  },
+
+	  styles: {
+	    holdArea: {
+	      backgroundColor: 'maroon',
+	      minWidth: '77.5px',
+	      border: '1px solid red'
+	    }
+	  }
 	});
 
-	exports.default = Staging;
+	exports.default = Holder;
 
 /***/ }
 /******/ ]);
