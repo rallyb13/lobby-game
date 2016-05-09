@@ -3,7 +3,6 @@ var classNames = require('classnames');
 
 var Token = React.createClass({
   render: function(){
-    var symbol = this.props.symbol || [''];
     var symbolClass = classNames({
       'icon-oil-drop': this.props.symbol === 'oil1',
       'icon-oil-can': this.props.symbol === 'oil2',
@@ -31,10 +30,11 @@ var Token = React.createClass({
 
       'icon-vote': this.props.symbol === 'con1',
       'icon-megaphone': this.props.symbol === 'mega'
-    });
+    }),
+    backgroundType = this.props.symbol !== '' ? 'url(../assets/icons/' + symbolClass + '.png) no-repeat center/contain' : 'inherit';
 
     return (
-    <div style={{background: 'url(../assets/icons/' + symbolClass + '.png) no-repeat center/contain', minHeight: '77.5px'}}>
+      <div style={{background: backgroundType, minHeight: '77.5px'}}>
       </div>
     );
   },
