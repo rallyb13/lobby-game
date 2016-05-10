@@ -158,6 +158,13 @@ QuidStore.clearMatches = function(matches){
   }
 };
 
+//helper for oil slick: eliminates all pieces in a single rowPos
+QuidStore.oilSlick = function(rowNum){
+  for (var i = 0; i < currentState.board.columns; i++){
+    this.setToken('', rowNum, i);
+  }
+};
+
 //
 //
 //************ INDEXING FUNCTIONS TO HELP GAME LOGIC FUNCTIONALITY REFERENCING BOARD/COORDINATE DATA
@@ -247,15 +254,19 @@ QuidStore.completeMove = function(rowPos, colPos){
     swarm = false;
 
   //handle placement of tokens
-  if (token === 'mega'){
+  if (token === 'oil6'){
+    this.oilSlick(rowPos);
+  } else if (token === 'mega'){
     token = this.convertMega(rowPos, colPos);
   } else if (token === 'pork'){
     currentState.porkOn.push( JSON.stringify([rowPos, colPos]) );
   } else if (token.slice(0,3) === 'con' && token !== 'con1'){
     this.addAppeasement(token, rowPos, colPos);
   }
-  token = this.handleMatches(token, rowPos, colPos);
-  this.setToken(token, rowPos, colPos);
+  if (token !== 'oil6'){
+    token = this.handleMatches(token, rowPos, colPos);
+    this.setToken(token, rowPos, colPos);
+  }
 
   this.payForHolds();
   this.nextMove();

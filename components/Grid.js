@@ -36,7 +36,9 @@ var Grid = React.createClass({
       validForMega = this.props.megaPossCoords,
       stringCoords;
 
-    if (staged === 'mega'){
+    if (staged === 'oil6'){
+      return true;
+    } else if (staged === 'mega'){
       if (isEmpty){
         stringCoords = [rowPos, colPos];
         stringCoords = JSON.stringify(stringCoords);

@@ -8,7 +8,7 @@ var BenchSeat = React.createClass({
     var favor = this.props.favor,
       selected = this.props.selected,
       tokenGroup = this.props.token.slice(0,3),
-      count = favor ? this.props.count : " ";
+      count = favor ? this.props.count : '';
 
     return React.cloneElement(
       <div onClick={this.useHelper}>
@@ -52,7 +52,7 @@ var BenchSeat = React.createClass({
       cons;
 
     if (type === 'oil') {
-      QuidStore.deposit(25000);
+      QuidStore.selectThisToken(token);
     } else if (type === 'agr'){
       QuidStore.freezeCons();
     } else if (type === 'mil'){
