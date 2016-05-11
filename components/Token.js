@@ -34,8 +34,7 @@ var Token = React.createClass({
     backgroundType = this.props.symbol !== '' ? 'url(../assets/icons/' + symbolClass + '.png) no-repeat center/contain' : 'inherit';
 
     return (
-      <div style={{background: backgroundType, minHeight: '77.5px'}}>
-      </div>
+      <div style={{background: backgroundType, minHeight: '77.5px'}} />
     );
   },
 
