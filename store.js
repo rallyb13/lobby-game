@@ -111,6 +111,9 @@ QuidStore.setToken = function (token, rowPos, colPos){
 //helper fn to make selected appeasement token the next staged token
 //emits its own change as this does NOT trigger a move completion
 QuidStore.selectThisToken = function(token){
+  if (token === 'mega'){
+    this.checkMegaValid();
+  }
   currentState.holdTokens[0] = currentState.stagedToken;
   currentState.stagedToken = token;
   this.emitChange();
