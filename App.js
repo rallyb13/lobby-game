@@ -44,7 +44,7 @@ var App = React.createClass ({
           <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange}/>
           <div style={this.styles.panel}>
             <Scoreboard state={this.state} gameOver={isGameOver}/>
-            {allHolders}
+            <div style={this.styles.holders}>{allHolders}</div>
           </div>
           <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver}/>
         </div>
@@ -77,6 +77,10 @@ var App = React.createClass ({
       width: '30%',
       float: 'right'
     },
+    holders: {
+      display: 'inline-block',
+      float: 'left'
+    }
   }
 });
 export default App
