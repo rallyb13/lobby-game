@@ -192,8 +192,20 @@ var Utils = {
             33: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
               msg: "If the timing isn't working for you, bottle a project up in committee. Click the empty hold area below and your next token will be held there. Just click it again to select it for use. But it will cost $10 every legislative day you use the hold.",
-              nextTrigger: 230, //TODO: this will change!
+              nextTrigger: 130,
               special: "hold"
+            }
+          },
+          4: {
+            130: {
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil2', 'oil2', 'oil3', 'oil3', 'con1', 'con1', 'con1', 'mega'],
+              msg: "In the old days, people campaigned so they could do things in office. These days you have to legislate so that you can win your next campaign. Make sure you know what the political consequences will be before you cast any vote.",
+              nextTrigger: 56
+            },
+            56: {
+              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
+              msg: "No surprise that Derricks is going negative. It's better for both of you to suppress turn-out. That way you can focus on getting your own people out. That's what the money you raise will go to this season: ads that will help convince people leaning his way to not bother voting.",
+              nextTrigger: 230 //TODO: keep changing from here
             }
           },
           8: {
