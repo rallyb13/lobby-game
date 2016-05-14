@@ -9,7 +9,9 @@ import NextGoal from './NextGoal';
 
 var Scoreboard = React.createClass({
   render: function(){
-    var advMsg = this.props.state.advMsg,
+    var negativeBal = this.props.state.bankBalance < this.props.state.nextGoal,
+      textColor = (negativeBal && this.props.state.movesRemaining <= 20) ? 'red' : 'black',
+      advMsg = this.props.state.advMsg,
       isGameOver = this.props.gameOver, //isGameOver is only one set in App, not part of state object
       nextBit;
 
@@ -26,10 +28,10 @@ var Scoreboard = React.createClass({
           {nextBit}
           <Message alert={this.props.state.newMessage} message={this.props.state.message} phase={this.props.state.phase} gameOver={isGameOver} />
           <Score score={this.props.state.score} />
-          <Bank bankBalance={this.props.state.bankBalance} />
+          <Bank bankBalance={this.props.state.bankBalance} textColor={textColor} />
           <Office electedOffice={this.props.state.electedOffice} />
-          <MoveCounter movesRemaining={this.props.state.movesRemaining} phase={this.props.state.phase}/>
-          <NextGoal nextGoal={this.props.state.nextGoal} />
+          <MoveCounter movesRemaining={this.props.state.movesRemaining} phase={this.props.state.phase} textColor={textColor} />
+          <NextGoal nextGoal={this.props.state.nextGoal} textColor={textColor} />
         </div>
       </div>
     );

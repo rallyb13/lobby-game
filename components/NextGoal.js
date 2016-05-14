@@ -5,7 +5,7 @@ var NextGoal = React.createClass({
   render: function(){
     return (
       <div>
-        <h5>Next Goal: ${Utils.formatNum(this.props.nextGoal)}</h5>
+        <h5 style={{color: this.props.textColor}} >Next Goal: ${Utils.formatNum(this.props.nextGoal)}</h5>
       </div>
     );
   },

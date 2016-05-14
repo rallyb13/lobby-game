@@ -5,7 +5,7 @@ var MoveCounter = React.createClass({
     var txt = this.props.phase <=32 ? "Days Until Next Election" : "Days as Winner"
     return (
       <div>
-        <h5>{txt}: {this.props.movesRemaining}</h5>
+        <h5 style={{color: this.props.textColor}} >{txt}: {this.props.movesRemaining}</h5>
       </div>
     );
   }
