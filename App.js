@@ -3,7 +3,6 @@ import QuidStore from './store';
 import Utils from './utils';
 import Bench from './components/Bench';
 import Grid from './components/Grid';
-import NextSelect from './components/NextSelect';
 import Scoreboard from './components/Scoreboard';
 import Holder from './components/Holder';
 

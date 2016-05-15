@@ -6,6 +6,7 @@ import Bank from './Bank';
 import Office from './Office';
 import MoveCounter from './MoveCounter';
 import NextGoal from './NextGoal';
+import NextSelect from './NextSelect';
 
 var Scoreboard = React.createClass({
   render: function(){
