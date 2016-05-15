@@ -66,12 +66,11 @@ var NextSelect = React.createClass({
   styles: {
     container: {
       backgroundColor: 'white',
-      border: '5px double #000',
-      borderRadius: '100%',
       height: '150px',
+      width: '100%',
       display: 'block',
       position: 'relative',
-      margin: '15px',
+      marginLeft: '-5px',
       padding: '5px'
     },
     restart: {
