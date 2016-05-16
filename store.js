@@ -702,7 +702,7 @@ QuidStore.handlePork = function(matches, rowPos, colPos){
 //core game functionality: called if game continues at moves reaching zero/bank balance checked
 //many changes to game situation are changed by this "level up" and so triggered here
 //at office change, board resize takes place
-QuidStore.changePhase = function(phaseShift){
+QuidStore.changePhase = function(phaseShift, fromChoice){
   var phase,
     phaseData,
     coords;
@@ -737,6 +737,9 @@ QuidStore.changePhase = function(phaseShift){
     currentState.board.columns = coords[1];
     this.handleNewSquares();
   }
+  if (fromChoice){
+    currentState.advMsg = 'none';
+  }
   this.emitChange();
 };
 
@@ -757,7 +760,7 @@ QuidStore.handleElection = function(repeat){
     advMsg = advMsg[repeat];
   }
   if (advMsg === 'none'){
-    this.changePhase(1);
+    this.changePhase(1, false);
   }
   currentState.advMsg = advMsg;
 };

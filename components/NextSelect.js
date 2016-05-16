@@ -42,7 +42,7 @@ var NextSelect = React.createClass({
       adjustment = -1
       QuidStore.rerunPhase(true);
     }
-    QuidStore.changePhase(adjustment);
+    QuidStore.changePhase(adjustment, true);
   },
 
   //handles choice of running for next elected office, adjusting phase as needed
@@ -60,7 +60,7 @@ var NextSelect = React.createClass({
       adjustment = repeat === 0 ? 1 : 3;
       QuidStore.rerunPhase(false);
     }
-    QuidStore.changePhase(adjustment);
+    QuidStore.changePhase(adjustment, true);
   },
 
   styles: {
