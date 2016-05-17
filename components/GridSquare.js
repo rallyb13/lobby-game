@@ -17,7 +17,6 @@ var GridSquare = React.createClass({
       </div>,
       { style:
         {
-          color : Utils.handleColors(tokenGroup, 'color'),
           backgroundColor: Utils.handleColors(tokenGroup, 'bColor', selected),
           outlineColor: Utils.handleColors(tokenGroup, 'bColor', selected),
           height: this.handlePercentage(rowCount),

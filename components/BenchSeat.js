@@ -18,7 +18,6 @@ var BenchSeat = React.createClass({
       { style:
         {
           float: this.pickSide(favor),
-          color: Utils.handleColors(tokenGroup, 'color'),
           backgroundColor: Utils.handleColors(tokenGroup, 'bColor', selected),
           width: '60px',
           height: '60px',

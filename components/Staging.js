@@ -17,7 +17,6 @@ var Staging = React.createClass({
 				<div style={{width:'50%'}}> {toStage} </div>
 			</div>,
 			{ style: {
-					color: Utils.handleColors(tokenGroup, 'color'),
 					backgroundColor: Utils.handleColors(tokenGroup, 'bColor'),
 					padding: '0 5px 0 10px',
 					border: '5px double #000',
