@@ -3,6 +3,76 @@
 
 var Utils = {
 
+  //phase ref specifically for elected office changes
+  setElectedOffice: function(phase, currentOffice) {
+    var electedOfficeMap = {
+          1: 'State Delegate',
+          8: 'State Senator',
+          16: 'US Representative',
+          24: 'US Senator (Junior)',
+          30: 'US Senator (Senior)'
+        };
+    if (typeof electedOfficeMap[phase] === 'undefined'){
+      return currentOffice;
+    } else {
+      return electedOfficeMap[phase];
+    }
+  },
+
+  //phase ref specifically for messages that appear with choice of advancing to next phase/office or repeating last phase
+  setElectionChoice: function(phase, repeat) {
+    var advMsgMap = {
+      5: "Want to run for State Senate? With no real competition to face in the primary, this could be your moment to climb...",
+      6: 'NOW would you like to run for State Senate? ',
+      12: "You're destined for great things. The US House of Representatives is calling your name. Will you run?",
+      13: 'Want to go to DC now? The US Congress awaits...',
+      19: {
+        0: "Want to challenge X for that Senate seat?",
+        1: "Want to challenge Y for his Senate seat?",
+        2: "none"
+      }
+    };
+    if (typeof advMsgMap[phase] === 'undefined'){
+      return 'none';
+    } else {
+      return advMsgMap[phase];
+    }
+  },
+
+  //reference for board dimensions relating to each office
+  handleBoardChange: function(electedOffice) {
+    var dimensions = [],
+      boardMap = {
+        'State Delegate': {rows: 6, columns: 6},
+        'State Senator': {rows: 6, columns: 7},
+        'US Representative': {rows: 7, columns: 7},
+        'US Senator (Junior)': {rows: 7, columns: 8},
+        'US Senator (Senior)': {rows: 8, columns: 8}
+      };
+    dimensions.push(boardMap[electedOffice].rows);
+    dimensions.push(boardMap[electedOffice].columns);
+    return dimensions;
+  },
+
+  //token category reference for color & background color (and special selected case)
+  handleColors: function(tokenGroup, attribute, selected){
+    var colorMap = {
+      'oil': {bColor: 'gray'},
+      'agr': {bColor: 'yellow'},
+      'mil': {bColor: 'red'},
+      'fin': {bColor: 'green'},
+      '': {bColor: '#A4BD99'},
+      'meg': {bColor: '#A4BD99'},
+      'con': {bColor: 'blue'},
+      'por': {bColor: 'pink'},
+    }
+    if (selected === true) {
+      return 'magenta';
+    } else {
+      return colorMap[tokenGroup][attribute];
+    }
+  },
+
   //token reference stores what each matches into, pts & bank earned on both setting and matching
   //priority is used to select among options when megaphone placed at point of multiple matches
   //appeasement tokens have data on cost, range of moves the token stays in place, and what token "decays" into
@@ -43,25 +113,6 @@ var Utils = {
       'pork': {nextUp: 'final', pts: 666, mPts: 666, val: 666, mVal: 666 },
     }
     return tokenMap[token][attribute];
-  },
-
-  //token category reference for color & background color (and special selected case)
-  handleColors: function(tokenGroup, attribute, selected){
-    var colorMap = {
-      'oil': {bColor: 'gray'},
-      'agr': {bColor: 'yellow'},
-      'mil': {bColor: 'red'},
-      'fin': {bColor: 'green'},
-      '': {bColor: '#A4BD99'},
-      'meg': {bColor: '#A4BD99'},
-      'con': {bColor: 'blue'},
-      'por': {bColor: 'pink'},
-    }
-    if (selected === true) {
-      return 'magenta';
-    } else {
-      return colorMap[tokenGroup][attribute];
-    }
   },
 
   //phase reference for how many moves, bank balance needed to continue, msg to open new phase, and msg used for game ending at that level
@@ -270,63 +321,12 @@ var Utils = {
     }
   },
 
-  //phase ref specifically for elected office changes
-  setElectedOffice: function(phase, currentOffice) {
-    var electedOfficeMap = {
-          1: 'State Delegate',
-          8: 'State Senator',
-          16: 'US Representative',
-          24: 'US Senator (Junior)',
-          30: 'US Senator (Senior)'
-        };
-    if (typeof electedOfficeMap[phase] === 'undefined'){
-      return currentOffice;
-    } else {
-      return electedOfficeMap[phase];
-    }
-  },
-
-  //phase ref specifically for messages that appear with choice of advancing to next phase/office or repeating last phase
-  setElectionChoice: function(phase, repeat) {
-    var advMsgMap = {
-      5: "Want to run for State Senate? With no real competition to face in the primary, this could be your moment to climb...",
-      6: 'NOW would you like to run for State Senate? ',
-      12: "You're destined for great things. The US House of Representatives is calling your name. Will you run?",
-      13: 'Want to go to DC now? The US Congress awaits...',
-      19: {
-        0: "Want to challenge X for that Senate seat?",
-        1: "Want to challenge Y for his Senate seat?",
-        2: "none"
-      }
-    };
-    if (typeof advMsgMap[phase] === 'undefined'){
-      return 'none';
-    } else {
-      return advMsgMap[phase];
-    }
-  },
-
-  //reference for board dimensions relating to each office
-  handleBoardChange: function(electedOffice) {
-    var dimensions = [],
-      boardMap = {
-        'State Delegate': {rows: 6, columns: 6},
-        'State Senator': {rows: 6, columns: 7},
-        'US Representative': {rows: 7, columns: 7},
-        'US Senator (Junior)': {rows: 7, columns: 8},
-        'US Senator (Senior)': {rows: 8, columns: 8}
-      };
-    dimensions.push(boardMap[electedOffice].rows);
-    dimensions.push(boardMap[electedOffice].columns);
-    return dimensions;
-  },
-
   //utility function to format number to appear with appropriate commas
   formatNum: function(num){
     var numString = num.toString(),
       charCount = numString.length,
       leftSideCount = charCount % 3,
-      segmentCount = segmentCount = charCount/3,
+      segmentCount = charCount/3,
       formatted = '',
       i;
 
