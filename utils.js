@@ -19,8 +19,8 @@ var Utils = {
     }
   },
 
-  //phase ref specifically for messages that appear with choice of advancing to next phase/office or repeating last phase
-  setElectionChoice: function(phase, repeat) {
+  //phase ref specifically for messages that appear with choice of advancing to next phase/office
+  setElectionChoice: function(phase) {
     var advMsgMap = {
       5: "Want to run for State Senate? With no real competition to face in the primary, this could be your moment to climb...",
       6: 'NOW would you like to run for State Senate? ',

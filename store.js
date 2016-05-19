@@ -124,6 +124,7 @@ QuidStore.deposit = function(num){
   currentState.bankBalance = currentState.bankBalance + num;
 };
 
+//helper fn to update score
 QuidStore.score = function(num){
   currentState.score = currentState.score + num;
 };
