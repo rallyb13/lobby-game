@@ -20047,11 +20047,7 @@
 
 	var _Grid2 = _interopRequireDefault(_Grid);
 
-	var _NextSelect = __webpack_require__(176);
-
-	var _NextSelect2 = _interopRequireDefault(_NextSelect);
-
-	var _Scoreboard = __webpack_require__(177);
+	var _Scoreboard = __webpack_require__(176);
 
 	var _Scoreboard2 = _interopRequireDefault(_Scoreboard);
 
@@ -20083,16 +20079,14 @@
 	        isGameOver = this.isGameOver(advMsg),
 	        holders = this.state.holdTokens,
 	        allHolders = [],
-	        key,
 	        i;
 
 	    if (holders.length > 1) {
 	      for (i = 1; i < holders.length; i++) {
-	        key = 'holder' + i;
-	        allHolders.push(_react2.default.createElement(_Holder2.default, { token: this.state.holdTokens[i], position: i, key: key }));
+	        allHolders.push(_react2.default.createElement(_Holder2.default, { token: this.state.holdTokens[i], position: i, key: i }));
 	      }
 	    } else {
-	      allHolders.push(_react2.default.createElement('div', null));
+	      allHolders.push(_react2.default.createElement('div', { key: 0 }));
 	    }
 
 	    return _react2.default.createElement(
@@ -20111,7 +20105,11 @@
 	          'div',
 	          { style: this.styles.panel },
 	          _react2.default.createElement(_Scoreboard2.default, { state: this.state, gameOver: isGameOver }),
-	          allHolders
+	          _react2.default.createElement(
+	            'div',
+	            { style: this.styles.holders },
+	            allHolders
+	          )
 	        ),
 	        _react2.default.createElement(_Grid2.default, { board: this.state.board, stagedToken: this.state.stagedToken, megaPossCoords: this.state.megaPossCoords, toFavor: this.state.createFavor, gameOver: isGameOver })
 	      )
@@ -20143,6 +20141,10 @@
 	    panel: {
 	      width: '30%',
 	      float: 'right'
+	    },
+	    holders: {
+	      display: 'inline-block',
+	      float: 'left'
 	    }
 	  }
 	});
@@ -20276,6 +20278,9 @@
 	//helper fn to make selected appeasement token the next staged token
 	//emits its own change as this does NOT trigger a move completion
 	QuidStore.selectThisToken = function (token) {
+	  if (token === 'mega') {
+	    this.checkMegaValid();
+	  }
 	  currentState.holdTokens[0] = currentState.stagedToken;
 	  currentState.stagedToken = token;
 	  this.emitChange();
@@ -20286,6 +20291,7 @@
 	  currentState.bankBalance = currentState.bankBalance + num;
 	};
 
+	//helper fn to update score
 	QuidStore.score = function (num) {
 	  currentState.score = currentState.score + num;
 	};
@@ -20320,6 +20326,13 @@
 	QuidStore.clearMatches = function (matches) {
 	  for (var i = 0; i < matches.length; i++) {
 	    this.setToken('', matches[i][0], matches[i][1]);
+	  }
+	};
+
+	//helper for oil slick: eliminates all pieces in a single rowPos
+	QuidStore.oilSlick = function (rowNum) {
+	  for (var i = 0; i < currentState.board.columns; i++) {
+	    this.setToken('', rowNum, i);
 	  }
 	};
 
@@ -20412,15 +20425,19 @@
 	      swarm = false;
 
 	  //handle placement of tokens
-	  if (token === 'mega') {
+	  if (token === 'oil6') {
+	    this.oilSlick(rowPos);
+	  } else if (token === 'mega') {
 	    token = this.convertMega(rowPos, colPos);
 	  } else if (token === 'pork') {
 	    currentState.porkOn.push(JSON.stringify([rowPos, colPos]));
 	  } else if (token.slice(0, 3) === 'con' && token !== 'con1') {
 	    this.addAppeasement(token, rowPos, colPos);
 	  }
-	  token = this.handleMatches(token, rowPos, colPos);
-	  this.setToken(token, rowPos, colPos);
+	  if (token !== 'oil6') {
+	    token = this.handleMatches(token, rowPos, colPos);
+	    this.setToken(token, rowPos, colPos);
+	  }
 
 	  this.payForHolds();
 	  this.nextMove();
@@ -20474,7 +20491,7 @@
 	      currentState.newMessage = true;
 	      if (progressionData.special === 'hold') {
 	        currentState.holdTokens.push('');
-	      } else if (progressionData.special = 'appeasement') {
+	      } else if (progressionData.special === 'appeasement') {
 	        if (currentState.helpers['con3'] === 0) {
 	          currentState.helpers['con3'] = 1;
 	        } else {
@@ -20851,7 +20868,7 @@
 	//core game functionality: called if game continues at moves reaching zero/bank balance checked
 	//many changes to game situation are changed by this "level up" and so triggered here
 	//at office change, board resize takes place
-	QuidStore.changePhase = function (phaseShift) {
+	QuidStore.changePhase = function (phaseShift, fromChoice) {
 	  var phase, phaseData, coords;
 
 	  currentState.phase = currentState.phase + phaseShift;
@@ -20884,6 +20901,9 @@
 	    currentState.board.columns = coords[1];
 	    this.handleNewSquares();
 	  }
+	  if (fromChoice) {
+	    currentState.advMsg = 'none';
+	  }
 	  this.emitChange();
 	};
 
@@ -20904,7 +20924,7 @@
 	    advMsg = advMsg[repeat];
 	  }
 	  if (advMsg === 'none') {
-	    this.changePhase(1);
+	    this.changePhase(1, false);
 	  }
 	  currentState.advMsg = advMsg;
 	};
@@ -20924,6 +20944,76 @@
 	//All of the internal progression lists can be accessed here.
 
 	var Utils = {
+
+	  //phase ref specifically for elected office changes
+	  setElectedOffice: function setElectedOffice(phase, currentOffice) {
+	    var electedOfficeMap = {
+	      1: 'State Delegate',
+	      8: 'State Senator',
+	      16: 'US Representative',
+	      24: 'US Senator (Junior)',
+	      30: 'US Senator (Senior)'
+	    };
+	    if (typeof electedOfficeMap[phase] === 'undefined') {
+	      return currentOffice;
+	    } else {
+	      return electedOfficeMap[phase];
+	    }
+	  },
+
+	  //phase ref specifically for messages that appear with choice of advancing to next phase/office
+	  setElectionChoice: function setElectionChoice(phase) {
+	    var advMsgMap = {
+	      5: "Want to run for State Senate? With no real competition to face in the primary, this could be your moment to climb...",
+	      6: 'NOW would you like to run for State Senate? ',
+	      12: "You're destined for great things. The US House of Representatives is calling your name. Will you run?",
+	      13: 'Want to go to DC now? The US Congress awaits...',
+	      19: {
+	        0: "Want to challenge X for that Senate seat?",
+	        1: "Want to challenge Y for his Senate seat?",
+	        2: "none"
+	      }
+	    };
+	    if (typeof advMsgMap[phase] === 'undefined') {
+	      return 'none';
+	    } else {
+	      return advMsgMap[phase];
+	    }
+	  },
+
+	  //reference for board dimensions relating to each office
+	  handleBoardChange: function handleBoardChange(electedOffice) {
+	    var dimensions = [],
+	        boardMap = {
+	      'State Delegate': { rows: 6, columns: 6 },
+	      'State Senator': { rows: 6, columns: 7 },
+	      'US Representative': { rows: 7, columns: 7 },
+	      'US Senator (Junior)': { rows: 7, columns: 8 },
+	      'US Senator (Senior)': { rows: 8, columns: 8 }
+	    };
+	    dimensions.push(boardMap[electedOffice].rows);
+	    dimensions.push(boardMap[electedOffice].columns);
+	    return dimensions;
+	  },
+
+	  //token category reference for color & background color (and special selected case)
+	  handleColors: function handleColors(tokenGroup, attribute, selected) {
+	    var colorMap = {
+	      'oil': { bColor: 'gray' },
+	      'agr': { bColor: 'yellow' },
+	      'mil': { bColor: 'red' },
+	      'fin': { bColor: 'green' },
+	      '': { bColor: '#A4BD99' },
+	      'meg': { bColor: '#A4BD99' },
+	      'con': { bColor: 'blue' },
+	      'por': { bColor: 'pink' }
+	    };
+	    if (selected === true) {
+	      return 'magenta';
+	    } else {
+	      return colorMap[tokenGroup][attribute];
+	    }
+	  },
 
 	  //token reference stores what each matches into, pts & bank earned on both setting and matching
 	  //priority is used to select among options when megaphone placed at point of multiple matches
@@ -20965,25 +21055,6 @@
 	      'pork': { nextUp: 'final', pts: 666, mPts: 666, val: 666, mVal: 666 }
 	    };
 	    return tokenMap[token][attribute];
-	  },
-
-	  //token category reference for color & background color (and special selected case)
-	  handleColors: function handleColors(tokenGroup, attribute, selected) {
-	    var colorMap = {
-	      'oil': { color: 'black', bColor: 'gray' },
-	      'agr': { color: 'green', bColor: 'yellow' },
-	      'mil': { color: 'black', bColor: 'red' },
-	      'fin': { color: 'yellow', bColor: 'green' },
-	      '': { color: '#4B5043', bColor: '#A4BD99' },
-	      'meg': { color: '#4B5043', bColor: '#A4BD99' },
-	      'con': { color: 'white', bColor: 'blue' },
-	      'por': { color: 'red', bColor: 'pink' }
-	    };
-	    if (selected === true) {
-	      return 'magenta';
-	    } else {
-	      return colorMap[tokenGroup][attribute];
-	    }
 	  },
 
 	  //phase reference for how many moves, bank balance needed to continue, msg to open new phase, and msg used for game ending at that level
@@ -21114,8 +21185,20 @@
 	        33: {
 	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
 	          msg: "If the timing isn't working for you, bottle a project up in committee. Click the empty hold area below and your next token will be held there. Just click it again to select it for use. But it will cost $10 every legislative day you use the hold.",
-	          nextTrigger: 230, //TODO: this will change!
+	          nextTrigger: 130,
 	          special: "hold"
+	        }
+	      },
+	      4: {
+	        130: {
+	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil2', 'oil2', 'oil3', 'oil3', 'con1', 'con1', 'con1', 'mega'],
+	          msg: "In the old days, people campaigned so they could do things in office. These days you have to legislate so that you can win your next campaign. Make sure you know what the political consequences will be before you cast any vote.",
+	          nextTrigger: 56
+	        },
+	        56: {
+	          tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
+	          msg: "No surprise that Derricks is going negative. It's better for both of you to suppress turn-out. That way you can focus on getting your own people out. That's what the money you raise will go to this season: ads that will help convince people leaning his way to not bother voting.",
+	          nextTrigger: 230 //TODO: keep changing from here
 	        }
 	      },
 	      8: {
@@ -21180,63 +21263,12 @@
 	    }
 	  },
 
-	  //phase ref specifically for elected office changes
-	  setElectedOffice: function setElectedOffice(phase, currentOffice) {
-	    var electedOfficeMap = {
-	      1: 'State Delegate',
-	      8: 'State Senator',
-	      16: 'US Representative',
-	      24: 'US Senator (Junior)',
-	      30: 'US Senator (Senior)'
-	    };
-	    if (typeof electedOfficeMap[phase] === 'undefined') {
-	      return currentOffice;
-	    } else {
-	      return electedOfficeMap[phase];
-	    }
-	  },
-
-	  //phase ref specifically for messages that appear with choice of advancing to next phase/office or repeating last phase
-	  setElectionChoice: function setElectionChoice(phase, repeat) {
-	    var advMsgMap = {
-	      5: "Want to run for State Senate? With no real competition to face in the primary, this could be your moment to climb...",
-	      6: 'NOW would you like to run for State Senate? ',
-	      12: "You're destined for great things. The US House of Representatives is calling your name. Will you run?",
-	      13: 'Want to go to DC now? The US Congress awaits...',
-	      19: {
-	        0: "Want to challenge X for that Senate seat?",
-	        1: "Want to challenge Y for his Senate seat?",
-	        2: "none"
-	      }
-	    };
-	    if (typeof advMsgMap[phase] === 'undefined') {
-	      return 'none';
-	    } else {
-	      return advMsgMap[phase];
-	    }
-	  },
-
-	  //reference for board dimensions relating to each office
-	  handleBoardChange: function handleBoardChange(electedOffice) {
-	    var dimensions = [],
-	        boardMap = {
-	      'State Delegate': { rows: 6, columns: 6 },
-	      'State Senator': { rows: 6, columns: 7 },
-	      'US Representative': { rows: 7, columns: 7 },
-	      'US Senator (Junior)': { rows: 7, columns: 8 },
-	      'US Senator (Senior)': { rows: 8, columns: 8 }
-	    };
-	    dimensions.push(boardMap[electedOffice].rows);
-	    dimensions.push(boardMap[electedOffice].columns);
-	    return dimensions;
-	  },
-
 	  //utility function to format number to appear with appropriate commas
 	  formatNum: function formatNum(num) {
 	    var numString = num.toString(),
 	        charCount = numString.length,
 	        leftSideCount = charCount % 3,
-	        segmentCount = segmentCount = charCount / 3,
+	        segmentCount = charCount / 3,
 	        formatted = '',
 	        i;
 
@@ -21665,22 +21697,21 @@
 	    var favor = this.props.favor,
 	        selected = this.props.selected,
 	        tokenGroup = this.props.token.slice(0, 3),
-	        count = favor ? this.props.count : " ";
+	        count = favor ? this.props.count : '';
 
 	    return _react2.default.cloneElement(_react2.default.createElement(
 	      'div',
 	      { onClick: this.useHelper },
-	      _react2.default.createElement(_Token2.default, { symbol: this.props.token }),
 	      _react2.default.createElement(
 	        'span',
 	        { style: { color: 'white' } },
 	        ' ',
 	        count,
 	        ' '
-	      )
+	      ),
+	      _react2.default.createElement(_Token2.default, { symbol: this.props.token })
 	    ), { style: {
 	        float: this.pickSide(favor),
-	        color: _utils2.default.handleColors(tokenGroup, 'color'),
 	        backgroundColor: _utils2.default.handleColors(tokenGroup, 'bColor', selected),
 	        width: '60px',
 	        height: '60px',
@@ -21713,7 +21744,7 @@
 	        cons;
 
 	    if (type === 'oil') {
-	      _store2.default.deposit(25000);
+	      _store2.default.selectThisToken(token);
 	    } else if (type === 'agr') {
 	      _store2.default.freezeCons();
 	    } else if (type === 'mil') {
@@ -21750,7 +21781,6 @@
 	  displayName: 'Token',
 
 	  render: function render() {
-	    var symbol = this.props.symbol || [''];
 	    var symbolClass = classNames({
 	      'icon-oil-drop': this.props.symbol === 'oil1',
 	      'icon-oil-can': this.props.symbol === 'oil2',
@@ -21778,9 +21808,10 @@
 
 	      'icon-vote': this.props.symbol === 'con1',
 	      'icon-megaphone': this.props.symbol === 'mega'
-	    });
+	    }),
+	        backgroundType = this.props.symbol !== '' ? 'url(../assets/icons/' + symbolClass + '.png) no-repeat center/contain' : 'inherit';
 
-	    return _react2.default.createElement('div', { style: { background: 'url(../assets/icons/' + symbolClass + '.png) no-repeat center/contain', minHeight: '77.5px' } });
+	    return _react2.default.createElement('div', { style: { background: backgroundType, minHeight: '77.5px' } });
 	  }
 
 	});
@@ -21901,7 +21932,9 @@
 	        validForMega = this.props.megaPossCoords,
 	        stringCoords;
 
-	    if (staged === 'mega') {
+	    if (staged === 'oil6') {
+	      return true;
+	    } else if (staged === 'mega') {
 	      if (isEmpty) {
 	        stringCoords = [rowPos, colPos];
 	        stringCoords = JSON.stringify(stringCoords);
@@ -21993,7 +22026,6 @@
 	      { className: this.props.eligible ? "grid-square" : '', onClick: this.placeToken },
 	      _react2.default.createElement(_Token2.default, { symbol: this.props.token })
 	    ), { style: {
-	        color: _utils2.default.handleColors(tokenGroup, 'color'),
 	        backgroundColor: _utils2.default.handleColors(tokenGroup, 'bColor', selected),
 	        outlineColor: _utils2.default.handleColors(tokenGroup, 'bColor', selected),
 	        height: this.handlePercentage(rowCount),
@@ -22037,162 +22069,37 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _store = __webpack_require__(167);
-
-	var _store2 = _interopRequireDefault(_store);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var NextSelect = _react2.default.createClass({
-	  displayName: 'NextSelect',
-
-	  render: function render() {
-	    var advMsg = this.props.advMsg,
-	        displayButton;
-
-	    if (this.props.gameOver) {
-	      displayButton = _react2.default.createElement(
-	        'button',
-	        { style: this.styles.restart, onClick: this.restart },
-	        ' Restart '
-	      );
-	    } else {
-	      displayButton = _react2.default.createElement(
-	        'div',
-	        { style: this.styles.choice },
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          advMsg
-	        ),
-	        _react2.default.createElement(
-	          'button',
-	          { style: this.styles.buttons, onClick: this.acceptAdvance },
-	          ' Higher Office! '
-	        ),
-	        _react2.default.createElement(
-	          'button',
-	          { style: this.styles.buttons, onClick: this.refuseAdvance },
-	          ' Am Comfy Here '
-	        )
-	      );
-	    }
-	    return _react2.default.createElement(
-	      'div',
-	      { style: this.styles.container },
-	      displayButton
-	    );
-	  },
-
-	  //resets state object and starts new game
-	  restart: function restart() {
-	    document.clear();
-	    location.reload();
-	  },
-
-	  //handles choice of NOT running for next elected office, adjusting phase as needed
-	  refuseAdvance: function refuseAdvance() {
-	    var phase = this.props.phase,
-	        adjustment;
-
-	    if (phase === 5 || phase === 12) {
-	      adjustment = 1;
-	    } else if (phase === 6 || phase === 13) {
-	      adjustment = 0;
-	      _store2.default.rerunPhase(true);
-	    } else if (phase === 19) {
-	      adjustment = -1;
-	      _store2.default.rerunPhase(true);
-	    }
-	    _store2.default.changePhase(adjustment);
-	  },
-
-	  //handles choice of running for next elected office, adjusting phase as needed
-	  acceptAdvance: function acceptAdvance(phase, repeat) {
-	    var phase = this.props.phase,
-	        repeat = this.props.repeat,
-	        adjustment;
-
-	    if (phase === 5 || phase === 12) {
-	      adjustment = 2;
-	    } else if (phase === 6 || phase === 13) {
-	      adjustment = 1;
-	      _store2.default.rerunPhase(false);
-	    } else if (phase === 19) {
-	      adjustment = repeat === 0 ? 1 : 3;
-	      _store2.default.rerunPhase(false);
-	    }
-	    _store2.default.changePhase(adjustment);
-	  },
-
-	  styles: {
-	    container: {
-	      backgroundColor: 'white',
-	      border: '5px double #000',
-	      borderRadius: '100%',
-	      height: '150px',
-	      display: 'block',
-	      position: 'relative',
-	      margin: '15px',
-	      padding: '5px'
-	    },
-	    restart: {
-	      margin: '25% 0 0 35%',
-	      padding: '5%'
-	    },
-	    choice: {
-	      margin: '10% 0 0 5%',
-	      padding: '5%'
-	    },
-	    buttons: {
-	      margin: '1% 2% 0 0'
-	    }
-	  }
-	});
-
-	exports.default = NextSelect;
-
-/***/ },
-/* 177 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _Staging = __webpack_require__(178);
+	var _Staging = __webpack_require__(177);
 
 	var _Staging2 = _interopRequireDefault(_Staging);
 
-	var _Message = __webpack_require__(179);
+	var _Message = __webpack_require__(178);
 
 	var _Message2 = _interopRequireDefault(_Message);
 
-	var _Score = __webpack_require__(180);
+	var _Score = __webpack_require__(179);
 
 	var _Score2 = _interopRequireDefault(_Score);
 
-	var _Bank = __webpack_require__(181);
+	var _Bank = __webpack_require__(180);
 
 	var _Bank2 = _interopRequireDefault(_Bank);
 
-	var _Office = __webpack_require__(182);
+	var _Office = __webpack_require__(181);
 
 	var _Office2 = _interopRequireDefault(_Office);
 
-	var _MoveCounter = __webpack_require__(183);
+	var _MoveCounter = __webpack_require__(182);
 
 	var _MoveCounter2 = _interopRequireDefault(_MoveCounter);
 
-	var _NextGoal = __webpack_require__(184);
+	var _NextGoal = __webpack_require__(183);
 
 	var _NextGoal2 = _interopRequireDefault(_NextGoal);
+
+	var _NextSelect = __webpack_require__(184);
+
+	var _NextSelect2 = _interopRequireDefault(_NextSelect);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22200,13 +22107,15 @@
 	  displayName: 'Scoreboard',
 
 	  render: function render() {
-	    var advMsg = this.props.state.advMsg,
+	    var negativeBal = this.props.state.bankBalance < this.props.state.nextGoal,
+	        textColor = negativeBal && this.props.state.movesRemaining <= 20 ? 'red' : 'black',
+	        advMsg = this.props.state.advMsg,
 	        isGameOver = this.props.gameOver,
 	        //isGameOver is only one set in App, not part of state object
 	    nextBit;
 
 	    if (isGameOver || advMsg !== 'none') {
-	      nextBit = _react2.default.createElement(NextSelect, { gameOver: isGameOver, advMsg: advMsg, phase: this.props.state.phase, repeat: this.props.state.repeat });
+	      nextBit = _react2.default.createElement(_NextSelect2.default, { gameOver: isGameOver, advMsg: advMsg, phase: this.props.state.phase, repeat: this.props.state.repeat });
 	    } else {
 	      nextBit = _react2.default.createElement(_Staging2.default, { stagedToken: this.props.state.stagedToken, gameOver: isGameOver });
 	    }
@@ -22225,10 +22134,10 @@
 	        nextBit,
 	        _react2.default.createElement(_Message2.default, { alert: this.props.state.newMessage, message: this.props.state.message, phase: this.props.state.phase, gameOver: isGameOver }),
 	        _react2.default.createElement(_Score2.default, { score: this.props.state.score }),
-	        _react2.default.createElement(_Bank2.default, { bankBalance: this.props.state.bankBalance }),
+	        _react2.default.createElement(_Bank2.default, { bankBalance: this.props.state.bankBalance, textColor: textColor }),
 	        _react2.default.createElement(_Office2.default, { electedOffice: this.props.state.electedOffice }),
-	        _react2.default.createElement(_MoveCounter2.default, { movesRemaining: this.props.state.movesRemaining, phase: this.props.state.phase }),
-	        _react2.default.createElement(_NextGoal2.default, { nextGoal: this.props.state.nextGoal })
+	        _react2.default.createElement(_MoveCounter2.default, { movesRemaining: this.props.state.movesRemaining, phase: this.props.state.phase, textColor: textColor }),
+	        _react2.default.createElement(_NextGoal2.default, { nextGoal: this.props.state.nextGoal, textColor: textColor })
 	      )
 	    );
 	  },
@@ -22269,7 +22178,7 @@
 	exports.default = Scoreboard;
 
 /***/ },
-/* 178 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22323,7 +22232,6 @@
 					' '
 				)
 			), { style: {
-					color: _utils2.default.handleColors(tokenGroup, 'color'),
 					backgroundColor: _utils2.default.handleColors(tokenGroup, 'bColor'),
 					padding: '0 5px 0 10px',
 					border: '5px double #000',
@@ -22338,7 +22246,7 @@
 	exports.default = Staging;
 
 /***/ },
-/* 179 */
+/* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22422,7 +22330,7 @@
 	exports.default = Message;
 
 /***/ },
-/* 180 */
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22462,7 +22370,7 @@
 	exports.default = Score;
 
 /***/ },
-/* 181 */
+/* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22490,7 +22398,7 @@
 	      null,
 	      _react2.default.createElement(
 	        'h5',
-	        null,
+	        { style: { color: this.props.textColor } },
 	        'Bank Balance: $',
 	        _utils2.default.formatNum(this.props.bankBalance)
 	      )
@@ -22501,7 +22409,7 @@
 	exports.default = Bank;
 
 /***/ },
-/* 182 */
+/* 181 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22536,7 +22444,7 @@
 	exports.default = Office;
 
 /***/ },
-/* 183 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22561,7 +22469,7 @@
 	      null,
 	      _react2.default.createElement(
 	        "h5",
-	        null,
+	        { style: { color: this.props.textColor } },
 	        txt,
 	        ": ",
 	        this.props.movesRemaining
@@ -22573,7 +22481,7 @@
 	exports.default = MoveCounter;
 
 /***/ },
-/* 184 */
+/* 183 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22601,7 +22509,7 @@
 	      null,
 	      _react2.default.createElement(
 	        'h5',
-	        null,
+	        { style: { color: this.props.textColor } },
 	        'Next Goal: $',
 	        _utils2.default.formatNum(this.props.nextGoal)
 	      )
@@ -22610,6 +22518,134 @@
 	});
 
 	exports.default = NextGoal;
+
+/***/ },
+/* 184 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _store = __webpack_require__(167);
+
+	var _store2 = _interopRequireDefault(_store);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var NextSelect = _react2.default.createClass({
+	  displayName: 'NextSelect',
+
+	  render: function render() {
+	    var advMsg = this.props.advMsg,
+	        displayButton;
+
+	    if (this.props.gameOver) {
+	      displayButton = _react2.default.createElement(
+	        'button',
+	        { style: this.styles.restart, onClick: this.restart },
+	        ' Restart '
+	      );
+	    } else {
+	      displayButton = _react2.default.createElement(
+	        'div',
+	        { style: this.styles.choice },
+	        _react2.default.createElement(
+	          'div',
+	          null,
+	          advMsg
+	        ),
+	        _react2.default.createElement(
+	          'button',
+	          { style: this.styles.buttons, onClick: this.acceptAdvance },
+	          ' Higher Office! '
+	        ),
+	        _react2.default.createElement(
+	          'button',
+	          { style: this.styles.buttons, onClick: this.refuseAdvance },
+	          ' Am Comfy Here '
+	        )
+	      );
+	    }
+	    return _react2.default.createElement(
+	      'div',
+	      { style: this.styles.container },
+	      displayButton
+	    );
+	  },
+
+	  //resets state object and starts new game
+	  restart: function restart() {
+	    document.clear();
+	    location.reload();
+	  },
+
+	  //handles choice of NOT running for next elected office, adjusting phase as needed
+	  refuseAdvance: function refuseAdvance() {
+	    var phase = this.props.phase,
+	        adjustment;
+
+	    if (phase === 5 || phase === 12) {
+	      adjustment = 1;
+	    } else if (phase === 6 || phase === 13) {
+	      adjustment = 0;
+	      _store2.default.rerunPhase(true);
+	    } else if (phase === 19) {
+	      adjustment = -1;
+	      _store2.default.rerunPhase(true);
+	    }
+	    _store2.default.changePhase(adjustment, true);
+	  },
+
+	  //handles choice of running for next elected office, adjusting phase as needed
+	  acceptAdvance: function acceptAdvance(phase, repeat) {
+	    var phase = this.props.phase,
+	        repeat = this.props.repeat,
+	        adjustment;
+
+	    if (phase === 5 || phase === 12) {
+	      adjustment = 2;
+	    } else if (phase === 6 || phase === 13) {
+	      adjustment = 1;
+	      _store2.default.rerunPhase(false);
+	    } else if (phase === 19) {
+	      adjustment = repeat === 0 ? 1 : 3;
+	      _store2.default.rerunPhase(false);
+	    }
+	    _store2.default.changePhase(adjustment, true);
+	  },
+
+	  styles: {
+	    container: {
+	      backgroundColor: 'white',
+	      height: '150px',
+	      width: '100%',
+	      display: 'block',
+	      position: 'relative',
+	      marginLeft: '-5px',
+	      padding: '5px'
+	    },
+	    restart: {
+	      margin: '25% 0 0 35%',
+	      padding: '5%'
+	    },
+	    choice: {
+	      margin: '10% 0 0 5%',
+	      padding: '5%'
+	    },
+	    buttons: {
+	      margin: '1% 2% 0 0'
+	    }
+	  }
+	});
+
+	exports.default = NextSelect;
 
 /***/ },
 /* 185 */
@@ -22660,8 +22696,10 @@
 	  styles: {
 	    holdArea: {
 	      backgroundColor: 'maroon',
-	      minWidth: '77.5px',
-	      border: '1px solid red'
+	      width: '77.5px',
+	      border: '1px solid red',
+	      float: 'left',
+	      margin: '5px'
 	    }
 	  }
 	});
