@@ -10,10 +10,10 @@ var Token = React.createClass({
       'icon-refinery': this.props.symbol === 'oil4',
       'icon-pipeline': this.props.symbol === 'oil5',
 
-      'icon-seed': this.props.symbol === 'agr1',
+      'icon-seeds': this.props.symbol === 'agr1',
       'icon-corn': this.props.symbol === 'agr2',
-      'icon-cow': this.props.symbol === 'agr3',
-      // 'icon-': this.props.symbol === 'agr4',
+      'icon-cattle': this.props.symbol === 'agr3',
+      'icon-slaughter': this.props.symbol === 'agr4',
       'icon-fast-food': this.props.symbol === 'agr5',
 
       'icon-bullet': this.props.symbol === 'mil1',
@@ -29,6 +29,7 @@ var Token = React.createClass({
       'icon-tower': this.props.symbol === 'fin5',
 
       'icon-vote': this.props.symbol === 'con1',
+      'icon-park': this.props.symbol === 'con2',
       'icon-megaphone': this.props.symbol === 'mega'
     }),
     backgroundType = this.props.symbol !== '' ? 'url(../assets/icons/' + symbolClass + '.png) no-repeat center/contain' : 'inherit';
