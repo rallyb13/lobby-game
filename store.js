@@ -15,7 +15,7 @@ var currentState = {
   bankBalance: 0,
   phase: 1,
   repeat: 0, //tracks if level is repeated (when higher office declined)
-  nextGoal: 50000,
+  nextGoal: 35000,
   electedOffice: 'State Delegate',
   message: 'Click any unoccupied square in the grid to place the next item. Match 3 oils drops to make an oil can...',
   advMsg: 'none',
