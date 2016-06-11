@@ -40,11 +40,11 @@ var App = React.createClass ({
       <div>
         <div style={{maxWidth:'900px', margin: '0 auto'}}>
           <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
-          <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange}/>
           <div style={this.styles.panel}>
             <Scoreboard state={this.state} gameOver={isGameOver}/>
             <div style={this.styles.holders}>{allHolders}</div>
           </div>
+          <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange}/>
           <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver}/>
         </div>
       </div>
@@ -74,7 +74,7 @@ var App = React.createClass ({
     },
     panel: {
       width: '30%',
-      float: 'right'
+      float: 'left'
     },
     holders: {
       display: 'inline-block',
