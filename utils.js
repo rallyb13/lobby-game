@@ -137,7 +137,7 @@ var Utils = {
         msg: "You made it through the primary, but WHOA, here comes a tough general election! You're gonna have to put the 'aggro' in Big Agro."},
       10: { moves: 315, goal: 90000, end: "a CattleProd Corporation consultant in their state office, making $175K/yr.",
         msg: "Re-elected to State Senate! Some small fries are lining up against you for the next primary--but you're the two-term incumbent."},
-      11: { moves: 45, goal: 30000, end: "a CattleProd Corporation consultant, at $175K/yr, though OilCanU wants to offer you a spot, too. Maybe you could do even 'conult' for both?",
+      11: { moves: 45, goal: 30000, end: "a CattleProd Corporation consultant, at $175K/yr, though OilCanU wants to offer you a spot, too. Maybe you could do even 'consult' for both?",
         msg: "Big Agro helped you slaughter your primary opponents. Now you just have to sweet-talk your way through the general."},
       12: { moves: 360, goal: 125000, end: "a chief executive of special projects for AgriVat Industries. First special project is a conference in the Bahamas, so better get flying. $205K/yr.",
         msg: "You get a high-fructose high-five! You're secure in your State Senate office. No challengers on the horizon. How sweet it is..."},

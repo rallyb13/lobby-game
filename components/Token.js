@@ -9,12 +9,14 @@ var Token = React.createClass({
       'icon-derrick': this.props.symbol === 'oil3',
       'icon-refinery': this.props.symbol === 'oil4',
       'icon-pipeline': this.props.symbol === 'oil5',
+      'icon-oilslick': this.props.symbol === 'oil6',
 
       'icon-seeds': this.props.symbol === 'agr1',
       'icon-corn': this.props.symbol === 'agr2',
       'icon-cattle': this.props.symbol === 'agr3',
       'icon-slaughter': this.props.symbol === 'agr4',
-      'icon-fast-food': this.props.symbol === 'agr5',
+      'icon-restaurant': this.props.symbol === 'agr5',
+      'icon-greasefire': this.props.symbol === 'agr6',
 
       'icon-bullet': this.props.symbol === 'mil1',
       'icon-gun': this.props.symbol === 'mil2',
