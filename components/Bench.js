@@ -32,8 +32,8 @@ var Bench = React.createClass({
       color: 'white',
       backgroundColor: '#966F33',
       height: '70px',
-      float: 'left',
-      marginLeft: '5px',
+      float: 'right',
+      marginRight: '5px',
       width: '500px',
       display: 'block',
       position: 'relative'

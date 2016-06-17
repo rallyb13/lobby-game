@@ -10,7 +10,7 @@ To deploy to haikuthunder.com/quid
 
 To deploy with FTP:
 * npm run build
-* move index.html, index.js, and images dir to server
+* move contents of public directory to server
 
 
 The logic of the lobbying game (Quid) is as follows:
