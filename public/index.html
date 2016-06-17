@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="assets/styles.css">
+    <title>QUID!</title>
+  </head>
+  <body>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyAeF1q8FXwNgx34pLIH3BXU5lt_dEktXNc",
+        authDomain: "quid-2c79a.firebaseapp.com",
+        databaseURL: "https://quid-2c79a.firebaseio.com",
+        storageBucket: "quid-2c79a.appspot.com",
+      };
+      firebase.initializeApp(config);
+    </script>
+
+    <!-- Google Tag Manager -->
+    <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-59PGPC"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-59PGPC');</script>
+    <!-- End Google Tag Manager -->
+    <div id="app"></div>
+    <script src="index.js"></script>
+  </body>
+</html>
