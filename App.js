@@ -69,7 +69,7 @@ var App = React.createClass ({
 
   styles: {
     gameTitle: {
-        color: 'white',
+        color: '#000',
         padding: '10px, 25px'
     },
     panel: {
