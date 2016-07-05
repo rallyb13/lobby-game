@@ -12,7 +12,7 @@ var BenchSeat = React.createClass({
 
     return React.cloneElement(
       <div onClick={this.useHelper}>
-        <span style={{color:'white'}}> {count} </span>
+        <span style={{position: 'absolute'}}> {count} </span>
         <Token symbol={this.props.token} />
       </div>,
       { style:
