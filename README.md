@@ -4,8 +4,9 @@ There are a few dependencies. Please run the following command in the project fo
 Then run it using:
 * npm start
 
-To deploy to haikuthunder.com/quid
+To deploy to quid.haikuthunder.com
 * make sure you have the Firebase CLI installed (npm install -g firebase-tools)
+* make sure you have the most up to date code (git pull)
 * npm run deploy
 
 To deploy with FTP:
