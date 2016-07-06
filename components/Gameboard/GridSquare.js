@@ -1,7 +1,7 @@
 import React from 'react';
-import QuidStore from '../store';
-import Utils from '../utils';
-import Token from './Token';
+import QuidStore from '../../store';
+import Utils from '../../utils';
+import Token from '../Token';
 
 var GridSquare = React.createClass({
 

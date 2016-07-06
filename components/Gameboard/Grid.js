@@ -1,5 +1,5 @@
 import React from 'react';
-import QuidStore from '../store';
+import QuidStore from '../../store';
 import GridSquare from './GridSquare';
 
 var Grid = React.createClass({

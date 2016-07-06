@@ -1,8 +1,8 @@
 import React from 'react';
 import QuidStore from './store';
 import Utils from './utils';
-import Bench from './components/Bench';
-import Grid from './components/Grid';
+import Bench from './components/Bench/Bench';
+import Grid from './components/Gameboard/Grid';
 import Scoreboard from './components/Scoreboard/Scoreboard';
 import Holder from './components/Holder';
 
