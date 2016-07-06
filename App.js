@@ -5,6 +5,7 @@ import Bench from './components/Bench/Bench';
 import Grid from './components/Gameboard/Grid';
 import Scoreboard from './components/Scoreboard/Scoreboard';
 import Holder from './components/Holder';
+import Menu from './components/Menu/Menu';
 
 var App = React.createClass ({
   //creates current board with randomly selected starting tokens and sets game-starting state object
@@ -41,6 +42,7 @@ var App = React.createClass ({
         <div style={{maxWidth:'900px', margin: '0 auto'}}>
           <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
           <div style={this.styles.panel}>
+            <Menu />
             <Scoreboard state={this.state} gameOver={isGameOver}/>
             <div style={this.styles.holders}>{allHolders}</div>
           </div>
