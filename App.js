@@ -3,7 +3,7 @@ import QuidStore from './store';
 import Utils from './utils';
 import Bench from './components/Bench';
 import Grid from './components/Grid';
-import Scoreboard from './components/Scoreboard';
+import Scoreboard from './components/Scoreboard/Scoreboard';
 import Holder from './components/Holder';
 
 var App = React.createClass ({

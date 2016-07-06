@@ -1,6 +1,6 @@
 import React from 'react';
-import Token from './Token';
-import Utils from '../utils'
+import Token from '.././Token';
+import Utils from '../../utils'
 
 var Staging = React.createClass({
 
