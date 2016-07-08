@@ -1,8 +1,13 @@
 There are a few dependencies. Please run the following command in the project folder once you have pulled it down:
 * npm install
+* npm install -g babel-cli tape faucet
 
 Then run it using:
 * npm start
+
+To test:
+* all test files should go in the 'tests' directory
+* npm test
 
 To deploy to quid.haikuthunder.com
 * make sure you have the Firebase CLI installed (npm install -g firebase-tools)
