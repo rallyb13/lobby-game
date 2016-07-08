@@ -263,8 +263,13 @@ var Utils = {
             230: {
               tokens: ['oil1', 'oil2', 'oil2', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'con1', 'con1', 'mega'],
               msg: "Parks clearly won't be enough. Consider a bigger project, like a library. It'll cost you more, but maybe it'll shut those pesky constituents up a little longer.",
-              nextTrigger: 299,
+              nextTrigger: 172,
               special: "appeasement"
+            },
+            172: {
+              tokens: ['oil1', 'oil2', 'oil2', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'con1', 'con1', 'mega', 'pork'],
+              msg: "Juggling unrelated interests is what pork was invented for. When writing legislation to help one lobby, you can slip something in to help another. Set the pork on any token on the board and it'll get scooped up when you make a match nearby.",
+              nextTrigger: 299
             }
           },
           10: {
