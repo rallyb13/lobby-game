@@ -21,7 +21,7 @@ var Grid = React.createClass({
     }
 
     return (
-      <div style={this.styles.mainGrid} >
+      <div className="game-grid" >
         { squares }
       </div>
     );
@@ -69,19 +69,6 @@ var Grid = React.createClass({
       return false
     }
   },
-
-  styles: {
-      mainGrid: {
-          backgroundColor: '#A4BD99',
-          height: "100%",
-          width: "69%",
-          display: 'inline-block',
-          margin: '5px 0 20px 5px',
-          //Set min-width so always have 6 columns
-          minWidth: '550px'
-      }
-  }
-
 });
 
 export default Grid

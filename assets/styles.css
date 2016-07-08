@@ -18,9 +18,41 @@ body {
 h1 {
   text-align: center;
 }
+.main {
+  max-width: 100%;
+  margin: 0 auto;
+}
+.white-paper-panel {
+  float: left;
+}
+.game-grid {
+  background-color: #A4BD99;
+  height: 100%;
+  width: 100%;
+  display: inline-block;
+  margin: 5px 0 20px 5px;
+}
 .grid-square {
+  display: inline-block;
+  position: relative;
+  margin-bottom: -4px;
+}
+.eligible {
   background-color: #A4BD99;
 }
-.grid-square:hover {
+.eligible:hover {
   background: #fff !important;
+}
+
+/* for larger screens */
+@media (min-width: 900px) {
+  .main {
+    max-width: 900px;
+  }
+  .white-paper-panel {
+    width: 30%;
+  }
+  .game-grid {
+    width: 69%;
+  }
 }

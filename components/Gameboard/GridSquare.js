@@ -12,7 +12,7 @@ var GridSquare = React.createClass({
       colCount = this.props.board.columns;
 
     return React.cloneElement(
-      <div className={this.props.eligible ? "grid-square" : ''} onClick={this.placeToken} >
+      <div className={this.props.eligible ? "eligible grid-square" : 'grid-square'} onClick={this.placeToken} >
         <Token symbol={this.props.token} />
       </div>,
       { style:
@@ -21,11 +21,6 @@ var GridSquare = React.createClass({
           outlineColor: Utils.handleColors(tokenGroup, 'bColor', selected),
           height: this.handlePercentage(rowCount),
           width: this.handlePercentage(colCount),
-          display: 'inline-block',
-          position: 'relative',
-          marginBottom: '-4px',
-          minHeight: '77.5px',
-          minWidth: '77.5px'
         }
       }
     );

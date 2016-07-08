@@ -39,9 +39,9 @@ var App = React.createClass ({
 
     return (
       <div>
-        <div style={{maxWidth:'900px', margin: '0 auto'}}>
+        <div className="main">
           <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
-          <div style={this.styles.panel}>
+          <div className="white-paper-panel">
             <Menu />
             <Scoreboard state={this.state} gameOver={isGameOver}/>
             <div style={this.styles.holders}>{allHolders}</div>
@@ -73,10 +73,6 @@ var App = React.createClass ({
     gameTitle: {
         color: '#000',
         padding: '10px, 25px'
-    },
-    panel: {
-      width: '30%',
-      float: 'left'
     },
     holders: {
       display: 'inline-block',
