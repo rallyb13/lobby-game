@@ -1,6 +1,7 @@
 import React from 'react';
 import Staging from './Staging';
 import Message from './Message';
+import HighScore from './HighScore';
 import Score from './Score';
 import Bank from './Bank';
 import Office from './Office';
@@ -33,6 +34,8 @@ var Scoreboard = React.createClass({
           <Office electedOffice={this.props.state.electedOffice} />
           <MoveCounter movesRemaining={this.props.state.movesRemaining} phase={this.props.state.phase} textColor={textColor} />
           <NextGoal nextGoal={this.props.state.nextGoal} textColor={textColor} />
+          <HighScore highScore={this.props.state.userInfo.highScore} currentScore={this.props.state.score} />
+          <HighOffice highOffice={this.props.state.userInfo.highOffice} currentOffice={this.props.electedOffice} />
         </div>
       </div>
     );

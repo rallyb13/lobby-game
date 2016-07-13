@@ -6,6 +6,9 @@ var currentState = {
   board: {
     rows: 6, columns: 6, grid: []
   },
+  userInfo: {
+    userName: '', highScore: [0], highOffice: ['State Delegate']
+  },
   tokensArray: ['oil1', 'oil1', 'oil1', 'oil2'],
   stagedToken: 'oil1',
   holdTokens: [''],
