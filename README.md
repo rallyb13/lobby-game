@@ -5,9 +5,11 @@ There are a few dependencies. Please run the following command in the project fo
 Then run it using:
 * npm start
 
-To test:
+## To test:
+
 * all test files should go in the 'tests' directory
-* npm test
+
+``` $ npm test ```
 
 To deploy to quid.haikuthunder.com
 * make sure you have the Firebase CLI installed (npm install -g firebase-tools)
