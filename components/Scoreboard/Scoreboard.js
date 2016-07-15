@@ -11,7 +11,8 @@ import NextSelect from './NextSelect';
 var Scoreboard = React.createClass({
   render: function(){
     var negativeBal = this.props.state.bankBalance < this.props.state.nextGoal,
-      textColor = (negativeBal && this.props.state.movesRemaining <= 20) ? 'red' : 'black',
+      moveCount = this.props.state.movesRemaining,
+      textColor = (negativeBal && moveCount <= 20 && moveCount > 0) ? 'red' : 'black',
       advMsg = this.props.state.advMsg,
       isGameOver = this.props.gameOver, //isGameOver is only one set in App, not part of state object
       nextBit;

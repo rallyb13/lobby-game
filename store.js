@@ -313,7 +313,7 @@ QuidStore.nextMove = function(){
     currentState.movesRemaining++;
   }
 
-  if (moves === 0){
+  if (moves === 1){
     this.handleElection(currentState.repeat % 3);
   }
   else if (moves === currentState.trigger) {
