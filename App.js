@@ -11,8 +11,13 @@ var App = React.createClass ({
   //creates current board with randomly selected starting tokens and sets game-starting state object
   componentWillMount: function () {
     QuidStore.setupBoard();
+    //if you uncomment this, you will have refresh-persistant board state...with some buggy side-effects
+    /*localStorage['lastTurn'] ? this.setState(JSON.parse(localStorage['lastTurn'])) : */
     this.setState(QuidStore.getCurrentState());
+    localStorage.setItem('thisTurn', JSON.stringify( QuidStore.getCurrentState() ) )
+    localStorage.setItem('lastTurn', localStorage['thisTurn'] )
   },
+
 
   componentDidMount: function(){
     QuidStore.addChangeListener(this.onChange);
@@ -21,6 +26,24 @@ var App = React.createClass ({
   componentWillUnmount: function(){
     QuidStore.removeChangeListener(this.onChange);
   },
+
+  //trying to figure out the restartBoard method.
+
+/*
+  restartBoard: function(){
+    QuidStore.setupBoard();
+    this.setState(QuidStore.getCurrentState());
+    localStorage.setItem('thisTurn', JSON.stringify( QuidStore.getCurrentState() ) )
+    localStorage.setItem('lastTurn', localStorage['thisTurn'] )
+  },
+
+*/
+
+  //when user clicks undo, the current state is set to the last state, which was saved in localStorage
+    undoLastTurn: function(){
+        localStorage.setItem('thisTurn', localStorage['lastTurn'])
+        this.setState(JSON.parse(localStorage['lastTurn']))
+    },
 
   render(){
     var advMsg = this.state.advMsg,
@@ -42,7 +65,7 @@ var App = React.createClass ({
         <div className="main">
           <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
           <div className="white-paper-panel">
-            <Menu />
+            <Menu restartBoard={this.restartBoard} undoLastTurn={this.undoLastTurn}/>
             <Scoreboard state={this.state} gameOver={isGameOver}/>
             <div style={this.styles.holders}>{allHolders}</div>
           </div>
@@ -54,9 +77,14 @@ var App = React.createClass ({
   },
 
   //when state object change is emitted, resets state so that changes can be filtered to appropriate components
+  //localStorage API requires stringify when working with Objects
   onChange: function() {
     this.setState(QuidStore.getCurrentState());
+    localStorage.setItem('lastTurn', localStorage['thisTurn'] )
+    localStorage.setItem('thisTurn', JSON.stringify( QuidStore.getCurrentState() ) )
+
   },
+
 
   //checks that board is not full and bank balance is still positive (at end of election cycle)
   isGameOver: function(advMsg){

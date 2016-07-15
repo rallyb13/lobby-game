@@ -1,16 +1,24 @@
+
 import React from 'react';
 
 var Menu = React.createClass({
+  handleUndo() {
+    this.props.undoLastTurn()
+  },
+  handleRestart() {
+    this.props.restartBoard()
+  },
   render: function(){
     return (
       <ul style={this.styles.menu}>
         <li style={this.styles.listItem}>Login</li>
-        <li style={this.styles.listItem}>Restart</li>
+        <li onClick={this.handleRestart} style={this.styles.listItem}>Restart</li>
         <li style={this.styles.listItem}>Help</li>
+        <li onClick={this.handleUndo} style={this.styles.listItem}>Undo (just once!)</li>
       </ul>
     )
   },
-  
+
   styles: {
     menu: {
       listStyle: 'none',
