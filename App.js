@@ -70,7 +70,7 @@ var App = React.createClass ({
             <div style={this.styles.holders}>{allHolders}</div>
           </div>
           <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange}/>
-          <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver}/>
+          <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver} moves={this.state.movesRemaining} office={this.state.electedOffice}/>
         </div>
       </div>
     );
