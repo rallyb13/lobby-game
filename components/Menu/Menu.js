@@ -14,7 +14,7 @@ var Menu = React.createClass({
         <li style={this.styles.listItem}>Login</li>
         <li onClick={this.handleRestart} style={this.styles.listItem}>Restart</li>
         <li style={this.styles.listItem}>Help</li>
-        <li onClick={this.handleUndo} style={this.styles.listItem}>Undo (just once!)</li>
+        <li onClick={this.handleUndo} style={this.styles.listItem}>Undo</li>
       </ul>
     )
   },

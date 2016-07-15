@@ -11,13 +11,10 @@ var App = React.createClass ({
   //creates current board with randomly selected starting tokens and sets game-starting state object
   componentWillMount: function () {
     QuidStore.setupBoard();
-    //if you uncomment this, you will have refresh-persistant board state...with some buggy side-effects
-    /*localStorage['lastTurn'] ? this.setState(JSON.parse(localStorage['lastTurn'])) : */
     this.setState(QuidStore.getCurrentState());
     localStorage.setItem('thisTurn', JSON.stringify( QuidStore.getCurrentState() ) )
     localStorage.setItem('lastTurn', localStorage['thisTurn'] )
   },
-
 
   componentDidMount: function(){
     QuidStore.addChangeListener(this.onChange);
@@ -26,18 +23,6 @@ var App = React.createClass ({
   componentWillUnmount: function(){
     QuidStore.removeChangeListener(this.onChange);
   },
-
-  //trying to figure out the restartBoard method.
-
-/*
-  restartBoard: function(){
-    QuidStore.setupBoard();
-    this.setState(QuidStore.getCurrentState());
-    localStorage.setItem('thisTurn', JSON.stringify( QuidStore.getCurrentState() ) )
-    localStorage.setItem('lastTurn', localStorage['thisTurn'] )
-  },
-
-*/
 
   //when user clicks undo, the current state is set to the last state, which was saved in localStorage
     undoLastTurn: function(){
