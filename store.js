@@ -455,28 +455,24 @@ QuidStore.addAppeasement = function(token, rowPos, colPos){
     max = Utils.getTokenData(token, 'dMax'),
     time = Math.floor(Math.random() * (max - min) ) + min,
     moveTrigger = currentState.movesRemaining - time,
-    phaseTrigger = currentState.phase;
+    isInPhase = moveTrigger > 0;
 
-  while (moveTrigger < 0){
-    phaseTrigger++;
-    moveTrigger = moveTrigger + Utils.getPhaseData(phaseTrigger)['moves'];
-  }
-  currentState.appeasements.push( [rowPos, colPos, token, moveTrigger, phaseTrigger] );
+  currentState.appeasements.push( [rowPos, colPos, token, moveTrigger, isInPhase] );
 };
 
 //when appeasement tokens are in use, this checks removal times and calls for removal as appropriate
 QuidStore.checkAppeasements = function(special){
   var appeasements = currentState.appeasements,
-    phase = currentState.phase,
     move = currentState.movesRemaining,
-    indexes = [],
     isTarget,
     i;
 
   for (i = appeasements.length - 1; i >= 0; i--){
-    isTarget = special ? (appeasements[i][3] >= move) : (appeasements[i][3] === move);
-    if(appeasements[i][4] === phase && isTarget){
-      this.removeAppeasement(i, appeasements[i][0], appeasements[i][1], appeasements[i][2]);
+    if(appeasements[i][4]){
+      isTarget = special ? (appeasements[i][3] >= move) : (appeasements[i][3] === move);
+      if (isTarget){
+        this.removeAppeasement(i, appeasements[i][0], appeasements[i][1], appeasements[i][2]);
+      }
     }
   }
 };
@@ -490,6 +486,19 @@ QuidStore.removeAppeasement = function(index, rowPos, colPos, token){
 
   if (newToken !== ''){
     this.addAppeasement(newToken, rowPos, colPos);
+  }
+};
+
+//at phase change, recalculates triggers of remaining appeasements
+QuidStore.handleAppeasements = function(moves){
+  var appeasements = currentState.appeasements;
+  for (var i = appeasements.length - 1; i >= 0; i--){
+    if(appeasements[i][3] === 0){
+      this.removeAppeasement(i, appeasements[i][0], appeasements[i][1], appeasements[i][2]);
+    } else {
+      appeasements[i][3] = moves + appeasements[i][3];
+      appeasements[i][4] = appeasements[i][3] > 0;
+    }
   }
 };
 
@@ -741,6 +750,8 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
   if (fromChoice){
     currentState.advMsg = 'none';
   }
+  
+  this.handleAppeasements(phaseData.moves);
   this.emitChange();
 };
 
