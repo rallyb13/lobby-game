@@ -7,8 +7,8 @@ var Token = React.createClass({
       'icon-oil-drop': this.props.symbol === 'oil1',
       'icon-oil-can': this.props.symbol === 'oil2',
       'icon-derrick': this.props.symbol === 'oil3',
-      'icon-refinery': this.props.symbol === 'oil4',
-      'icon-pipeline': this.props.symbol === 'oil5',
+      'icon-pipeline': this.props.symbol === 'oil4',
+      'icon-refinery': this.props.symbol === 'oil5',
       'icon-oilslick': this.props.symbol === 'oil6',
 
       'icon-seeds': this.props.symbol === 'agr1',
