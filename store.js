@@ -24,7 +24,7 @@ var currentState = {
   advMsg: 'none',
   advanceQuestion: false, //true when phase change should prompt choice of office advancement
   trigger: 160, //move # at which message will change
-  newMessage: true, //only true at first appearance of new message
+  unreadMsgCount: 0,
   //special token quick refs
   megaPossCoords: [], //coordinates where megaphone can be dropped
   megaPossTokens: [], //arrays of valid tokens megaphone can become (at coordinate corresponding to megaPossCoords)
@@ -331,7 +331,7 @@ QuidStore.nextMove = function(){
       currentState.tokensArray = progressionData.tokens;
       currentState.message = progressionData.msg;
       currentState.trigger = progressionData.nextTrigger;
-      currentState.newMessage = true;
+      currentState.unreadMsgCount = currentState.unreadMsgCount + 1;
       if (progressionData.special === 'hold'){
         currentState.holdTokens.push('');
       } else if (progressionData.special === 'appeasement'){
@@ -349,8 +349,6 @@ QuidStore.nextMove = function(){
         }
       }
     }
-  } else if (moves !== currentState.trigger && moves !== 0){
-    currentState.newMessage = false;
   }
 };
 
@@ -742,7 +740,7 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
 
   //change more often (tokensArray also, but not on phase change)
   currentState.message = phaseData.msg;
-  currentState.newMessage = true;
+  currentState.unreadMsgCount = currentState.unreadMsgCount + 1;
 
   //changes less often
   currentState.electedOffice = Utils.setElectedOffice(phase, currentState.electedOffice);

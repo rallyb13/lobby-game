@@ -1,6 +1,6 @@
 import React from 'react';
 import Staging from './Staging';
-import Message from './Message';
+import MemoButton from './MemoButton';
 import Score from './Score';
 import Bank from './Bank';
 import Office from './Office';
@@ -28,7 +28,7 @@ var Scoreboard = React.createClass({
         <h3 style={this.styles.heading}>White Paper</h3>
         <div style={this.styles.bodyBoard}>
           {nextBit}
-          <Message alert={this.props.state.newMessage} message={this.props.state.message} phase={this.props.state.phase} gameOver={isGameOver} />
+          <MemoButton alertCount={this.props.state.unreadMsgCount}/>
           <Score score={this.props.state.score} />
           <Bank bankBalance={this.props.state.bankBalance} textColor={textColor} />
           <Office electedOffice={this.props.state.electedOffice} />
