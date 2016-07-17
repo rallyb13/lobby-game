@@ -20,7 +20,7 @@ var Token = React.createClass({
 
       'icon-bullet': this.props.symbol === 'mil1',
       'icon-gun': this.props.symbol === 'mil2',
-      'icon-assult-rifle': this.props.symbol === 'mil3',
+      'icon-AR-15': this.props.symbol === 'mil3',
       'icon-missle': this.props.symbol === 'mil4',
       'icon-tank': this.props.symbol === 'mil5',
 
