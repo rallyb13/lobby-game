@@ -6,6 +6,9 @@ var currentState = {
   board: {
     rows: 6, columns: 6, grid: []
   },
+  userInfo: {
+    username: ''
+  },
   tokensArray: ['oil1', 'oil1', 'oil1', 'oil2'],
   stagedToken: 'oil1',
   holdTokens: [''],
@@ -97,6 +100,12 @@ QuidStore.getCurrentState = function(){
 //************** STATE CHANGE HELPER FUNCTIONS
 //
 //
+
+QuidStore.setUser = function (name) {
+  currentState.userInfo.username = name;
+  this.emitChange();
+};
+
 
 //helper fn to return token placed at specific GridSquare by coordinates
 QuidStore.getToken = function (rowPos, colPos){

@@ -1,5 +1,6 @@
 
 import React from 'react';
+import QuidStore from '../../store';
 
 var Menu = React.createClass({
   handleUndo() {
@@ -8,15 +9,37 @@ var Menu = React.createClass({
   handleRestart() {
     this.props.restartBoard()
   },
+
   render: function(){
+    var username = this.props.username,
+        displayName = username === '' ? 'Login' : username;
     return (
       <ul style={this.styles.menu}>
-        <li style={this.styles.listItem}>Login</li>
-        <li onClick={this.handleRestart} style={this.styles.listItem}>Restart</li>
-        <li style={this.styles.listItem}>Help</li>
-        <li onClick={this.handleUndo} style={this.styles.listItem}>Undo</li>
+        <li style={this.styles.listItem} onClick={this.handleLogin}>{displayName}</li>
+        <li style={this.styles.listItem} onClick={this.handleRestart}>Restart</li>
+        <li style={this.styles.listItem} onClick={this.handleUndo}>Undo</li>
       </ul>
     )
+  },
+
+  handleLogin() {
+    var provider = new firebase.auth.GoogleAuthProvider();
+
+    firebase.auth().signInWithPopup(provider).then(function(result) {
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      var token = result.credential.accessToken;
+      // The signed-in user info.
+      var user = result.user;
+      QuidStore.setUser(user.displayName);
+    }).catch(function(error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // The email of the user's account used.
+      var email = error.email;
+      // The firebase.auth.AuthCredential type that was used.
+      var credential = error.credential;
+    });
   },
 
   styles: {
@@ -30,6 +53,7 @@ var Menu = React.createClass({
       padding: '5px'
     }
   }
+  
 });
 
 export default Menu;
