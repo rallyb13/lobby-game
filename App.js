@@ -6,6 +6,7 @@ import Grid from './components/Gameboard/Grid';
 import Scoreboard from './components/Scoreboard/Scoreboard';
 import Holder from './components/Holder';
 import Menu from './components/Menu/Menu';
+import Overlay from './components/Overlay';
 
 var App = React.createClass ({
   //creates current board with randomly selected starting tokens and sets game-starting state object
@@ -57,6 +58,7 @@ var App = React.createClass ({
           <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange}/>
           <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver} moves={this.state.movesRemaining} office={this.state.electedOffice}/>
         </div>
+        <Overlay/>
       </div>
     );
   },
