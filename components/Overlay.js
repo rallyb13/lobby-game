@@ -3,9 +3,36 @@ import React from 'react'
 
 var Overlay = React.createClass({
   render(){
+    var helpTabs = this.getHelpTabs(this.props.phase);
+    
     return(
-      <div></div>
+      <div>
+        <p>This is where dude goes</p>
+        <div>{helpTabs}</div>
+      </div>
     )
+  },
+  
+  getHelpTabs: function(currentPhase){
+    var tabList = {
+      'Current Election': 0,
+      'Oil Lobby': 1,
+      'Constituents & Appeasements': 1,
+      'Megaphone': 2,
+      'Hold Spaces': 3,
+      'Agribusiness Lobby': 7,
+      'Pork': 8,
+      'Military-Industrial Lobby': 15,
+      'Financial Lobby': 20
+    },
+    tabs = [];
+    
+    for (var key in tabList){
+      if (tabList[key] <= currentPhase){
+        tabs.push(<p>{key}</p>);
+      }
+    }
+    return tabs;
   }
 })
 
