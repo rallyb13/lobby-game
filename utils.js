@@ -193,56 +193,46 @@ var Utils = {
           1: {
             160: {
               tokens: ['oil1', 'oil1', 'oil2'],
-              msg: "Oil cans make derricks, which make refineries, which make pipelines. Keep the oil flowing and their lobby will keep your coffers stuffed.",
               nextTrigger: 140
             },
             140: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'con1'],
-              msg: "Keep an eye on your bank balance and how many legislative days you have left until your next election. If you can't raise the money in time, you'll be out of a job.",
               nextTrigger: 115
             },
             115: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1'],
-              msg: "Your constituents may start to notice how much you're aiding the oil lobby. They do get in the way when upset. It costs legislative time and some of funding to publicize it, but try appeasing them with a park...before they SWARM!",
               nextTrigger: 82
             },
             82: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1'],
-              msg: "Don't worry about getting the pipelines together. Once you've made enough of them, you'll earn a favor, matched or not. But DO make sure to keep space on the board. Gridlock means game over.",
               nextTrigger: 44
             },
             44: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1'],
-              msg: "Of course, people forget what you did for them pretty fast. Each appeasement has a limited lifespan. Don't worry--lobbyists have better memories.",
               nextTrigger: 115
             }
           },
           2: {
             115: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1'],
-              msg: "That next goal is just for handling Ollie, but he's not the only one to worry about. Build up enough money to survive the general election that'll be right up behind it!",
               nextTrigger: 98
             },
             98: {
               tokens: ['oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1'],
-              msg: "Don't worry about election laws that say money raised is earmarked for this election or that one. This is what super-PACs are for. Rolling money on through election cycles is just one of many ways we winners buck the system.",
               nextTrigger: 63
             },
             63: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1', 'mega'],
-              msg: "Passing helpful legislation isn't the only way to help out your friendly lobbyists. Use your position of authority to give them a voice. Use your megaphone as a wild card.",
               nextTrigger: 17
             },
             17: {
               tokens: ['oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
-              msg: "Those pipelines eventually add up to favors. An oil slick can clear the way for more development. Select the OIL favor, then click any square in the row you want emptied.",
               nextTrigger: 33
             }
           },
           3: {
             33: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
-              msg: "If the timing isn't working for you, bottle a project up in committee. Click the empty hold area below and your next token will be held there. Just click it again to select it for use. But it will cost $10 every legislative day you use the hold.",
               nextTrigger: 130,
               special: "hold"
             }
@@ -250,32 +240,27 @@ var Utils = {
           4: {
             130: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil2', 'oil2', 'oil3', 'oil3', 'con1', 'con1', 'con1', 'mega'],
-              msg: "In the old days, people campaigned so they could do things in office. These days you have to legislate so that you can win your next campaign. Make sure you know what the political consequences will be before you cast any vote.",
               nextTrigger: 56
             },
             56: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
-              msg: "No surprise that Derricks is going negative. It's better for both of you to suppress turn-out. That way you can focus on getting your own people out. That's what the money you raise will go to this season: ads that will help convince people leaning his way to not bother voting.",
               nextTrigger: 230 //TODO: keep changing from here
             }
           },
           8: {
             230: {
               tokens: ['oil1', 'oil2', 'oil2', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'con1', 'con1', 'mega'],
-              msg: "Parks clearly won't be enough. Consider a bigger project, like a library. It'll cost you more, but maybe it'll shut those pesky constituents up a little longer.",
               nextTrigger: 172,
               special: "appeasement"
             },
             172: {
               tokens: ['oil1', 'oil2', 'oil2', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'con1', 'con1', 'mega', 'pork'],
-              msg: "Juggling unrelated interests is what pork was invented for. When writing legislation to help one lobby, you can slip something in to help another. Set the pork on any token on the board and it'll get scooped up when you make a match nearby.",
               nextTrigger: 299
             }
           },
           10: {
             299: {
               tokens: ['oil1', 'oil2', 'oil3', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'agr2', 'agr2', 'agr2', 'agr2', 'agr3', 'con1', 'con1', 'con1', 'mega'],
-              msg: "Balancing two special interests gets complicated, and it'll only be crazier when you step onto the national scene. The second hold area charges $100 per legislative day, but it might be worth it.",
               nextTrigger: 120,
               special: "hold"
             }
@@ -283,7 +268,6 @@ var Utils = {
           16: {
             120: {
               tokens: ['oil1', 'oil2', 'oil3', 'agr1', 'agr1', 'agr2', 'agr2', 'agr2', 'agr3', 'mil1', 'mil1', 'mil1', 'mil1', 'mil1', 'mil2', 'mil2', 'mil2', 'con1', 'con1', 'con1', 'mega', 'mega'],
-              msg: "Oh yeah, you could probably use your new powers as a national representative to builds some bridges or other infrastructure. That'll really distract those stupid voters! Ha ha haa!",
               nextTrigger: 555,
               special: "appeasement"
             }
@@ -291,7 +275,6 @@ var Utils = {
           24: {
             555: {
               tokens: ['agr2', 'agr3', 'mil1', 'mil1', 'mil2', 'mil2', 'mil3', 'fin1', 'fin1', 'fin1', 'fin1', 'fin1', 'fin2', 'fin2', 'con1', 'con1', 'con1', 'mega', 'pork', 'pork'],
-              msg: "It costs big at $1000 a day, but when you really want to set things up right, you might just want this final hold area.",
               nextTrigger: 461,
               special: "hold"
             }
@@ -299,20 +282,17 @@ var Utils = {
           27: {
             461: {
               tokens: ['oil1', 'agr1', 'fin1', 'fin1', 'mil1', 'mil1', 'mega', 'mega', 'con1'],
-              msg: "Budget Crisis! During this special session, you'll only have low level tokens to work with. Use the extra time in Washington to make more speeches (megaphones) than usual.",
               nextTrigger: 459,
               moveChange: 40
             },
             459: {
               tokens: ['oil1', 'agr1', 'mil1', 'mil2', 'mil2', 'fin1', 'fin2', 'fin2', 'fin3', 'mega', 'pork', 'con1', 'con1'],
-              msg: "The special session's over and the budget crisis has been patched up, for now. With the holidays over and the next session starting, things will slowly be getting back to normal...",
               nextTrigger: 155 //TODO: this will change!
             }
           },
           30: {
             155: {
               tokens: ['oil1', 'oil2', 'agr1', 'agr2', 'mil1', 'mil2', 'mil2', 'mil3', 'fin1', 'fin1', 'fin2', 'fin2', 'fin3', 'fin3', 'fin4', 'con1', 'con1', 'con1', 'mega', 'mega', 'pork', 'pork'],
-              msg: "Government shutdown knocked some days off the legislative calendar! Better make up for it, espeically when the big banks are counting on you!",
               nextTrigger: 777, //TODO: this will change!
               moveChange: -23
             }

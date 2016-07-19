@@ -329,9 +329,7 @@ QuidStore.nextMove = function(){
     progressionData = Utils.progressGame(currentState.phase, moves);
     if (progressionData !== false){
       currentState.tokensArray = progressionData.tokens;
-      currentState.message = progressionData.msg;
       currentState.trigger = progressionData.nextTrigger;
-      currentState.unreadMsgCount = currentState.unreadMsgCount + 1;
       if (progressionData.special === 'hold'){
         currentState.holdTokens.push('');
       } else if (progressionData.special === 'appeasement'){
