@@ -11,12 +11,16 @@ var MemoButton = React.createClass({
     } else if (alertCount > 1){
       msg = <button style={this.styles.alertMulti}> {msgText + ': ' + alertCount + ' unread memos'}</button>;
     } else{
-      msg = <button style={this.styles.noAlert}>{msgText}</button>
+      msg = <button onClick={this.openModal} style={this.styles.noAlert}>{msgText}</button>
     }
 
     return (
       <div> {msg} </div>
     );
+  },
+  
+  openModal: function() {
+    document.getElementById('modal').style.display = 'block';
   },
   
   styles: {

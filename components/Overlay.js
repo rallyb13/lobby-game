@@ -6,17 +6,21 @@ var Overlay = React.createClass({
     var helpTabs = this.getHelpTabs(this.props.phase);
     
     return(
-      <div className="modal">
+      <div className="modal" id="modal">
         <div className="leftPanel">
           <p>This is where dude goes</p>
           <div>{helpTabs}</div>
         </div>
         <div>
-          <p>This is where the close button goes.</p>
+          <p onClick={this.closeModal}>This is where the close button goes.</p>
           <p>This is where the main panel goes.</p>
         </div>
       </div>
     )
+  },
+  
+  closeModal: function() {
+    document.getElementById('modal').style.display = 'none';
   },
   
   getHelpTabs: function(currentPhase){
@@ -35,7 +39,7 @@ var Overlay = React.createClass({
     
     for (var key in tabList){
       if (tabList[key] <= currentPhase){
-        tabs.push(<p>{key}</p>);
+        tabs.push(<p key={key}>{key}</p>);
       }
     }
     return tabs;
