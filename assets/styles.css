@@ -44,6 +44,24 @@ h1 {
   background: #fff !important;
 }
 
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  width: 90%;
+  height: 90%;
+  opacity: 0.8;
+  border-radius: 10%;
+  border: 1px gray solid;
+}
+
+.leftPanel {
+  float: left;
+  width: 40%
+}
+
 /* for larger screens */
 @media (min-width: 900px) {
   .main {

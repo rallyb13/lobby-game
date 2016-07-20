@@ -6,9 +6,15 @@ var Overlay = React.createClass({
     var helpTabs = this.getHelpTabs(this.props.phase);
     
     return(
-      <div>
-        <p>This is where dude goes</p>
-        <div>{helpTabs}</div>
+      <div className="modal">
+        <div className="leftPanel">
+          <p>This is where dude goes</p>
+          <div>{helpTabs}</div>
+        </div>
+        <div>
+          <p>This is where the close button goes.</p>
+          <p>This is where the main panel goes.</p>
+        </div>
       </div>
     )
   },
