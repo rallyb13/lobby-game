@@ -28,7 +28,7 @@ var Scoreboard = React.createClass({
         <h3 style={this.styles.heading}>White Paper</h3>
         <div style={this.styles.bodyBoard}>
           {nextBit}
-          <MemoButton alertCount={this.props.state.unreadMsgCount}/>
+          <MemoButton/>
           <Score score={this.props.state.score} />
           <Bank bankBalance={this.props.state.bankBalance} textColor={textColor} />
           <Office electedOffice={this.props.state.electedOffice} />
