@@ -6,7 +6,7 @@ import Grid from './components/Gameboard/Grid';
 import Scoreboard from './components/Scoreboard/Scoreboard';
 import Holder from './components/Holder';
 import Menu from './components/Menu/Menu';
-import Overlay from './components/Overlay';
+import Overlay from './components/Overlay/Overlay';
 
 var App = React.createClass ({
   //creates current board with randomly selected starting tokens and sets game-starting state object
