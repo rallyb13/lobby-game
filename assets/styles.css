@@ -44,6 +44,7 @@ h1 {
   background: #fff !important;
 }
 
+/************ OVERLAY ***********/
 .modal {
   display: none;
   position: fixed;
@@ -53,8 +54,7 @@ h1 {
   background-color: rgba(255, 255, 255, 0.8);
   width: 90%;
   height: 90%;
-  border-radius: 10%;
-  border: 1px gray solid;
+  border: 5px gray solid;
 }
 
 .leftPanel {
@@ -78,6 +78,18 @@ h1 {
 .helpTab:last-child {
   border-bottom: 3px teal solid;
 }
+
+.closeButton {
+  border: 1px gold solid;
+  border-radius: 100%;
+  color: white;
+  background-color: black;
+  padding: 10px;
+  position: absolute;
+  top: 0px;
+  right: 10px;
+}
+
 
 /* for larger screens */
 @media (min-width: 900px) {

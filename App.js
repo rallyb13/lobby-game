@@ -57,7 +57,7 @@ var App = React.createClass ({
           </div>
           <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange}/>
           <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver} moves={this.state.movesRemaining} office={this.state.electedOffice}/>
-          <Overlay phase={this.state.phase}/>
+          <Overlay isGameOver={isGameOver} moves={this.state.movesRemaining} office={this.state.electedOffice} phase={this.state.phase}/>
         </div>
       </div>
     );

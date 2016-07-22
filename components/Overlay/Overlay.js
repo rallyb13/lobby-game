@@ -1,5 +1,6 @@
 import React from 'react'
 import HelpTab from './HelpTab'
+import Banner from './Banner'
 
 var Overlay = React.createClass({
   render(){
@@ -7,12 +8,13 @@ var Overlay = React.createClass({
     
     return(
       <div className="modal" id="modal">
+        <h3 className='closeButton' onClick={this.closeModal}>X</h3>
         <div className="leftPanel">
           <p>This is where dude goes</p>
           <div>{helpTabs}</div>
         </div>
         <div>
-          <p onClick={this.closeModal}>This is where the close button goes.</p>
+          <Banner isGameOver={this.props.isGameOver} moves={this.props.moves} office={this.props.office}/>
           <p>This is where the main panel goes.</p>
         </div>
       </div>
