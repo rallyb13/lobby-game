@@ -14,13 +14,11 @@ var Banner = React.createClass({
   getHeadline(){
     var isGameOver = this.props.isGameOver;
         
-    if (this.props.moves === 0) {
-      if (isGameOver) {
-        if (isGameOver === 'board'){
-          return 'Talk about gridlock! Game Over.';
-        } else {
-          return 'Game Over: Votes can be bought, just not by you.';
-        }
+    if (this.props.moves === 0 || isGameOver) {
+      if (isGameOver === 'board'){
+        return 'Talk about gridlock! Game Over.';
+      } else if (isGameOver === 'bank'){
+        return 'Game Over: Votes can be bought, just not by you.';
       } else {
         return 'Congratulations, ' + this.props.office + '!';
       }
