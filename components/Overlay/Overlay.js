@@ -1,4 +1,5 @@
 import React from 'react'
+import QuidStore from '../../store'
 import HelpTab from './HelpTab'
 import Banner from './Banner'
 import Funds from './Funds'
@@ -27,6 +28,9 @@ var Overlay = React.createClass({
   
   closeModal: function() {
     document.getElementById('modal').style.display = 'none';
+    if (this.props.gameData.movesRemaining === 0){
+      QuidStore.handleElection();
+    }
   },
   
   getHelpTabs: function(currentPhase){

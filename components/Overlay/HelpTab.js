@@ -29,6 +29,7 @@ var HelpTab = React.createClass({
       //hide #currentElection; display #helpDisplay; set #helpDisplay background image
       console.log(resources[resourceName]);
     }
+    //should also unset selection color of the rest and set selection color of current choice
   }
 })
 

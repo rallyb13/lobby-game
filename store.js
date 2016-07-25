@@ -312,18 +312,18 @@ QuidStore.completeMove = function(rowPos, colPos){
 //checks for next trigger (of msg & token selection changes) && for end of countdown (which triggers phase change)
 //also has special logic for late-in-game surprise changes to move counter (and handles appeasement tokens on board at the time)
 QuidStore.nextMove = function(){
-  var moves = currentState.movesRemaining,
-    progressionData,
-    moveChange;
+  var moves, progressionData, moveChange;
 
   if (currentState.phase <= 32){
     currentState.movesRemaining--;
   } else {
     currentState.movesRemaining++;
   }
-
-  if (moves === 1){
-    this.handleElection(currentState.repeat % 3);
+  
+  moves = currentState.movesRemaining;
+  if (moves === 0){
+    this.endPhase();
+    // this.handleElection();
   }
   else if (moves === currentState.trigger) {
     progressionData = Utils.progressGame(currentState.phase, moves);
@@ -760,11 +760,22 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
   this.emitChange();
 };
 
+
+QuidStore.endPhase = function(){
+  document.getElementById('modal').style.display = 'block';
+  if (currentState.nextGoal > currentState.bankBalance){
+    //pass bank reason w/ failMsg from utils as msg
+  } else {
+    //pass winMsg from utils
+  }
+};
+
 //when moves hit 0 left, checks bank balance to determine if game continues
 //handles setting higher office election choices at specific phases
-QuidStore.handleElection = function(repeat){
+QuidStore.handleElection = function(){
   var phase = currentState.phase,
-    advMsg = Utils.setElectionChoice(phase);
+    advMsg = Utils.setElectionChoice(phase),
+    repeat = currentState.repeat % 3;
 
   this.deposit(-currentState.nextGoal);
   if (currentState.bankBalance <= 0){
