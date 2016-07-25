@@ -18,15 +18,15 @@ var HelpTab = React.createClass({
           'Hold Spaces': 3,
           'Agribusiness Lobby': 7,
           'Pork': 8,
-          'Arms Lobby': 15,
+          'Military-Industrial Lobby': 15,
           'Financial Lobby': 20
         };
 
     //code to hide main display of Election info && link path for resource to background of panel
     if (resourceName === 'Current Election'){
-      //display right tab A; hide right tab B
+      //display #currentElection; hide #helpDisplay
     } else {
-      //hide right tab A; display right tab B; set right tab B background image
+      //hide #currentElection; display #helpDisplay; set #helpDisplay background image
       console.log(resources[resourceName]);
     }
   }

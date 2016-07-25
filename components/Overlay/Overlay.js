@@ -1,10 +1,11 @@
 import React from 'react'
 import HelpTab from './HelpTab'
 import Banner from './Banner'
+import Funds from './Funds'
 
 var Overlay = React.createClass({
   render(){
-    var helpTabs = this.getHelpTabs(this.props.phase);
+    var helpTabs = this.getHelpTabs(this.props.gameData.phase);
     
     return(
       <div className="modal" id="modal">
@@ -14,8 +15,11 @@ var Overlay = React.createClass({
           <div>{helpTabs}</div>
         </div>
         <div>
-          <Banner isGameOver={this.props.isGameOver} moves={this.props.moves} office={this.props.office}/>
-          <p>This is where the main panel goes.</p>
+          <Banner isGameOver={this.props.isGameOver} moves={this.props.gameData.movesRemaining} office={this.props.gameData.electedOffice}/>
+          <div id='currentElection'>
+            <Funds balance={this.props.gameData.bankBalance} goal={this.props.gameData.nextGoal} />
+          </div>
+          <div id='helpDisplay'></div>
         </div>
       </div>
     )
@@ -34,7 +38,7 @@ var Overlay = React.createClass({
       'Hold Spaces': 3,
       'Agribusiness Lobby': 7,
       'Pork': 8,
-      'Arms Lobby': 15,
+      'Military-Industrial Lobby': 15,
       'Financial Lobby': 20
     },
     tabs = [];
