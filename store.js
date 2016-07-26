@@ -34,7 +34,7 @@ var currentState = {
   createFavor: [], //only has content if set about to be combined
   freeze: 0, //number of moves con1 tokens frozen for
   helpers: {
-    'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 0, 'con5': 0
+    'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 1, 'con5': 0
   },
   helperChange: false
 };

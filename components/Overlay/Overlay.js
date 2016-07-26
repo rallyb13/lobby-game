@@ -12,7 +12,7 @@ var Overlay = React.createClass({
       <div className="modal" id="modal">
         <h3 className='closeButton' onClick={this.closeModal}>X</h3>
         <div className="leftPanel">
-          <p>This is where dude goes</p>
+          <img src='../../assets/icons/chief-of-staff.png' alt='Chief of Staff'></img>
           <div>{helpTabs}</div>
         </div>
         <div>
