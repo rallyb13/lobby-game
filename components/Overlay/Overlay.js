@@ -6,7 +6,8 @@ import Funds from './Funds'
 
 var Overlay = React.createClass({
   render(){
-    var helpTabs = this.getHelpTabs(this.props.gameData.phase);
+    var helpTabs = this.getHelpTabs(this.props.gameData.phase),
+        message = this.props.gameData.message;
     
     return(
       <div className="modal" id="modal">
@@ -19,6 +20,7 @@ var Overlay = React.createClass({
           <Banner isGameOver={this.props.isGameOver} moves={this.props.gameData.movesRemaining} office={this.props.gameData.electedOffice}/>
           <div id='currentElection'>
             <Funds balance={this.props.gameData.bankBalance} goal={this.props.gameData.nextGoal} />
+            <p>{message}</p>
           </div>
           <div id='helpDisplay'></div>
         </div>

@@ -34,7 +34,7 @@ var currentState = {
   createFavor: [], //only has content if set about to be combined
   freeze: 0, //number of moves con1 tokens frozen for
   helpers: {
-    'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 1, 'con5': 0
+    'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 0, 'con5': 0
   },
   helperChange: false
 };
@@ -762,11 +762,14 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
 
 
 QuidStore.endPhase = function(){
+  var firstPart = "Don't worry, Loser. Friends take care of friends. You've got a new job now, working as ",
+      phaseData = Utils.getPhaseData(currentState.phase);
+  
   document.getElementById('modal').style.display = 'block';
   if (currentState.nextGoal > currentState.bankBalance){
-    //pass bank reason w/ failMsg from utils as msg
+    currentState.message = firstPart + phaseData['failMsg'];
   } else {
-    //pass winMsg from utils
+    currentState.message = phaseData['winMsg'];
   }
 };
 

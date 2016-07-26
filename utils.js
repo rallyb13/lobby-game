@@ -118,11 +118,16 @@ var Utils = {
   //phase reference for how many moves, bank balance needed to continue, msg to open new phase, and msg used for game ending at that level
   getPhaseData: function(phase){
     var phaseMap = {
-      1: { moves: 180, goal: 35000, end: "a lowly regional consultant for OilOnU, making a meager $75,000/yr.", msg: ""},
-      2: { moves: 145, goal: 45000, end: "a mid-level special projects consultant for the oil lobby, making only $88,500/yr.",
-        msg: "Nice work! But this time you'll face a primary challenger. Prove you can help Big Oil more than Ollie 'Oilcan' Derricks can." },
+      1: { playMsg: "",
+        failMsg: "a lowly regional consultant for OilOnU, making a meager $75,000/yr.",
+        winMsg: "Nice work! But this time you'll face a primary challenger. Prove you can help Big Oil more than Ollie 'Oilcan' Derricks can.",
+        moves: 180, goal: 35000 },
+      2: { playMsg: "",
+        failMsg: "a mid-level special projects consultant for the oil lobby, making only $88,500/yr.",
+        winMsg: "You greased 'Oilcan' Derricks for the primary win! Now put the pedal to the petrol and nab the general election.",
+        moves: 145, goal: 45000 },
       3: { moves: 45, goal: 20000, end: "a consultant in OilOnU's state office. At $100,000/yr, you'll be fine, buddy.",
-        msg: "You greased 'Oilcan' Derricks for the primary win! Now put the pedal to the petrol and nab the general election."},
+        msg: ""},
       4: { moves: 145, goal: 50000, end: "a consultant. Pack your bags! You're moving to OilCanU's national headquarters. $110,000/yr",
         msg: "You've held your seat. Looks like Derricks is back for a tougher challenge, though. Has he got a bigger lobby in his pocket, or is he just glad to see you?"},
       5: { moves: 45, goal: 20000, end: "a consultant, whatever that is. You'll 'work' remote and net $120K/yr.",
