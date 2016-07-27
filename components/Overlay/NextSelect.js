@@ -9,14 +9,14 @@ var NextSelect = React.createClass({
     if (this.props.gameOver) {
       displayButton = <button style={this.styles.restart} onClick={this.restart}> Restart </button>;
     } else {
-      displayButton = <div style={this.styles.choice}>
+      displayButton = <div>
           <div>{advMsg}</div>
           <button style={this.styles.buttons} onClick={this.acceptAdvance} > Higher Office! </button>
           <button style={this.styles.buttons} onClick={this.refuseAdvance} > Am Comfy Here </button>
         </div>;
     }
     return(
-      <div style={this.styles.container} >
+      <div>
         {displayButton}
       </div>
     );
@@ -46,7 +46,7 @@ var NextSelect = React.createClass({
   },
 
   //handles choice of running for next elected office, adjusting phase as needed
-  acceptAdvance: function(phase, repeat){
+  acceptAdvance: function(){
     var phase = this.props.phase,
       repeat = this.props.repeat,
       adjustment;
@@ -60,25 +60,14 @@ var NextSelect = React.createClass({
       adjustment = repeat === 0 ? 1 : 3;
       QuidStore.rerunPhase(false);
     }
-    QuidStore.changePhase(adjustment, true);
+    QuidStore.changePhase(adjustment, true); //should be able to add to repeat without bringing it through as props
+    //this will probably need to close modal
+    //or we'll need a trigger for EVERY phase to go on that prompts phase change
   },
 
   styles: {
-    container: {
-      backgroundColor: 'white',
-      height: '150px',
-      width: '100%',
-      display: 'block',
-      position: 'relative',
-      marginLeft: '-5px',
-      padding: '5px'
-    },
     restart: {
       margin: '25% 0 0 35%',
-      padding: '5%'
-    },
-    choice: {
-      margin: '10% 0 0 5%',
       padding: '5%'
     },
     buttons: {

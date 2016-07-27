@@ -762,14 +762,19 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
 
 
 QuidStore.endPhase = function(){
-  var firstPart = "Don't worry, Loser. Friends take care of friends. You've got a new job now, working as ",
-      phaseData = Utils.getPhaseData(currentState.phase);
+  var phase = currentState.phase,
+      firstPart = "Don't worry, Loser. Friends take care of friends. You've got a new job now, working as ",
+      phaseData = Utils.getPhaseData(phase);
   
   document.getElementById('modal').style.display = 'block';
   if (currentState.nextGoal > currentState.bankBalance){
     currentState.message = firstPart + phaseData['failMsg'];
   } else {
     currentState.message = phaseData['winMsg'];
+    currentState.advMsg = Utils.setElectionChoice(phase);
+    if (phase === 19){
+      currentState.advMsg = currentState.advMsg[currentState.repeat % 3];
+    }
   }
 };
 
@@ -780,6 +785,7 @@ QuidStore.handleElection = function(){
     advMsg = Utils.setElectionChoice(phase),
     repeat = currentState.repeat % 3;
 
+//TODO: only this block will remain, moved to changePhase (none can be otherwise handled)
   this.deposit(-currentState.nextGoal);
   if (currentState.bankBalance <= 0){
     currentState.advMsg = 'bank';

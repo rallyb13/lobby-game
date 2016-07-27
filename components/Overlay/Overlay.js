@@ -3,11 +3,14 @@ import QuidStore from '../../store'
 import HelpTab from './HelpTab'
 import Banner from './Banner'
 import Funds from './Funds'
+import NextSelect from './NextSelect';
 
 var Overlay = React.createClass({
   render(){
     var helpTabs = this.getHelpTabs(this.props.gameData.phase),
-        message = this.props.gameData.message;
+        message = this.props.gameData.message,
+        advMsg = this.props.gameData.advMsg,
+        nextBit = advMsg === 'none' ? <div></div> : <NextSelect gameOver={this.props.isGameOver} advMsg={advMsg} phase={this.props.gameData.phase} repeat={this.props.gameData.repeat} />;
     
     return(
       <div className="modal" id="modal">
@@ -21,6 +24,7 @@ var Overlay = React.createClass({
           <div id='currentElection'>
             <Funds balance={this.props.gameData.bankBalance} goal={this.props.gameData.nextGoal} />
             <p>{message}</p>
+            {nextBit}
           </div>
           <div id='helpDisplay'></div>
         </div>
@@ -31,7 +35,7 @@ var Overlay = React.createClass({
   closeModal: function() {
     document.getElementById('modal').style.display = 'none';
     if (this.props.gameData.movesRemaining === 0){
-      QuidStore.handleElection();
+      QuidStore.handleElection(); //this will be replaced
     }
   },
   
