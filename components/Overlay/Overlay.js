@@ -35,7 +35,8 @@ var Overlay = React.createClass({
   closeModal: function() {
     document.getElementById('modal').style.display = 'none';
     if (this.props.gameData.movesRemaining === 0){
-      QuidStore.handleElection(); //this will be replaced
+      //TODO: this should be handled by button clicks... (even if just start next phase)
+      QuidStore.changePhase(1, false);
     }
   },
   

@@ -728,6 +728,7 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
     phaseData,
     coords;
 
+  this.deposit(-currentState.nextGoal);
   currentState.phase = currentState.phase + phaseShift;
   phase = currentState.phase;
   phaseData = Utils.getPhaseData(phase);
@@ -766,7 +767,8 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
   this.emitChange();
 };
 
-
+//called at end of phase OR when there are no more spaces--pops overlay up and handles all needed for conclusion of phase &/or game
+//endGame is true if fn is called from full board (mid-phase), false if called at last move of phase (but will then check for lost election)
 QuidStore.endPhase = function(endGame){
   var phase = currentState.phase,
       firstPart = "Don't worry, Loser. Friends take care of friends. You've got a new job now, working as ",
@@ -782,30 +784,6 @@ QuidStore.endPhase = function(endGame){
       currentState.advMsg = currentState.advMsg[currentState.repeat % 3];
     }
   }
-};
-
-//when moves hit 0 left, checks bank balance to determine if game continues
-//handles setting higher office election choices at specific phases
-QuidStore.handleElection = function(){
-  var phase = currentState.phase,
-    advMsg = Utils.setElectionChoice(phase),
-    repeat = currentState.repeat % 3;
-
-//TODO: only this block will remain, moved to changePhase (none can be otherwise handled)
-  this.deposit(-currentState.nextGoal);
-  if (currentState.bankBalance <= 0){
-    currentState.advMsg = 'bank';
-    this.emitChange();
-    return;
-  }
-
-  if (phase === 19){
-    advMsg = advMsg[repeat];
-  }
-  if (advMsg === 'none'){
-    this.changePhase(1, false);
-  }
-  currentState.advMsg = advMsg;
 };
 
 export default QuidStore;
