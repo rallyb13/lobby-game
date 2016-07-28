@@ -300,10 +300,17 @@ QuidStore.completeMove = function(rowPos, colPos){
     swarm = true;
   }
   this.moveConstituents(rowPos, colPos, swarm);
-
-  this.setNextToken();
-  if (token.slice(3,4) === '5'){
-    this.addTopLevelToken(token, rowPos, colPos);
+  
+  //with swarm/move constituents, appeasement && top level token removal all handled,
+  //here we check if board is filled before going on
+  if (QuidStore.findTokenCoords('').length === 0){
+    currentState.advMsg = 'board';
+    this.endPhase(true);
+  } else {
+    this.setNextToken();
+    if (token.slice(3,4) === '5'){
+      this.addTopLevelToken(token, rowPos, colPos);
+    }
   }
   this.emitChange();
 };
@@ -322,8 +329,7 @@ QuidStore.nextMove = function(){
   
   moves = currentState.movesRemaining;
   if (moves === 0){
-    this.endPhase();
-    // this.handleElection();
+    this.endPhase(false);
   }
   else if (moves === currentState.trigger) {
     progressionData = Utils.progressGame(currentState.phase, moves);
@@ -761,13 +767,13 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
 };
 
 
-QuidStore.endPhase = function(){
+QuidStore.endPhase = function(endGame){
   var phase = currentState.phase,
       firstPart = "Don't worry, Loser. Friends take care of friends. You've got a new job now, working as ",
       phaseData = Utils.getPhaseData(phase);
   
   document.getElementById('modal').style.display = 'block';
-  if (currentState.nextGoal > currentState.bankBalance){
+  if (currentState.nextGoal > currentState.bankBalance || endGame){
     currentState.message = firstPart + phaseData['failMsg'];
   } else {
     currentState.message = phaseData['winMsg'];

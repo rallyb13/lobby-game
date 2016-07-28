@@ -32,8 +32,7 @@ var App = React.createClass ({
     },
 
   render(){
-    var advMsg = this.state.advMsg,
-        isGameOver = this.isGameOver(advMsg),
+    var isGameOver = this.isGameOver(),
         holders = this.state.holdTokens,
         allHolders = [],
         i;
@@ -52,7 +51,7 @@ var App = React.createClass ({
           <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
           <div className="white-paper-panel">
             <Menu username={this.state.userInfo.username} restartBoard={this.restartBoard} undoLastTurn={this.undoLastTurn}/>
-            <Scoreboard state={this.state} gameOver={isGameOver}/>
+            <Scoreboard state={this.state} />
             <div style={this.styles.holders}>{allHolders}</div>
           </div>
           <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange}/>
@@ -74,11 +73,11 @@ var App = React.createClass ({
 
 
   //checks that board is not full and bank balance is still positive (at end of election cycle)
-  isGameOver: function(advMsg){
-    if (advMsg === 'bank'){
+  isGameOver: function(){
+    var advMsg = this.state.advMsg;
+    
+    if (advMsg === 'bank' || advMsg === 'board'){
       return advMsg;
-    } else if (QuidStore.findTokenCoords('').length === 0){
-      return 'board';
     } else {
       return false;
     }

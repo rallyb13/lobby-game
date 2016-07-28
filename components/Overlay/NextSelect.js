@@ -7,7 +7,7 @@ var NextSelect = React.createClass({
       displayButton;
 
     if (this.props.gameOver) {
-      displayButton = <button style={this.styles.restart} onClick={this.restart}> Restart </button>;
+      displayButton = <button onClick={this.restart}> Restart </button>;
     } else {
       displayButton = <div>
           <div>{advMsg}</div>
@@ -66,10 +66,6 @@ var NextSelect = React.createClass({
   },
 
   styles: {
-    restart: {
-      margin: '25% 0 0 35%',
-      padding: '5%'
-    },
     buttons: {
       margin: '1% 2% 0 0'
     }
