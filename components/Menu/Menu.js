@@ -6,9 +6,6 @@ var Menu = React.createClass({
   handleUndo() {
     this.props.undoLastTurn()
   },
-  handleRestart() {
-    this.props.restartBoard()
-  },
 
   render: function(){
     var username = this.props.username,
@@ -16,7 +13,6 @@ var Menu = React.createClass({
     return (
       <ul style={this.styles.menu}>
         <li style={this.styles.listItem} onClick={this.handleLogin}>{displayName}</li>
-        <li style={this.styles.listItem} onClick={this.handleRestart}>Restart</li>
         <li style={this.styles.listItem} onClick={this.handleUndo}>Undo</li>
       </ul>
     )

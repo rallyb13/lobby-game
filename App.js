@@ -50,7 +50,7 @@ var App = React.createClass ({
         <div className="main">
           <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
           <div className="white-paper-panel">
-            <Menu username={this.state.userInfo.username} restartBoard={this.restartBoard} undoLastTurn={this.undoLastTurn}/>
+            <Menu username={this.state.userInfo.username} undoLastTurn={this.undoLastTurn}/>
             <Scoreboard state={this.state} />
             <div style={this.styles.holders}>{allHolders}</div>
           </div>
