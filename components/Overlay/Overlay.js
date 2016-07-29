@@ -8,19 +8,24 @@ import NextSelect from './NextSelect';
 var Overlay = React.createClass({
   render(){
     var helpTabs = this.getHelpTabs(this.props.gameData.phase),
+        moves = this.props.gameData.movesRemaining,
         message = this.props.gameData.message,
         advMsg = this.props.gameData.advMsg,
-        nextBit = advMsg === 'none' ? <div></div> : <NextSelect gameOver={this.props.isGameOver} advMsg={advMsg} phase={this.props.gameData.phase} repeat={this.props.gameData.repeat} />;
+        displayCase = moves === 0 || advMsg !== 'none',
+        close = displayCase <p></p> : <h3 className='closeButton' onClick={this.closeModal}>X</h3>,
+        nextBit = displayCase ?
+            <NextSelect gameOver={this.props.isGameOver} advMsg={advMsg} moves={moves} phase={this.props.gameData.phase} repeat={this.props.gameData.repeat} /> :
+            <div></div>;
     
     return(
       <div className="modal" id="modal">
-        <h3 className='closeButton' onClick={this.closeModal}>X</h3>
+        {close}
         <div className="leftPanel">
           <img src='../../assets/icons/chief-of-staff.png' alt='Chief of Staff'></img>
           <div>{helpTabs}</div>
         </div>
         <div>
-          <Banner isGameOver={this.props.isGameOver} moves={this.props.gameData.movesRemaining} office={this.props.gameData.electedOffice}/>
+          <Banner isGameOver={this.props.isGameOver} moves={moves} office={this.props.gameData.electedOffice}/>
           <div id='currentElection'>
             <Funds balance={this.props.gameData.bankBalance} goal={this.props.gameData.nextGoal} />
             <p>{message}</p>
@@ -34,10 +39,6 @@ var Overlay = React.createClass({
   
   closeModal: function() {
     document.getElementById('modal').style.display = 'none';
-    if (this.props.gameData.movesRemaining === 0){
-      //TODO: this should be handled by button clicks... (even if just start next phase)
-      QuidStore.changePhase(1, false);
-    }
   },
   
   getHelpTabs: function(currentPhase){

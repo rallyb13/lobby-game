@@ -8,13 +8,16 @@ var NextSelect = React.createClass({
 
     if (this.props.gameOver) {
       displayButton = <button onClick={this.restart}> Restart </button>;
-    } else {
+    } else if (advMsg !== 'none'){
       displayButton = <div>
           <div>{advMsg}</div>
           <button style={this.styles.buttons} onClick={this.acceptAdvance} > Higher Office! </button>
           <button style={this.styles.buttons} onClick={this.refuseAdvance} > Am Comfy Here </button>
         </div>;
-    }
+      } else {
+        displayButton = <button onClick={this.continue}> Keep Running </button>;
+      }
+
     return(
       <div>
         {displayButton}
@@ -28,6 +31,11 @@ var NextSelect = React.createClass({
     location.reload();
   },
 
+  continue: function() {
+    document.getElementById('modal').style.display = 'none';
+    QuidStore.changePhase(1, false);
+  },
+  
   //handles choice of NOT running for next elected office, adjusting phase as needed
   refuseAdvance: function(){
     var phase = this.props.phase,
@@ -42,6 +50,7 @@ var NextSelect = React.createClass({
       adjustment = -1
       QuidStore.rerunPhase(true);
     }
+    document.getElementById('modal').style.display = 'none';
     QuidStore.changePhase(adjustment, true);
   },
 
@@ -60,6 +69,7 @@ var NextSelect = React.createClass({
       adjustment = repeat === 0 ? 1 : 3;
       QuidStore.rerunPhase(false);
     }
+    document.getElementById('modal').style.display = 'none';
     QuidStore.changePhase(adjustment, true); //should be able to add to repeat without bringing it through as props
     //this will probably need to close modal
     //or we'll need a trigger for EVERY phase to go on that prompts phase change
