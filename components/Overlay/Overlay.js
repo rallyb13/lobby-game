@@ -12,11 +12,11 @@ var Overlay = React.createClass({
         message = this.props.gameData.message,
         advMsg = this.props.gameData.advMsg,
         displayCase = moves === 0 || advMsg !== 'none',
-        close = displayCase <p></p> : <h3 className='closeButton' onClick={this.closeModal}>X</h3>,
+        close = displayCase ? <p></p> : <h3 className='closeButton' onClick={this.closeModal}>X</h3>,
         nextBit = displayCase ?
             <NextSelect gameOver={this.props.isGameOver} advMsg={advMsg} moves={moves} phase={this.props.gameData.phase} repeat={this.props.gameData.repeat} /> :
             <div></div>;
-    
+
     return(
       <div className="modal" id="modal">
         {close}
@@ -36,11 +36,11 @@ var Overlay = React.createClass({
       </div>
     )
   },
-  
+
   closeModal: function() {
     document.getElementById('modal').style.display = 'none';
   },
-  
+
   getHelpTabs: function(currentPhase){
     var tabList = {
       'Current Election': 0,
@@ -54,7 +54,7 @@ var Overlay = React.createClass({
       'Financial Lobby': 20
     },
     tabs = [];
-    
+
     for (var key in tabList){
       if (tabList[key] <= currentPhase){
         tabs.push(<HelpTab resourceName={key} key={key}/>);
