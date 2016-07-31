@@ -36,7 +36,7 @@ var Overlay = React.createClass({
                 <p>{message}</p>
                 {nextBit}
               </div>
-              <div id='helpDisplay'>
+              <div id='helpDisplay' className="helpWrapper">
                 {helpDetailEl}
               </div>
             </div>

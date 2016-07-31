@@ -51,10 +51,11 @@ h1 {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.875);
   width: 90%;
   height: 90%;
   border: 5px gray solid;
+  overflow-y: auto;
 }
 
 .modalBanner {
@@ -64,6 +65,7 @@ h1 {
 
 .modalWrapper {
     display: flex;
+    flex-direction: column;
 }
 
 .leftPanel {
@@ -75,6 +77,24 @@ h1 {
 .mainPanel {
     flex-basis: 60vw;
     flex: 1 0;
+}
+
+.helpWrapper {
+    margin: 0 10vw;
+}
+
+.helpWrapper img {
+    margin: 0 0 3em;
+    display: block;
+}
+
+.inline-help-images {
+    margin: 0 10vw 3em;
+}
+
+.inline-help-images img {
+    display: inline;
+    margin: 0;
 }
 
 .helpTab {
@@ -139,5 +159,14 @@ h1 {
   }
   .game-grid {
     width: 69%;
+  }
+  .modalWrapper {
+      flex-direction: row;
+  }
+  .helpWrapper img {
+      margin: 0 10vw 3em;
+  }
+  .inline-help-images img {
+      margin: 0;
   }
 }
