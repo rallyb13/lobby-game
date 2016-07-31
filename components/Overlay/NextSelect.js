@@ -1,5 +1,6 @@
 import React from 'react';
 import QuidStore from '../../store';
+import Utils from '../../utils';
 
 var NextSelect = React.createClass({
   render: function(){
@@ -32,7 +33,7 @@ var NextSelect = React.createClass({
   },
 
   continue: function() {
-    document.getElementById('modal').style.display = 'none';
+    Utils.toggleOverlay(false);
     QuidStore.changePhase(1, false);
   },
   
@@ -50,7 +51,7 @@ var NextSelect = React.createClass({
       adjustment = -1
       QuidStore.rerunPhase(true);
     }
-    document.getElementById('modal').style.display = 'none';
+    Utils.toggleOverlay(false);
     QuidStore.changePhase(adjustment, true);
   },
 
@@ -69,7 +70,7 @@ var NextSelect = React.createClass({
       adjustment = repeat === 0 ? 1 : 3;
       QuidStore.rerunPhase(false);
     }
-    document.getElementById('modal').style.display = 'none';
+    Utils.toggleOverlay(false);
     QuidStore.changePhase(adjustment, true); //should be able to add to repeat without bringing it through as props
     //this will probably need to close modal
     //or we'll need a trigger for EVERY phase to go on that prompts phase change

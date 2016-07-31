@@ -1,4 +1,5 @@
 import React from 'react'
+import QuidStore from '../../store'
 
 var HelpTab = React.createClass({
   render(){
@@ -9,27 +10,20 @@ var HelpTab = React.createClass({
     )
   },
   
+  //toggles basic election info and dumb component containing help divs, calls helper function to set correct component on overlay
   displayHelp: function(){
-    var resourceName = this.props.resourceName,
-        resources = {
-          'Oil Lobby': 1,
-          'Constituents': 1,
-          'Megaphone': 2,
-          'Hold Spaces': 3,
-          'Agribusiness Lobby': 7,
-          'Pork': 8,
-          'Military-Industrial Lobby': 15,
-          'Financial Lobby': 20
-        };
+    var resourceName = this.props.resourceName;
 
-    //code to hide main display of Election info && link path for resource to background of panel
     if (resourceName === 'Current Election'){
-      //display #currentElection; hide #helpDisplay
+      QuidStore.setHelpDetail(false);
+      document.getElementById('helpDisplay').style.display = 'none';
+      document.getElementById('currentElection').style.display = 'block';
     } else {
-      //hide #currentElection; display #helpDisplay; set #helpDisplay background image
-      console.log(resources[resourceName]);
+      document.getElementById('currentElection').style.display = 'none';
+      document.getElementById('helpDisplay').style.display = 'block';
+      QuidStore.setHelpDetail(resourceName);
     }
-    //should also unset selection color of the rest and set selection color of current choice
+    //should also unset selection color of the other tabs and set selection color of current choice
   }
 })
 

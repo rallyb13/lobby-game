@@ -20,6 +20,7 @@ var currentState = {
   repeat: 0, //tracks if level is repeated (when higher office declined)
   nextGoal: 35000,
   electedOffice: 'State Delegate',
+  helpDetail : false,
   message: 'Click any unoccupied square in the grid to place the next item. Match 3 oils drops to make an oil can...',
   advMsg: 'none',
   advanceQuestion: false, //true when phase change should prompt choice of office advancement
@@ -176,6 +177,12 @@ QuidStore.oilSlick = function(rowNum){
   for (var i = 0; i < currentState.board.columns; i++){
     this.setToken('', rowNum, i);
   }
+};
+
+//helper to communicate selected tab to overlay so that it can reference correct tab in props
+QuidStore.setHelpDetail = function(selection){
+  currentState.helpDetail = selection;
+  this.emitChange();
 };
 
 //
@@ -774,7 +781,7 @@ QuidStore.endPhase = function(endGame){
       firstPart = "Don't worry, Loser. Friends take care of friends. You've got a new job now, working as ",
       phaseData = Utils.getPhaseData(phase);
   
-  document.getElementById('modal').style.display = 'block';
+  Utils.toggleOverlay(true);
   if (currentState.nextGoal > currentState.bankBalance || endGame){
     currentState.message = firstPart + phaseData['failMsg'];
   } else {

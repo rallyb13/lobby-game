@@ -1,5 +1,6 @@
 import React from 'react'
 import QuidStore from '../../store'
+import Utils from '../../utils'
 import HelpTab from './HelpTab'
 import Banner from './Banner'
 import Funds from './Funds'
@@ -12,6 +13,8 @@ var Overlay = React.createClass({
         moves = this.props.gameData.movesRemaining,
         message = this.props.gameData.message,
         advMsg = this.props.gameData.advMsg,
+        helpSelection = this.props.gameData.helpDetail,
+        helpDetailEl = helpSelection ? this.getHelpComponent(helpSelection) : <div></div>,
         displayCase = moves === 0 || advMsg !== 'none',
         close = displayCase ? <p></p> : <h3 className='closeButton' onClick={this.closeModal}>X</h3>,
         nextBit = displayCase ?
@@ -32,17 +35,20 @@ var Overlay = React.createClass({
             <p>{message}</p>
             {nextBit}
           </div>
-          <OilLobbyHelp />
-          <div id='helpDisplay'></div>
+          <div id='helpDisplay'>
+            {helpDetailEl}
+          </div>
         </div>
       </div>
     )
   },
 
+  //calls utility function to close the modal
   closeModal: function() {
-    document.getElementById('modal').style.display = 'none';
+    Utils.toggleOverlay(false);
   },
 
+  //finds all tabs relevant to current phase and below, creates corresponding helpTabs
   getHelpTabs: function(currentPhase){
     var tabList = {
       'Current Election': 0,
@@ -63,6 +69,14 @@ var Overlay = React.createClass({
       }
     }
     return tabs;
+  },
+  
+  // utility function left here where components are used, returns correct component by name
+  getHelpComponent: function(selection){
+    var components = {
+      'Oil Lobby': <OilLobbyHelp />
+    };
+    return components[selection];
   }
 })
 

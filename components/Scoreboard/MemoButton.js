@@ -1,4 +1,5 @@
 import React from 'react';
+import Utils from '../../utils';
 
 var MemoButton = React.createClass({
   render: function(){
@@ -9,7 +10,7 @@ var MemoButton = React.createClass({
   },
   
   openModal: function() {
-    document.getElementById('modal').style.display = 'block';
+    Utils.toggleOverlay(true);
   },
   
   styles: {

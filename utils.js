@@ -72,6 +72,17 @@ var Utils = {
       return colorMap[tokenGroup][attribute];
     }
   },
+  
+  //opens/closes overlay and ensures current election is open tab in right panel when opened
+  toggleOverlay: function(open){
+    if (open){
+      document.getElementById('modal').style.display = 'block';
+      document.getElementById('currentElection').style.display = 'block';
+      document.getElementById('helpDisplay').style.display = 'none';
+    } else {
+      document.getElementById('modal').style.display = 'none';
+    }
+  },
 
   //token reference stores what each matches into, pts & bank earned on both setting and matching
   //priority is used to select among options when megaphone placed at point of multiple matches
