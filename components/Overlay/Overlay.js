@@ -3,7 +3,8 @@ import QuidStore from '../../store'
 import HelpTab from './HelpTab'
 import Banner from './Banner'
 import Funds from './Funds'
-import NextSelect from './NextSelect';
+import NextSelect from './NextSelect'
+import OilLobbyHelp from './OilLobbyHelp'
 
 var Overlay = React.createClass({
   render(){
@@ -12,7 +13,7 @@ var Overlay = React.createClass({
         message = this.props.gameData.message,
         advMsg = this.props.gameData.advMsg,
         displayCase = moves === 0 || advMsg !== 'none',
-        close = displayCase <p></p> : <h3 className='closeButton' onClick={this.closeModal}>X</h3>,
+        close = displayCase ? <p></p> : <h3 className='closeButton' onClick={this.closeModal}>X</h3>,
         nextBit = displayCase ?
             <NextSelect gameOver={this.props.isGameOver} advMsg={advMsg} moves={moves} phase={this.props.gameData.phase} repeat={this.props.gameData.repeat} /> :
             <div></div>;
@@ -31,6 +32,7 @@ var Overlay = React.createClass({
             <p>{message}</p>
             {nextBit}
           </div>
+          <OilLobbyHelp />
           <div id='helpDisplay'></div>
         </div>
       </div>
