@@ -84,8 +84,9 @@ h1 {
 }
 
 .helpWrapper img {
-    margin: 0 0 3em;
+    margin: 0 auto 3em;
     display: block;
+    max-width: 100%;
 }
 
 .inline-help-images {
@@ -163,10 +164,8 @@ h1 {
   .modalWrapper {
       flex-direction: row;
   }
-  .helpWrapper img {
-      margin: 0 10vw 3em;
-  }
-  .inline-help-images img {
-      margin: 0;
+  .short-help-image {
+      position: relative;
+      left: -80px;
   }
 }
