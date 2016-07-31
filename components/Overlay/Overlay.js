@@ -6,7 +6,7 @@ import Banner from './Banner'
 import Funds from './Funds'
 import NextSelect from './NextSelect'
 
-import OilLobbyHelp from './OilLobbyHelp'
+import OilLobbyHelp from './Helps/OilLobbyHelp'
 import ConstituentsHelp from './Helps/ConstituentsHelp'
 import MegaphoneHelp from './Helps/MegaphoneHelp'
 import HoldSpacesHelp from './Helps/HoldSpacesHelp'
