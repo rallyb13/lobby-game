@@ -3,17 +3,15 @@ import React from 'react'
 var Banner = React.createClass({
   render(){
     var headline = this.getHeadline();
-    
+
     return(
-      <div>
-        <h1>{headline}</h1>
-      </div>
+        <h1 className="modalBanner">{headline}</h1>
     )
   },
-  
+
   getHeadline(){
     var isGameOver = this.props.isGameOver;
-        
+
     if (this.props.moves === 0 || isGameOver) {
       if (isGameOver === 'board'){
         return 'Talk about gridlock! Game Over.';

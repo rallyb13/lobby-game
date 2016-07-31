@@ -57,10 +57,24 @@ h1 {
   border: 5px gray solid;
 }
 
+.modalBanner {
+    width: 100%;
+    display: block;
+}
+
+.modalWrapper {
+    display: flex;
+}
+
 .leftPanel {
-  float: left;
-  width: 40%;
-  margin: 20px 0 0 20px;
+  margin: 20px;
+  flex-basis: 40vw;
+  flex: 0 1;
+}
+
+.mainPanel {
+    flex-basis: 60vw;
+    flex: 1 0;
 }
 
 .helpTab {
@@ -69,7 +83,6 @@ h1 {
   background-color: maroon;
   text-align: center;
   padding: 10px;
-  width: 40%;
   margin-left: 10%;
   border-bottom: none;
   opacity: 1;
@@ -99,7 +112,7 @@ h1 {
 }
 
 .funds h3 {
-  margin: 0; 
+  margin: 0;
 }
 
 .calculation {
