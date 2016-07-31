@@ -32,20 +32,22 @@ var Overlay = React.createClass({
     return(
       <div className="modal" id="modal">
         {close}
-        <div className="leftPanel">
-          <img src='../../assets/icons/chief-of-staff.png' alt='Chief of Staff'></img>
-          <div>{helpTabs}</div>
-        </div>
-        <div>
-          <Banner isGameOver={this.props.isGameOver} moves={moves} office={this.props.gameData.electedOffice}/>
-          <div id='currentElection'>
-            <Funds balance={this.props.gameData.bankBalance} goal={this.props.gameData.nextGoal} />
-            <p>{message}</p>
-            {nextBit}
-          </div>
-          <div id='helpDisplay'>
-            {helpDetailEl}
-          </div>
+        <Banner isGameOver={this.props.isGameOver} moves={moves} office={this.props.gameData.electedOffice}/>
+        <div className="modalWrapper">
+            <div className="leftPanel">
+              <img src='../../assets/icons/chief-of-staff.png' alt='Chief of Staff'></img>
+              <div>{helpTabs}</div>
+            </div>
+            <div className="mainPanel">
+              <div id='currentElection'>
+                <Funds balance={this.props.gameData.bankBalance} goal={this.props.gameData.nextGoal} />
+                <p>{message}</p>
+                {nextBit}
+              </div>
+              <div id='helpDisplay' className="helpWrapper">
+                {helpDetailEl}
+              </div>
+            </div>
         </div>
       </div>
     )
@@ -78,7 +80,7 @@ var Overlay = React.createClass({
     }
     return tabs;
   },
-  
+
   // utility function left here where components are used, returns correct component by name
   getHelpComponent: function(selection){
     var components = {
