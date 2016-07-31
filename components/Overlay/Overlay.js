@@ -5,7 +5,15 @@ import HelpTab from './HelpTab'
 import Banner from './Banner'
 import Funds from './Funds'
 import NextSelect from './NextSelect'
+
 import OilLobbyHelp from './OilLobbyHelp'
+import ConstituentsHelp from './Helps/ConstituentsHelp'
+import MegaphoneHelp from './Helps/MegaphoneHelp'
+import HoldSpacesHelp from './Helps/HoldSpacesHelp'
+import AgribusinessLobbyHelp from './Helps/AgribusinessLobbyHelp'
+import PorkHelp from './Helps/PorkHelp'
+import MilitaryIndustrialLobbyHelp from './Helps/MilitaryIndustrialLobbyHelp'
+import FinancialLobbyHelp from './Helps/FinancialLobbyHelp'
 
 var Overlay = React.createClass({
   render(){
@@ -74,7 +82,14 @@ var Overlay = React.createClass({
   // utility function left here where components are used, returns correct component by name
   getHelpComponent: function(selection){
     var components = {
-      'Oil Lobby': <OilLobbyHelp />
+      'Oil Lobby': <OilLobbyHelp />,
+      'Constituents': <ConstituentsHelp />,
+      'Megaphone': <MegaphoneHelp />,
+      'Hold Spaces': <HoldSpacesHelp />,
+      'Agribusiness Lobby': <AgribusinessLobbyHelp />,
+      'Pork': <PorkHelp />,
+      'Military-Industrial Lobby': <MilitaryIndustrialLobbyHelp />,
+      'Financial Lobby': <FinancialLobbyHelp />
     };
     return components[selection];
   }
