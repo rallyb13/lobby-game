@@ -17,7 +17,7 @@ var Overlay = React.createClass({
         nextBit = displayCase ?
             <NextSelect gameOver={this.props.isGameOver} advMsg={advMsg} moves={moves} phase={this.props.gameData.phase} repeat={this.props.gameData.repeat} /> :
             <div></div>;
-    
+
     return(
       <div className="modal" id="modal">
         {close}
@@ -38,11 +38,11 @@ var Overlay = React.createClass({
       </div>
     )
   },
-  
+
   closeModal: function() {
     document.getElementById('modal').style.display = 'none';
   },
-  
+
   getHelpTabs: function(currentPhase){
     var tabList = {
       'Current Election': 0,
@@ -56,7 +56,7 @@ var Overlay = React.createClass({
       'Financial Lobby': 20
     },
     tabs = [];
-    
+
     for (var key in tabList){
       if (tabList[key] <= currentPhase){
         tabs.push(<HelpTab resourceName={key} key={key}/>);
