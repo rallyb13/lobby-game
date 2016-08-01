@@ -33,6 +33,8 @@ var Token = React.createClass({
       'icon-vote': this.props.symbol === 'con1',
       'icon-park': this.props.symbol === 'con2',
       'icon-library1': this.props.symbol === 'con3',
+      'icon-library2': this.props.symbol === 'con4',
+      'icon-bridge1': this.props.symbol === 'con5',
       'icon-megaphone': this.props.symbol === 'mega'
     }),
     backgroundType = this.props.symbol !== '' ? 'url(../assets/icons/' + symbolClass + '.png) no-repeat top/contain' : 'inherit';
