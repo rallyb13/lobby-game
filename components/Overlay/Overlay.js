@@ -41,7 +41,7 @@ var Overlay = React.createClass({
             <div className="mainPanel">
               <div id='currentElection'>
                 <Funds balance={this.props.gameData.bankBalance} goal={this.props.gameData.nextGoal} />
-                <p>{message}</p>
+                <p style={{fontSize: '1.5em'}}>{message}</p>
                 {nextBit}
               </div>
               <div id='helpDisplay' className="helpWrapper">
