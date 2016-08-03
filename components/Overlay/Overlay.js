@@ -38,13 +38,13 @@ var Overlay = React.createClass({
               <img src='../../assets/icons/chief-of-staff.png' alt='Chief of Staff'></img>
               <div>{helpTabs}</div>
             </div>
-            <div className="mainPanel">
+            <div className="mainPanel helpWrapper">
               <div id='currentElection'>
                 <Funds balance={this.props.gameData.bankBalance} goal={this.props.gameData.nextGoal} />
                 <p style={{fontSize: '1.5em'}}>{message}</p>
                 {nextBit}
               </div>
-              <div id='helpDisplay' className="helpWrapper">
+              <div id='helpDisplay'>
                 {helpDetailEl}
               </div>
             </div>
