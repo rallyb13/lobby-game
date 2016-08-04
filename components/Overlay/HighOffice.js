@@ -9,7 +9,7 @@ var HighOffice = React.createClass({
 
     return (
       <div>
-        <h5> Highest Held Office: {this.props.displayOffice}</h5>
+        <h5> Highest Held Office: {displayOffice}</h5>
       </div>
     );
   },
@@ -23,6 +23,8 @@ var HighOffice = React.createClass({
       {office: 'US Senator (Senior)', rank: 5}
     ]
     //electedOfficeMap.map()
+
+    return displayOffice;
   }
 });
 

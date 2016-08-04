@@ -10,7 +10,7 @@ var HighScore = React.createClass({
 
     return (
       <div>
-        <h5> High Score: {this.props.displayScore}</h5>
+        <h5> High Score: {displayScore}</h5>
       </div>
     );
   },
