@@ -24,6 +24,7 @@ var Scoreboard = React.createClass({
           <Office electedOffice={this.props.state.electedOffice} />
           <MoveCounter movesRemaining={this.props.state.movesRemaining} phase={this.props.state.phase} textColor={textColor} />
           <NextGoal nextGoal={this.props.state.nextGoal} textColor={textColor} />
+          
         </div>
       </div>
     );

@@ -5,6 +5,8 @@ import HelpTab from './HelpTab'
 import Banner from './Banner'
 import Funds from './Funds'
 import NextSelect from './NextSelect'
+import HighScore from './HighScore.js'
+import HighOffice from './HighOffice.js'
 
 import OilLobbyHelp from './Helps/OilLobbyHelp'
 import ConstituentsHelp from './Helps/ConstituentsHelp'
@@ -40,7 +42,11 @@ var Overlay = React.createClass({
             </div>
             <div className="mainPanel helpWrapper">
               <div id='currentElection'>
-                <Funds balance={this.props.gameData.bankBalance} goal={this.props.gameData.nextGoal} />
+                <div id='stats'>
+                  <Funds balance={this.props.gameData.bankBalance} goal={this.props.gameData.nextGoal} />
+                  <HighScore highScore={this.props.gameData.userInfo.highScore} currentScore={this.props.gameData.score} />
+                  <HighOffice highOffice={this.props.gameData.userInfo.highOffice} currentOffice={this.props.gameData.electedOffice} />
+                </div>
                 <p style={{fontSize: '1.5em'}}>{message}</p>
                 {nextBit}
               </div>
