@@ -72,6 +72,17 @@ var Utils = {
       return colorMap[tokenGroup][attribute];
     }
   },
+  
+  //opens/closes overlay and ensures current election is open tab in right panel when opened
+  toggleOverlay: function(open){
+    if (open){
+      document.getElementById('modal').style.display = 'block';
+      document.getElementById('currentElection').style.display = 'block';
+      document.getElementById('helpDisplay').style.display = 'none';
+    } else {
+      document.getElementById('modal').style.display = 'none';
+    }
+  },
 
   //token reference stores what each matches into, pts & bank earned on both setting and matching
   //priority is used to select among options when megaphone placed at point of multiple matches
@@ -118,70 +129,137 @@ var Utils = {
   //phase reference for how many moves, bank balance needed to continue, msg to open new phase, and msg used for game ending at that level
   getPhaseData: function(phase){
     var phaseMap = {
-      1: { moves: 180, goal: 35000, end: "a lowly regional consultant for OilOnU, making a meager $75,000/yr.", msg: ""},
-      2: { moves: 145, goal: 45000, end: "a mid-level special projects consultant for the oil lobby, making only $88,500/yr.",
-        msg: "Nice work! But this time you'll face a primary challenger. Prove you can help Big Oil more than Ollie 'Oilcan' Derricks can." },
-      3: { moves: 45, goal: 20000, end: "a consultant in OilOnU's state office. At $100,000/yr, you'll be fine, buddy.",
-        msg: "You greased 'Oilcan' Derricks for the primary win! Now put the pedal to the petrol and nab the general election."},
-      4: { moves: 145, goal: 50000, end: "a consultant. Pack your bags! You're moving to OilCanU's national headquarters. $110,000/yr",
-        msg: "You've held your seat. Looks like Derricks is back for a tougher challenge, though. Has he got a bigger lobby in his pocket, or is he just glad to see you?"},
-      5: { moves: 45, goal: 20000, end: "a consultant, whatever that is. You'll 'work' remote and net $120K/yr.",
-        msg: "You won the nomination! Other party's actually putting up a challenge, but nothing you can't handle."},
-      6: { moves: 180, goal: 50000, end: "a consultant, or in other words, you give an opinion once in a while. No, it's not a giveaway. I'm sure your opinion's probably worth $150K/yr.",
-        msg: "You're in for another term as State Delegate ... incumbency looks good on you! You can stick around for as long as you like now."},
-      7: { moves: 180, goal: 50000, end: "a national consultant with OilCanU. You don't even have to do anything but give an opinion. Which is worth $150,000.",
-        msg: "Nothing wrong with using your high profile as a State Delegate to highlight your candidacy for State Senate."},
-      8: { moves: 315, goal: 85000, end: "an OilCanU consultant, for $150,000. If you'd rather stay closer to home, CattleProd Corp offered you a spot in their regional office, but only for $95K/yr.",
-        msg: "Congrats, State Senator. Give agribusiness a leg up, and they'll send a fatty paycheck to help you out."},
-      9: { moves: 45, goal: 25000, end: "a lobbyist with Cornyland. You'll make $115K/yr easy, but that's not counting bonuses, or your expense account.",
-        msg: "You made it through the primary, but WHOA, here comes a tough general election! You're gonna have to put the 'aggro' in Big Agro."},
-      10: { moves: 315, goal: 90000, end: "a CattleProd Corporation consultant in their state office, making $175K/yr.",
-        msg: "Re-elected to State Senate! Some small fries are lining up against you for the next primary--but you're the two-term incumbent."},
-      11: { moves: 45, goal: 30000, end: "a CattleProd Corporation consultant, at $175K/yr, though OilCanU wants to offer you a spot, too. Maybe you could do even 'consult' for both?",
-        msg: "Big Agro helped you slaughter your primary opponents. Now you just have to sweet-talk your way through the general."},
-      12: { moves: 360, goal: 125000, end: "a chief executive of special projects for AgriVat Industries. First special project is a conference in the Bahamas, so better get flying. $205K/yr.",
-        msg: "You get a high-fructose high-five! You're secure in your State Senate office. No challengers on the horizon. How sweet it is..."},
-      13: { moves: 360, goal: 125000, end: "a consultant for the oil lobby, for $150K. AND a consulting job with CattleProd Corp, for $110/yr. Don't worry, neither job requires much attention.",
-        msg: "I suppose it's easy to get comfortable here. Just keep your lobbyists happy, and they'll keep your war chest fat."},
-      14: { moves: 130, goal: 125000, end: "a consultant. A couple jobs, actually: one with the oil lobby, another with agribusiness. Each pays $150K/yr, and you can do both. All you need to do is offer your opinion or advice once in a while.",
-        msg: "Your race to become a US Rep begins with a primary showdown against incumbent Aimee 'Deadeye' Dixon. Do what you can in the State Senate for the gun lobby if you want to hit national office."},
-      15: { moves: 50, goal: 125000, end: "a special executive. It's a position AgriVat just created. It'll pay $225K/yr, plus bonuses.",
-        msg: "You shot down 'Deadeye' and won the primary! Now, with help from the defense industry, you can shock and awe the voters into giving you the seat."},
-      16: { moves: 155, goal: 125000, end: "a consultant with OilCanU for $150K. AND a mid-level executive with AgriVat, for $160K/yr. They're both fine with you doing both, just show up at whichever office whenever you feel like.",
-        msg: "Mission Accomplished, Representative! Uh-oh, but 'Deadeye' Dixon says she'll be back for her seat."},
-      17: { moves: 75, goal: 125000, end: "a LockLoadMartyr consultant, for $250K/yr. Also, the oil lobby wants to consult with you every now and then, for $10,000/hr.",
-        msg: "Congrats, you won the party nomination. You should have no trouble gunning down the other party in the general, thanks to your firearms lobby friends."},
-      18: { moves: 155, goal: 125000, end: "an industry expert and professional consultant with the National Ricochet Association. You can make $225K/yr, plus $15,000 for each speaking gig.",
-        msg: "You've been re-elected to the House, but here comes another primary, and it's a deadly one! Make sure you go in with plenty of firepower!"},
-      19: { moves: 75, goal: 125000, end: "a professional consultant with the National Ricochet Association, $225K/yr. Also, they're planning a series of conventions. Can you prepare a speech? You'll get $16,000 each time you give it.",
-        msg: "Odds are good that you'll splatter another challenger this election. No need to bring out the big guns. Though, hey, it's a free country."},
-      20: { moves: 155, goal: 125000, end: "a national consultant for LockLoadMartyr for $275K/yr. Also, the National Ricochet Association wants to pay you $17,500 per speaking gig, so maybe it's time for a victory lap after all.",
-        msg: "It'll be tough to unseat longtime Senator Rich Brigand this primary--he's got a lot of financial sector money behind him. Show the Big Banks you've got the Powerballs!"},
-      21: { moves: 75, goal: 125000, end: "an Agrivat consultant, for $225K per year. Also a LockLoadMartyr consultant, for another $125K/yr.",
-        msg: "Whew! Your big gamble of a primary challenge paid off, but winning the general will still be difficult. Cut some regulations to help the banking lobby grow, grow, grow!"},
-      22: { moves: 155, goal: 125000, end: "a lobbyist for oil...and a lobbyist for agribusiness. Each pays $150K/yr. Also, the military/industrial lobby would like you to give some speeches, at $20K-a-pop.",
-        msg: "With Peter Pandurin retiring, there's no incumbent, making this an unexpectedly easy primary. All you need to do is get interest from Big Banks. You'll give them a great ROI, that's for sure."},
-      23: { moves: 75, goal: 125000, end: "a LockLoadMartyr executive, for $350K/yr (starting salary).",
-        msg: "You won the primary, but this'll be your toughest general election yet! You'll need a ton of cash. Help the financial industry until you're Too Big To Fail!"},
-      24: { moves: 615, goal: 125000, end: "a LockLoadMartyr executive, for $350K/yr (starting salary). And a confidential signing bonus...",
-        msg: "Keep doing intimate favors for the Big Banks. They'll thank you in the morning."},
-      25: { moves: 75, goal: 125000, end: "a lobbyist for the National Ricochet Association, and another as a lobbyist for LockLoadMartyr. Each pays $200K/yr. Neither requires you to go in to work much.",
-        msg: "Nice job in the primary. You have to persevere though the general election. Scratch the Big Banks' backs and they'll scratch yours ... or just give you lots of money."},
-      26: { moves: 690, goal: 125000, end: "a financial consultant, for $350K/yr. Also, the weapons manufacturing lobby wants you to consult for them, for $150K/yr. Yes, you can do both.",
-        msg: "Well, looks like you don't even have a primary challenger this time! The party thinks you're just too important to lose. And the financial sector agrees!"},
-      27: { moves: 615, goal: 125000, end: "an executive at Bank Of Insolvancy, for $400K/yr (starting salary), plus quarterly bonuses.",
-        msg: "Another election in the (money) bag! Now on to the next one. You have a few primary challengers, but don't worry--they're as weak as a local bank."},
-      28: { moves: 75, goal: 125000, end: "a FineGamble Financial consultant. You'll make half a mil per year (which doesn't include the quarterly bonuses).",
-        msg: "You won the primary, but you've got a difficult general election ahead. Better build up Big Bank support!"},
-      29: { moves: 690, goal: 125000, end: "an executive at Bank Of Insolvancy, for $400K/yr (starting salary), plus quarterly bonuses. Also, the oil and gun lobbies want to pay you $100K/yr each, for 'vital'/(occasional) consulting.",
-        msg: "Kudos on your re-election. Now you don't even have a challenger in the next primary! Guess you can take this one to the bank (oh ho ho)."},
-      30: { moves: 615, goal: 125000, end: "a FineGamble Financial consultant. You'll make half a mil per year (which doesn't include the quarterly bonuses). Lobbying firms in three other industries will also pay you occasional (6-figure) special consulting fees.",
-        msg: "Well, Senator, looks like you've got a challenger in the pirmary. But she's actually refused to take any money from lobbyists! This shouldn't be a tough win."},
-      31: { moves: 75, goal: 125000, end: "a FineGamble Financial executive, for $750K/yr (starting salary), plus bonuses. An easy enough job that will leave you time to collect 6-figure consulting fees from other lobbying friends, er, firms.",
-        msg: "Your old friend Rob M. Blynde is back again to challenge you for the seat. He's got serious support from Big Pharma and Tobacco, so I guess we'll find out who has the better friends."},
-      32: { moves: 690, goal: 125000, end: "a consultant with FineGamble Financial, for half a mil every year (starting salary), plus bonuses. Also a consult with LockLoadMartyr for another quarter mil. You can still do special consulting with other firms, for a $100K fee each.",
-        msg: "Gulp! You're in for the fight of your life. Your opponent, a serious 'reform candidate,' has a ton of popular support and is calling you out. Time to prove to America that, in the end, special interests always win!"},
-      33: { moves: 1, goal: 0, end: "Good game, Mr. President.", msg: "YOU WIN! In fact, you've been such a friend to so many lobbyists, that a group of them got together and decided to install you as President of the United States of America. Feel free to keep playing the game, Mr. President, but you've already won it all!"}
+      1: { failMsg: "a lowly regional consultant for OilOnU, making a meager $75,000/yr.",
+        winMsg: "Nice work! But this time you'll face a primary challenger. Prove you can help Big Oil more than Ollie 'Oilcan' Derricks can.",
+        moves: 180, goal: 35000 },
+      2: { playMsg: "Ollie 'Oilcan' Derricks has decided to challenge you in the primary. You can't help but feel sorry for the poor sleeze--he played slick with his district for years, but hey, census happens. Ollie's district (coincidentally one with the most earthquakes that no one has REALLY proved are caused by fracking) lost the most people, so he got redrawn, carved up. He's not known beyond his old district, nor even respected in it, but he does have some friends, so you better really pledge your allegiance to your lobby. Never let them doubt you can help them--because they know Ollie can.",
+        failMsg: "a mid-level special projects consultant for the oil lobby, making only $88,500/yr.",
+        winMsg: "You greased 'Oilcan' Derricks for the primary win! Now put the pedal to the petrol and nab the general election.",
+        moves: 145, goal: 45000 },
+      3: { playMsg: "I cannot believe this, but it's Bubs Oldentine! He's back to challenge you. Whew! After the fight Ollie put up, this old school fool ain't nothing. He doesn't even have a big lobby backing him up. Grease him! OH yeah, and don't worry about rolling the money over from one election into another. That would be illegal if it was all in YOUR campaign chest, but that's why we have superPACs. Just one more way winners buck the system.",
+        failMsg: "a consultant in OilOnU's state office. At $100,000/yr, you'll be fine, buddy.",
+        winMsg: "You've held your seat. Looks like Derricks is back for a tougher challenge, though. Has he got a bigger lobby in his pocket, or is he just glad to see you?",
+        moves: 45, goal: 20000 },
+      4: { playMsg: "Yes, indeed. Ollie 'Oilcan' Derricks has a new friend. The energy lobby isn't enough for him, so he's talking a good game to the agribusiness lobby. It's not a bad idea, actually. We'll look into that later. For now, let's figure they'll see he's all hat and no cattle. Even so, they've got crazy money to throw. They'll give him some cash just for making a move their way. He's gonna be tougher to beat this time.",
+        failMsg: "a consultant. Pack your bags! You're moving to OilCanU's national headquarters. $110,000/yr",
+        winMsg: "You won the nomination! Other party's actually putting up a new challenger, but nothing you can't handle.",
+        moves: 145, goal: 50000 },
+      5: { playMsg: "Well, lookee at that. The other party hasn't even bothered to mount a serious challenge. Some upstart city council kid named Johnny Q. Blick is coming at you. That's what they get for not building up their legislative bench and focusing only on the big elections. They've got nobody. Keep making money now, though, so you'll have more for the next election. It pays (BIG) to think ahead.",
+        failMsg: "a consultant, whatever that is. You'll 'work' remote and net $120K/yr.",
+        winMsg: "You're in for another term as State Delegate ... incumbency looks good on you! You can stick around for as long as you like now.  Especially since Ollie's looking into targeting a weaker district next time. The party likes you well enough that you shouldn't be challenged for this seat by your own any time soon.",
+        moves: 45, goal: 20000 },
+      6: { playMsg: "You're going another round with the city council kid, Blick. That little twerp has gotten some local community support and maybe a little union money, but he's still a small fry. Nobody will bet big on him for this little seat.",
+        failMsg: "a consultant, or in other words, you give an opinion once in a while. No, it's not a giveaway. You've been close to the action. I'm sure your opinion's probably worth $150K/yr.",
+        winMsg: "Nothing wrong with using your high profile as a State Delegate to highlight your candidacy for State Senate.",
+        moves: 180, goal: 50000 },
+      7: { playMsg: "Allow me to introduce you to George Sapp. For over twenty-seven years he's served his state in various roles, including four 4-year terms in the State Senate. Thanks to some opposition research, though, we know he's having an affair. The press is so obsessed with scandal, they'll forget everything he's ever done in their rush to high ratings. Because he's so beloved, your party hasn't bothered putting up a decent challenge. Looks like the perfect recipe to advance to a higher office--but he's still the incumbant, so you need to get your name out there, which costs big bucks.",
+        failMsg: "a national consultant with OilCanU. You don't even have to do anything but give an opinion. Which is worth $150,000.",
+        winMsg: "Congrats, State Senator. People may have mixed feelings about your win, but don't worry about them. In fact, there's a lobby I've been meeting with that's especially happy to see Sapp get the boot. Give agribusiness a leg up, and they'll send a fatty paycheck to help you out.",
+        moves: 180, goal: 75000 },
+      8: { playMsg: "Oh criminy. Remember Peter Pandurin? Of course you do. He may have voted with us in the House, but what a jerk. Well, rumor has it he's gonna challenge you for your seat now that you've won it for the party. What a tool.",
+        failMsg: "an OilCanU consultant, for $150,000. If you'd rather stay closer to home, CattleProd Corp offered you a spot in their regional office, but only for $95K/yr.",
+        winMsg: "You made it through the primary, but here comes a tough general election! You're gonna have to put the 'aggro' in Big Agro.",
+        moves: 315, goal: 85000 },
+      9: { playMsg: "Oh yeah, they've had a few years to prepare. The other party wants Sapp's old seat back. They're throwing some chick at you. Can't remember her name. Hell, I forget women are allowed to be politicians at all.",
+        failMsg: "a lobbyist with Cornyland. You'll make $115K/yr easy, but that's not counting bonuses, or your expense account.",
+        winMsg: "Re-elected to State Senate! Some small fries are lining up against you for the next primary--but you're the two-term incumbent.",
+        moves: 45, goal: 25000 },
+      10: { playMsg: "Doesn't look like Peter wants to risk coming at you again after the way you handled both him and what's her name. A bunch of little no-name wannabe party-players are lining up to try, but this one's not much to worry about.",
+        failMsg: "a CattleProd Corporation consultant in their state office, making $175K/yr.",
+        winMsg: "Big Agro helped you slaughter your primary opponents. Now you just have to sweet-talk your way through the general.",
+        moves: 315, goal: 90000 },
+      11: { playMsg: "So...you remember how that kid Blick ended up taking your seat in the House after you left? Well, he thinks he's going to follow your path up. Here he comes again. You've beaten him twice before. Let him and his labor pals know who rules the roost around here!",
+        failMsg: "a CattleProd Corporation consultant, at $175K/yr, though OilCanU wants to offer you a spot, too. Maybe you could do even 'consult' for both?",
+        winMsg: "You get a high-fructose high-five! You're secure in your State Senate office. No challengers on the horizon. How sweet it is...",
+        moves: 45, goal: 30000 },
+      12: { playMsg: "Yup, the party recognizes that this is YOUR seat now. Until you move on up, they'll see to it that not even Peter comes gunning for you. You only have to worry about Blick again. Stupid kid just won't quit.",
+        failMsg: "a chief executive of special projects for AgriVat Industries. First special project is a conference in the Bahamas, so better get flying. $205K/yr.",
+        winMsg: "I suppose it's easy to get comfortable here. Just keep your lobbyists happy, and they'll keep your war chest fat.",
+        moves: 360, goal: 125000 },
+      13: { playMsg: "Blick's given up on bumping you, I guess. That woman is back, though. You know, uh, whatsername?",
+        failMsg: "a consultant for the oil lobby, for $150K. AND a consulting job with CattleProd Corp, for $110/yr. Don't worry, neither job requires much attention.",
+        winMsg: "Your race to become a US Rep begins with a primary showdown against incumbent Aimee 'Deadeye' Dixon. Do what you can in the State Senate for the gun lobby if you want to hit national office.",
+        moves: 360, goal: 125000 },
+      14: { playMsg: "",
+        failMsg: "a consultant. A couple jobs, actually: one with the oil lobby, another with agribusiness. Each pays $150K/yr, and you can do both. All you need to do is offer your opinion or advice once in a while.",
+        winMsg: "You shot down 'Deadeye' and won the primary! Now, with help from the defense industry, you can shock and awe the voters into giving you the seat.",
+        moves: 130, goal: 125000 },
+      15: { playMsg: "",
+        failMsg: "a special executive. It's a position AgriVat just created. It'll pay $225K/yr, plus bonuses.",
+        winMsg: "Mission Accomplished, Representative! Uh-oh, but 'Deadeye' Dixon says she'll be back for her seat.",
+        moves: 50, goal: 125000 },
+      16: { playMsg: "",
+        failMsg: "a consultant with OilCanU for $150K. AND a mid-level executive with AgriVat, for $160K/yr. They're both fine with you doing both, just show up at whichever office whenever you feel like.",
+        winMsg: "Congrats, you won the party nomination. You should have no trouble gunning down the other party in the general, thanks to your firearms lobby friends.",
+        moves: 155, goal: 125000 },
+      17: { playMsg: "",
+        failMsg: "a LockLoadMartyr consultant, for $250K/yr. Also, the oil lobby wants to consult with you every now and then, for $10,000/hr.",
+        winMsg: "You've been re-elected to the House, but here comes another primary, and it's a deadly one! Make sure you go in with plenty of firepower!",
+        moves: 75, goal: 125000 },
+      18: { playMsg: "",
+        failMsg: "an industry expert and professional consultant with the National Ricochet Association. You can make $225K/yr, plus $15,000 for each speaking gig.",
+        winMsg: "Odds are good that you'll splatter another challenger this election. No need to bring out the big guns. Though, hey, it's a free country.",
+        moves: 155, goal: 125000 },
+      19: { playMsg: "",
+        failMsg: "a professional consultant with the National Ricochet Association, $225K/yr. Also, they're planning a series of conventions. Can you prepare a speech? You'll get $16,000 each time you give it.",
+        winMsg: "It'll be tough to unseat longtime Senator Rich Brigand this primary--he's got a lot of financial sector money behind him. Show the Big Banks you've got the Powerballs!",
+        moves: 75, goal: 125000 },
+      20: { playMsg: "",
+        failMsg: "a national consultant for LockLoadMartyr for $275K/yr. Also, the National Ricochet Association wants to pay you $17,500 per speaking gig, so maybe it's time for a victory lap after all.",
+        winMsg: "Whew! Your big gamble of a primary challenge paid off, but winning the general will still be difficult. Cut some regulations to help the banking lobby grow, grow, grow!",
+        moves: 155, goal: 125000 },
+      21: { playMsg: "",
+        failMsg: "an Agrivat consultant, for $225K per year. Also a LockLoadMartyr consultant, for another $125K/yr.",
+        winMsg: "With Peter Pandurin retiring, there's no incumbent, making this an unexpectedly easy primary. All you need to do is get interest from Big Banks. You'll give them a great ROI, that's for sure.",
+        moves: 75, goal: 125000 },
+      22: { playMsg: "",
+        failMsg: "a lobbyist for oil...and a lobbyist for agribusiness. Each pays $150K/yr. Also, the military/industrial lobby would like you to give some speeches, at $20K-a-pop.",
+        winMsg: "You won the primary, but this'll be your toughest general election yet! You'll need a ton of cash. Help the financial industry until you're Too Big To Fail!",
+        moves: 155, goal: 125000 },
+      23: { playMsg: "",
+        failMsg: "a LockLoadMartyr executive, for $350K/yr (starting salary).",
+        winMsg: "Keep doing intimate favors for the Big Banks. They'll thank you in the morning.",
+        moves: 75, goal: 125000 },
+      24: { playMsg: "",
+        failMsg: "a LockLoadMartyr executive, for $350K/yr (starting salary). And a confidential signing bonus...",
+        winMsg: "Nice job in the primary. You have to persevere though the general election. Scratch the Big Banks' backs and they'll scratch yours ... or just give you lots of money.",
+        moves: 615, goal: 125000 },
+      25: { playMsg: "",
+        failMsg: "a lobbyist for the National Ricochet Association, and another as a lobbyist for LockLoadMartyr. Each pays $200K/yr. Neither requires you to go in to work much.",
+        winMsg: "Well, looks like you don't even have a primary challenger this time! The party thinks you're just too important to lose. And the financial sector agrees!",
+        moves: 75, goal: 125000 },
+      26: { playMsg: "",
+        failMsg: "a financial consultant, for $350K/yr. Also, the weapons manufacturing lobby wants you to consult for them, for $150K/yr. Yes, you can do both.",
+        winMsg: "Another election in the (money) bag! Now on to the next one. You have a few primary challengers, but don't worry--they're as weak as a local bank.",
+        moves: 690, goal: 125000 },
+      27: { playMsg: "",
+        failMsg: "an executive at Bank Of Insolvancy, for $400K/yr (starting salary), plus quarterly bonuses.",
+        winMsg: "You won the primary, but you've got a difficult general election ahead. Better build up Big Bank support!",
+        moves: 615, goal: 125000 },
+      28: { playMsg: "",
+        failMsg: "a FineGamble Financial consultant. You'll make half a mil per year (which doesn't include the quarterly bonuses).",
+        winMsg: "Kudos on your re-election. Now you don't even have a challenger in the next primary! Guess you can take this one to the bank (oh ho ho).",
+        moves: 75, goal: 125000 },
+      29: { playMsg: "",
+        failMsg: "an executive at Bank Of Insolvancy, for $400K/yr (starting salary), plus quarterly bonuses. Also, the oil and gun lobbies want to pay you $100K/yr each, for 'vital'/(occasional) consulting.",
+        winMsg: "Well, Senator, looks like you've got a challenger in the pirmary. But she's actually refused to take any money from lobbyists! This shouldn't be a tough win.",
+        moves: 690, goal: 125000 },
+      30: { playMsg: "",
+        failMsg: "a FineGamble Financial consultant. You'll make half a mil per year (which doesn't include the quarterly bonuses). Lobbying firms in three other industries will also pay you occasional (6-figure) special consulting fees.",
+        winMsg: "Your old friend Rob M. Blynde is back again to challenge you for the seat. He's got serious support from Big Pharma and Tobacco, so I guess we'll find out who has the better friends.",
+        moves: 615, goal: 125000 },
+      31: { playMsg: "",
+        failMsg: "a FineGamble Financial executive, for $750K/yr (starting salary), plus bonuses. An easy enough job that will leave you time to collect 6-figure consulting fees from other lobbying friends, er, firms.",
+        winMsg: "Gulp! You're in for the fight of your life. Your opponent, a serious 'reform candidate,' has a ton of popular support and is calling you out. Time to prove to America that, in the end, special interests always win!",
+        moves: 75, goal: 125000 },
+      32: { playMsg: "",
+        failMsg: "a consultant with FineGamble Financial, for half a mil every year (starting salary), plus bonuses. Also a consult with LockLoadMartyr for another quarter mil. You can still do special consulting with other firms, for a $100K fee each.",
+        winMsg: "YOU WIN! In fact, you've been such a friend to so many lobbyists, that a group of them got together and decided to install you as President of the United States of America. Feel free to keep playing the game, Mr. President, but you've already won it all!",
+        moves: 690, goal: 125000 },
+      33: { playMsg: "Good game, Mr. President.",
+        failMsg: "",
+        winMsg: "",
+        moves: 1, goal: 0 }
     }
     return phaseMap[phase];
   },
@@ -193,56 +271,46 @@ var Utils = {
           1: {
             160: {
               tokens: ['oil1', 'oil1', 'oil2'],
-              msg: "Oil cans make derricks, which make refineries, which make pipelines. Keep the oil flowing and their lobby will keep your coffers stuffed.",
               nextTrigger: 140
             },
             140: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'con1'],
-              msg: "Keep an eye on your bank balance and how many legislative days you have left until your next election. If you can't raise the money in time, you'll be out of a job.",
               nextTrigger: 115
             },
             115: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1'],
-              msg: "Your constituents may start to notice how much you're aiding the oil lobby. They do get in the way when upset. It costs legislative time and some of funding to publicize it, but try appeasing them with a park...before they SWARM!",
               nextTrigger: 82
             },
             82: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1'],
-              msg: "Don't worry about getting the pipelines together. Once you've made enough of them, you'll earn a favor, matched or not. But DO make sure to keep space on the board. Gridlock means game over.",
               nextTrigger: 44
             },
             44: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1'],
-              msg: "Of course, people forget what you did for them pretty fast. Each appeasement has a limited lifespan. Don't worry--lobbyists have better memories.",
               nextTrigger: 115
             }
           },
           2: {
             115: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1'],
-              msg: "That next goal is just for handling Ollie, but he's not the only one to worry about. Build up enough money to survive the general election that'll be right up behind it!",
               nextTrigger: 98
             },
             98: {
               tokens: ['oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1'],
-              msg: "Don't worry about election laws that say money raised is earmarked for this election or that one. This is what super-PACs are for. Rolling money on through election cycles is just one of many ways we winners buck the system.",
               nextTrigger: 63
             },
             63: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1', 'mega'],
-              msg: "Passing helpful legislation isn't the only way to help out your friendly lobbyists. Use your position of authority to give them a voice. Use your megaphone as a wild card.",
               nextTrigger: 17
             },
             17: {
               tokens: ['oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
-              msg: "Those pipelines eventually add up to favors. An oil slick can clear the way for more development. Select the OIL favor, then click any square in the row you want emptied.",
               nextTrigger: 33
             }
           },
           3: {
             33: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
-              msg: "If the timing isn't working for you, bottle a project up in committee. Click the empty hold area below and your next token will be held there. Just click it again to select it for use. But it will cost $10 every legislative day you use the hold.",
               nextTrigger: 130,
               special: "hold"
             }
@@ -250,32 +318,27 @@ var Utils = {
           4: {
             130: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil2', 'oil2', 'oil3', 'oil3', 'con1', 'con1', 'con1', 'mega'],
-              msg: "In the old days, people campaigned so they could do things in office. These days you have to legislate so that you can win your next campaign. Make sure you know what the political consequences will be before you cast any vote.",
               nextTrigger: 56
             },
             56: {
               tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
-              msg: "No surprise that Derricks is going negative. It's better for both of you to suppress turn-out. That way you can focus on getting your own people out. That's what the money you raise will go to this season: ads that will help convince people leaning his way to not bother voting.",
               nextTrigger: 230 //TODO: keep changing from here
             }
           },
           8: {
             230: {
               tokens: ['oil1', 'oil2', 'oil2', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'con1', 'con1', 'mega'],
-              msg: "Parks clearly won't be enough. Consider a bigger project, like a library. It'll cost you more, but maybe it'll shut those pesky constituents up a little longer.",
               nextTrigger: 172,
               special: "appeasement"
             },
             172: {
               tokens: ['oil1', 'oil2', 'oil2', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'con1', 'con1', 'mega', 'pork'],
-              msg: "Juggling unrelated interests is what pork was invented for. When writing legislation to help one lobby, you can slip something in to help another. Set the pork on any token on the board and it'll get scooped up when you make a match nearby.",
               nextTrigger: 299
             }
           },
           10: {
             299: {
               tokens: ['oil1', 'oil2', 'oil3', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'agr2', 'agr2', 'agr2', 'agr2', 'agr3', 'con1', 'con1', 'con1', 'mega'],
-              msg: "Balancing two special interests gets complicated, and it'll only be crazier when you step onto the national scene. The second hold area charges $100 per legislative day, but it might be worth it.",
               nextTrigger: 120,
               special: "hold"
             }
@@ -283,7 +346,6 @@ var Utils = {
           16: {
             120: {
               tokens: ['oil1', 'oil2', 'oil3', 'agr1', 'agr1', 'agr2', 'agr2', 'agr2', 'agr3', 'mil1', 'mil1', 'mil1', 'mil1', 'mil1', 'mil2', 'mil2', 'mil2', 'con1', 'con1', 'con1', 'mega', 'mega'],
-              msg: "Oh yeah, you could probably use your new powers as a national representative to builds some bridges or other infrastructure. That'll really distract those stupid voters! Ha ha haa!",
               nextTrigger: 555,
               special: "appeasement"
             }
@@ -291,7 +353,6 @@ var Utils = {
           24: {
             555: {
               tokens: ['agr2', 'agr3', 'mil1', 'mil1', 'mil2', 'mil2', 'mil3', 'fin1', 'fin1', 'fin1', 'fin1', 'fin1', 'fin2', 'fin2', 'con1', 'con1', 'con1', 'mega', 'pork', 'pork'],
-              msg: "It costs big at $1000 a day, but when you really want to set things up right, you might just want this final hold area.",
               nextTrigger: 461,
               special: "hold"
             }
@@ -299,20 +360,17 @@ var Utils = {
           27: {
             461: {
               tokens: ['oil1', 'agr1', 'fin1', 'fin1', 'mil1', 'mil1', 'mega', 'mega', 'con1'],
-              msg: "Budget Crisis! During this special session, you'll only have low level tokens to work with. Use the extra time in Washington to make more speeches (megaphones) than usual.",
               nextTrigger: 459,
               moveChange: 40
             },
             459: {
               tokens: ['oil1', 'agr1', 'mil1', 'mil2', 'mil2', 'fin1', 'fin2', 'fin2', 'fin3', 'mega', 'pork', 'con1', 'con1'],
-              msg: "The special session's over and the budget crisis has been patched up, for now. With the holidays over and the next session starting, things will slowly be getting back to normal...",
               nextTrigger: 155 //TODO: this will change!
             }
           },
           30: {
             155: {
               tokens: ['oil1', 'oil2', 'agr1', 'agr2', 'mil1', 'mil2', 'mil2', 'mil3', 'fin1', 'fin1', 'fin2', 'fin2', 'fin3', 'fin3', 'fin4', 'con1', 'con1', 'con1', 'mega', 'mega', 'pork', 'pork'],
-              msg: "Government shutdown knocked some days off the legislative calendar! Better make up for it, espeically when the big banks are counting on you!",
               nextTrigger: 777, //TODO: this will change!
               moveChange: -23
             }

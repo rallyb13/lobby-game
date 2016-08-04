@@ -6,12 +6,15 @@ import Grid from './components/Gameboard/Grid';
 import Scoreboard from './components/Scoreboard/Scoreboard';
 import Holder from './components/Holder';
 import Menu from './components/Menu/Menu';
+import Overlay from './components/Overlay/Overlay';
 
 var App = React.createClass ({
   //creates current board with randomly selected starting tokens and sets game-starting state object
   componentWillMount: function () {
     QuidStore.setupBoard();
     this.setState(QuidStore.getCurrentState());
+    localStorage.setItem('thisTurn', JSON.stringify( QuidStore.getCurrentState() ) )
+    localStorage.setItem('lastTurn', localStorage['thisTurn'] )
   },
 
   componentDidMount: function(){
@@ -22,9 +25,14 @@ var App = React.createClass ({
     QuidStore.removeChangeListener(this.onChange);
   },
 
+  //when user clicks undo, the current state is set to the last state, which was saved in localStorage
+    undoLastTurn: function(){
+        localStorage.setItem('thisTurn', localStorage['lastTurn'])
+        this.setState(JSON.parse(localStorage['lastTurn']))
+    },
+
   render(){
-    var advMsg = this.state.advMsg,
-        isGameOver = this.isGameOver(advMsg),
+    var isGameOver = this.isGameOver(),
         holders = this.state.holdTokens,
         allHolders = [],
         i;
@@ -42,28 +50,34 @@ var App = React.createClass ({
         <div className="main">
           <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
           <div className="white-paper-panel">
-            <Menu />
-            <Scoreboard state={this.state} gameOver={isGameOver}/>
+            <Menu username={this.state.userInfo.username} undoLastTurn={this.undoLastTurn}/>
+            <Scoreboard state={this.state} />
             <div style={this.styles.holders}>{allHolders}</div>
           </div>
           <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange}/>
-          <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver}/>
+          <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver} moves={this.state.movesRemaining} office={this.state.electedOffice}/>
+          <Overlay gameData={this.state} isGameOver={isGameOver} />
         </div>
       </div>
     );
   },
 
   //when state object change is emitted, resets state so that changes can be filtered to appropriate components
+  //localStorage API requires stringify when working with Objects
   onChange: function() {
     this.setState(QuidStore.getCurrentState());
+    localStorage.setItem('lastTurn', localStorage['thisTurn'] )
+    localStorage.setItem('thisTurn', JSON.stringify( QuidStore.getCurrentState() ) )
+
   },
 
+
   //checks that board is not full and bank balance is still positive (at end of election cycle)
-  isGameOver: function(advMsg){
-    if (advMsg === 'bank'){
+  isGameOver: function(){
+    var advMsg = this.state.advMsg;
+    
+    if (advMsg === 'bank' || advMsg === 'board'){
       return advMsg;
-    } else if (QuidStore.findTokenCoords('').length === 0){
-      return 'board';
     } else {
       return false;
     }

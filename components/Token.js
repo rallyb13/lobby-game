@@ -7,8 +7,8 @@ var Token = React.createClass({
       'icon-oil-drop': this.props.symbol === 'oil1',
       'icon-oil-can': this.props.symbol === 'oil2',
       'icon-derrick': this.props.symbol === 'oil3',
-      'icon-refinery': this.props.symbol === 'oil4',
-      'icon-pipeline': this.props.symbol === 'oil5',
+      'icon-pipeline': this.props.symbol === 'oil4',
+      'icon-refinery': this.props.symbol === 'oil5',
       'icon-oilslick': this.props.symbol === 'oil6',
 
       'icon-seeds': this.props.symbol === 'agr1',
@@ -20,8 +20,8 @@ var Token = React.createClass({
 
       'icon-bullet': this.props.symbol === 'mil1',
       'icon-gun': this.props.symbol === 'mil2',
-      'icon-assult-rifle': this.props.symbol === 'mil3',
-      'icon-missle': this.props.symbol === 'mil4',
+      'icon-AR-15': this.props.symbol === 'mil3',
+      'icon-missile': this.props.symbol === 'mil4',
       'icon-tank': this.props.symbol === 'mil5',
 
       'icon-coin': this.props.symbol === 'fin1',
@@ -32,6 +32,9 @@ var Token = React.createClass({
 
       'icon-vote': this.props.symbol === 'con1',
       'icon-park': this.props.symbol === 'con2',
+      'icon-library1': this.props.symbol === 'con3',
+      'icon-library2': this.props.symbol === 'con4',
+      'icon-bridge1': this.props.symbol === 'con5',
       'icon-megaphone': this.props.symbol === 'mega'
     }),
     backgroundType = this.props.symbol !== '' ? 'url(../assets/icons/' + symbolClass + '.png) no-repeat top/contain' : 'inherit';

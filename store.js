@@ -7,7 +7,11 @@ var currentState = {
     rows: 6, columns: 6, grid: []
   },
   userInfo: {
+<<<<<<< HEAD
     userName: '', highScore: [0], highOffice: ['State Delegate']
+=======
+    username: ''
+>>>>>>> 0fee30c024171588bceeb30c7607b1657897f9fb
   },
   tokensArray: ['oil1', 'oil1', 'oil1', 'oil2'],
   stagedToken: 'oil1',
@@ -20,11 +24,12 @@ var currentState = {
   repeat: 0, //tracks if level is repeated (when higher office declined)
   nextGoal: 35000,
   electedOffice: 'State Delegate',
-  message: 'Click any unoccupied square in the grid to place the next item. Match 3 oils drops to make an oil can...',
+  helpDetail : false,
+  message: "Welcome to your first term. If you don't want it to be your last, you better get out there and hustle for some money. The best way to do this is by finding at least one lobby that flings money at their favorite people. You've only got 180 legislative days to prove how useful you can be if you stick around. Lucky for you, the party is paying more attention to bigger elections, so I don't foresee any primary challengers to speak of. But you've got to expect ol' Bubs Oldentine will try at least once to get his seat back. Don't rule him out, though; you'd be surprised how much it costs to beat even a loser like Bubs, who tries to keep campaigning separate from governing.",
   advMsg: 'none',
   advanceQuestion: false, //true when phase change should prompt choice of office advancement
   trigger: 160, //move # at which message will change
-  newMessage: true, //only true at first appearance of new message
+  unreadMsgCount: 0,
   //special token quick refs
   megaPossCoords: [], //coordinates where megaphone can be dropped
   megaPossTokens: [], //arrays of valid tokens megaphone can become (at coordinate corresponding to megaPossCoords)
@@ -101,6 +106,12 @@ QuidStore.getCurrentState = function(){
 //
 //
 
+QuidStore.setUser = function (name) {
+  currentState.userInfo.username = name;
+  this.emitChange();
+};
+
+
 //helper fn to return token placed at specific GridSquare by coordinates
 QuidStore.getToken = function (rowPos, colPos){
   return currentState.board.grid[rowPos][colPos];
@@ -170,6 +181,12 @@ QuidStore.oilSlick = function(rowNum){
   for (var i = 0; i < currentState.board.columns; i++){
     this.setToken('', rowNum, i);
   }
+};
+
+//helper to communicate selected tab to overlay so that it can reference correct tab in props
+QuidStore.setHelpDetail = function(selection){
+  currentState.helpDetail = selection;
+  this.emitChange();
 };
 
 //
@@ -294,10 +311,17 @@ QuidStore.completeMove = function(rowPos, colPos){
     swarm = true;
   }
   this.moveConstituents(rowPos, colPos, swarm);
-
-  this.setNextToken();
-  if (token.slice(3,4) === '5'){
-    this.addTopLevelToken(token, rowPos, colPos);
+  
+  //with swarm/move constituents, appeasement && top level token removal all handled,
+  //here we check if board is filled before going on
+  if (QuidStore.findTokenCoords('').length === 0){
+    currentState.advMsg = 'board';
+    this.endPhase(true);
+  } else {
+    this.setNextToken();
+    if (token.slice(3,4) === '5'){
+      this.addTopLevelToken(token, rowPos, colPos);
+    }
   }
   this.emitChange();
 };
@@ -306,26 +330,23 @@ QuidStore.completeMove = function(rowPos, colPos){
 //checks for next trigger (of msg & token selection changes) && for end of countdown (which triggers phase change)
 //also has special logic for late-in-game surprise changes to move counter (and handles appeasement tokens on board at the time)
 QuidStore.nextMove = function(){
-  var moves = currentState.movesRemaining,
-    progressionData,
-    moveChange;
+  var moves, progressionData, moveChange;
 
   if (currentState.phase <= 32){
     currentState.movesRemaining--;
   } else {
     currentState.movesRemaining++;
   }
-
+  
+  moves = currentState.movesRemaining;
   if (moves === 0){
-    this.handleElection(currentState.repeat % 3);
+    this.endPhase(false);
   }
   else if (moves === currentState.trigger) {
     progressionData = Utils.progressGame(currentState.phase, moves);
     if (progressionData !== false){
       currentState.tokensArray = progressionData.tokens;
-      currentState.message = progressionData.msg;
       currentState.trigger = progressionData.nextTrigger;
-      currentState.newMessage = true;
       if (progressionData.special === 'hold'){
         currentState.holdTokens.push('');
       } else if (progressionData.special === 'appeasement'){
@@ -343,8 +364,6 @@ QuidStore.nextMove = function(){
         }
       }
     }
-  } else if (moves !== currentState.trigger && moves !== 0){
-    currentState.newMessage = false;
   }
 };
 
@@ -458,28 +477,24 @@ QuidStore.addAppeasement = function(token, rowPos, colPos){
     max = Utils.getTokenData(token, 'dMax'),
     time = Math.floor(Math.random() * (max - min) ) + min,
     moveTrigger = currentState.movesRemaining - time,
-    phaseTrigger = currentState.phase;
+    isInPhase = moveTrigger > 0;
 
-  while (moveTrigger < 0){
-    phaseTrigger++;
-    moveTrigger = moveTrigger + Utils.getPhaseData(phaseTrigger)['moves'];
-  }
-  currentState.appeasements.push( [rowPos, colPos, token, moveTrigger, phaseTrigger] );
+  currentState.appeasements.push( [rowPos, colPos, token, moveTrigger, isInPhase] );
 };
 
 //when appeasement tokens are in use, this checks removal times and calls for removal as appropriate
 QuidStore.checkAppeasements = function(special){
   var appeasements = currentState.appeasements,
-    phase = currentState.phase,
     move = currentState.movesRemaining,
-    indexes = [],
     isTarget,
     i;
 
   for (i = appeasements.length - 1; i >= 0; i--){
-    isTarget = special ? (appeasements[i][3] >= move) : (appeasements[i][3] === move);
-    if(appeasements[i][4] === phase && isTarget){
-      this.removeAppeasement(i, appeasements[i][0], appeasements[i][1], appeasements[i][2]);
+    if(appeasements[i][4]){
+      isTarget = special ? (appeasements[i][3] >= move) : (appeasements[i][3] === move);
+      if (isTarget){
+        this.removeAppeasement(i, appeasements[i][0], appeasements[i][1], appeasements[i][2]);
+      }
     }
   }
 };
@@ -493,6 +508,19 @@ QuidStore.removeAppeasement = function(index, rowPos, colPos, token){
 
   if (newToken !== ''){
     this.addAppeasement(newToken, rowPos, colPos);
+  }
+};
+
+//at phase change, recalculates triggers of remaining appeasements
+QuidStore.handleAppeasements = function(moves){
+  var appeasements = currentState.appeasements;
+  for (var i = appeasements.length - 1; i >= 0; i--){
+    if(appeasements[i][3] === 0){
+      this.removeAppeasement(i, appeasements[i][0], appeasements[i][1], appeasements[i][2]);
+    } else {
+      appeasements[i][3] = moves + appeasements[i][3];
+      appeasements[i][4] = appeasements[i][3] > 0;
+    }
   }
 };
 
@@ -711,6 +739,7 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
     phaseData,
     coords;
 
+  this.deposit(-currentState.nextGoal);
   currentState.phase = currentState.phase + phaseShift;
   phase = currentState.phase;
   phaseData = Utils.getPhaseData(phase);
@@ -726,8 +755,8 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
   currentState.nextGoal = phaseData.goal;
 
   //change more often (tokensArray also, but not on phase change)
-  currentState.message = phaseData.msg;
-  currentState.newMessage = true;
+  currentState.message = phaseData.playMsg;
+  currentState.unreadMsgCount = currentState.unreadMsgCount + 1;
 
   //changes less often
   currentState.electedOffice = Utils.setElectedOffice(phase, currentState.electedOffice);
@@ -744,29 +773,28 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
   if (fromChoice){
     currentState.advMsg = 'none';
   }
+  
+  this.handleAppeasements(phaseData.moves);
   this.emitChange();
 };
 
-//when moves hit 0 left, checks bank balance to determine if game continues
-//handles setting higher office election choices at specific phases
-QuidStore.handleElection = function(repeat){
+//called at end of phase OR when there are no more spaces--pops overlay up and handles all needed for conclusion of phase &/or game
+//endGame is true if fn is called from full board (mid-phase), false if called at last move of phase (but will then check for lost election)
+QuidStore.endPhase = function(endGame){
   var phase = currentState.phase,
-    advMsg = Utils.setElectionChoice(phase);
-
-  this.deposit(-currentState.nextGoal);
-  if (currentState.bankBalance <= 0){
-    currentState.advMsg = 'bank';
-    this.emitChange();
-    return;
+      firstPart = "Don't worry, Loser. Friends take care of friends. You've got a new job now, working as ",
+      phaseData = Utils.getPhaseData(phase);
+  
+  Utils.toggleOverlay(true);
+  if (currentState.nextGoal > currentState.bankBalance || endGame){
+    currentState.message = firstPart + phaseData['failMsg'];
+  } else {
+    currentState.message = phaseData['winMsg'];
+    currentState.advMsg = Utils.setElectionChoice(phase);
+    if (phase === 19){
+      currentState.advMsg = currentState.advMsg[currentState.repeat % 3];
+    }
   }
-
-  if (phase === 19){
-    advMsg = advMsg[repeat];
-  }
-  if (advMsg === 'none'){
-    this.changePhase(1, false);
-  }
-  currentState.advMsg = advMsg;
 };
 
 export default QuidStore;

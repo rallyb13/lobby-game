@@ -44,6 +44,112 @@ h1 {
   background: #fff !important;
 }
 
+/************ OVERLAY ***********/
+.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 255, 255, 0.875);
+  width: 90%;
+  height: 90%;
+  border: 5px gray solid;
+  overflow-y: auto;
+}
+
+.modalBanner {
+    width: 100%;
+    display: block;
+}
+
+.modalWrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.leftPanel {
+  margin: 20px;
+  flex-basis: 40vw;
+  flex: 0 1;
+}
+
+.mainPanel {
+    flex-basis: 60vw;
+    flex: 1 0;
+}
+
+.helpWrapper {
+    margin: 0 10vw;
+}
+
+.helpWrapper img {
+    margin: 0 auto 3em;
+    display: block;
+    max-width: 100%;
+}
+
+.inline-help-images {
+    margin: 0 10vw 3em;
+}
+
+.inline-help-images img {
+    display: inline;
+    margin: 0;
+}
+
+.helpTab {
+  border: 3px teal solid;
+  color: white;
+  background-color: maroon;
+  text-align: center;
+  padding: 10px;
+  margin-left: 10%;
+  border-bottom: none;
+  opacity: 1;
+}
+
+.helpTab:last-child {
+  border-bottom: 3px teal solid;
+}
+
+.closeButton {
+  border: 1px gold solid;
+  border-radius: 100%;
+  color: white;
+  background-color: black;
+  padding: 10px;
+  position: absolute;
+  top: 0px;
+  right: 10px;
+}
+
+.funds {
+  border: 5px green solid;
+  background-color: lime;
+  padding: 1% 2.5%;
+  float: right;
+  margin-right: 10px;
+}
+
+.funds h3 {
+  margin: 0;
+}
+
+.calculation {
+  display: block;
+  list-style: none;
+  text-align: right;
+  margin: 0 0 2% -1%;
+  padding: 0;
+  font-size: 2.5em;
+}
+
+.midNum {
+  padding-bottom: 1px;
+  text-decoration: underline;
+}
+
 /* for larger screens */
 @media (min-width: 900px) {
   .main {
@@ -54,5 +160,12 @@ h1 {
   }
   .game-grid {
     width: 69%;
+  }
+  .modalWrapper {
+      flex-direction: row;
+  }
+  .short-help-image {
+      position: relative;
+      left: -80px;
   }
 }

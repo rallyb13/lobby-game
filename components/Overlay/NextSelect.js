@@ -1,5 +1,6 @@
 import React from 'react';
 import QuidStore from '../../store';
+import Utils from '../../utils';
 
 var NextSelect = React.createClass({
   render: function(){
@@ -7,16 +8,19 @@ var NextSelect = React.createClass({
       displayButton;
 
     if (this.props.gameOver) {
-      displayButton = <button style={this.styles.restart} onClick={this.restart}> Restart </button>;
-    } else {
-      displayButton = <div style={this.styles.choice}>
+      displayButton = <button onClick={this.restart}> Restart </button>;
+    } else if (advMsg !== 'none'){
+      displayButton = <div>
           <div>{advMsg}</div>
           <button style={this.styles.buttons} onClick={this.acceptAdvance} > Higher Office! </button>
           <button style={this.styles.buttons} onClick={this.refuseAdvance} > Am Comfy Here </button>
         </div>;
-    }
+      } else {
+        displayButton = <button onClick={this.continue}> Keep Running </button>;
+      }
+
     return(
-      <div style={this.styles.container} >
+      <div>
         {displayButton}
       </div>
     );
@@ -28,6 +32,11 @@ var NextSelect = React.createClass({
     location.reload();
   },
 
+  continue: function() {
+    Utils.toggleOverlay(false);
+    QuidStore.changePhase(1, false);
+  },
+  
   //handles choice of NOT running for next elected office, adjusting phase as needed
   refuseAdvance: function(){
     var phase = this.props.phase,
@@ -42,11 +51,12 @@ var NextSelect = React.createClass({
       adjustment = -1
       QuidStore.rerunPhase(true);
     }
+    Utils.toggleOverlay(false);
     QuidStore.changePhase(adjustment, true);
   },
 
   //handles choice of running for next elected office, adjusting phase as needed
-  acceptAdvance: function(phase, repeat){
+  acceptAdvance: function(){
     var phase = this.props.phase,
       repeat = this.props.repeat,
       adjustment;
@@ -60,27 +70,13 @@ var NextSelect = React.createClass({
       adjustment = repeat === 0 ? 1 : 3;
       QuidStore.rerunPhase(false);
     }
-    QuidStore.changePhase(adjustment, true);
+    Utils.toggleOverlay(false);
+    QuidStore.changePhase(adjustment, true); //should be able to add to repeat without bringing it through as props
+    //this will probably need to close modal
+    //or we'll need a trigger for EVERY phase to go on that prompts phase change
   },
 
   styles: {
-    container: {
-      backgroundColor: 'white',
-      height: '150px',
-      width: '100%',
-      display: 'block',
-      position: 'relative',
-      marginLeft: '-5px',
-      padding: '5px'
-    },
-    restart: {
-      margin: '25% 0 0 35%',
-      padding: '5%'
-    },
-    choice: {
-      margin: '10% 0 0 5%',
-      padding: '5%'
-    },
     buttons: {
       margin: '1% 2% 0 0'
     }

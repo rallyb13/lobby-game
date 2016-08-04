@@ -28,7 +28,7 @@ var GridSquare = React.createClass({
 
   //passes coordinates selected for (eligible) stagedToken placement, initiates completeMove state changes
   placeToken: function(){
-    if (this.props.eligible && !this.props.gameOver) {
+    if (this.props.eligible && !this.props.gameOver && !this.props.noMoves) {
       QuidStore.completeMove(this.props.rowPos, this.props.colPos);
     }
   },
