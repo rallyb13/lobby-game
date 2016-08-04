@@ -24,7 +24,7 @@ var HighOffice = React.createClass({
     ]
     //electedOfficeMap.map()
 
-    return displayOffice;
+    
   }
 });
 
