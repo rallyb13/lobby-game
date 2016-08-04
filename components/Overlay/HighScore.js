@@ -10,12 +10,13 @@ var HighScore = React.createClass({
 
     return (
       <div>
-        <h5> High Score: {Utils.formatNum(this.props.displayScore)}</h5>
+        <h5> High Score: {this.props.displayScore}</h5>
       </div>
     );
   },
 
   checkHighScore: function(highScores, currentScore) {
+    var displayScore;
     for(var i=0; i<highScores.length; i++) {
       if (currentScore > highScores[i]) {
         highScores.push(currentScore);

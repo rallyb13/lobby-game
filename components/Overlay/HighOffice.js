@@ -3,9 +3,9 @@ import Utils from '../../utils';
 
 var HighOffice = React.createClass({
   render: function(){
-    var highOffices: this.props.highOffice;
-    var currentOffice: this.props.currentOffice;
-    var displayOffice = this.checkHighOffice(highOffices, currentOffice);
+    var highOffice = this.props.highOffice;
+    var currentOffice = this.props.currentOffice;
+    var displayOffice = this.checkHighOffice(highOffice, currentOffice);
 
     return (
       <div>
@@ -14,7 +14,7 @@ var HighOffice = React.createClass({
     );
   },
 
-  checkHighOffice: function(highOffices, currentOffice) {
+  checkHighOffice: function(highOffice, currentOffice) {
     var electedOfficeMap = [
       {office: 'State Delegate', rank: 1},
       {office: 'State Senator', rank: 2},

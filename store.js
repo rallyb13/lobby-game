@@ -7,11 +7,7 @@ var currentState = {
     rows: 6, columns: 6, grid: []
   },
   userInfo: {
-<<<<<<< HEAD
-    userName: '', highScore: [0], highOffice: ['State Delegate']
-=======
-    username: ''
->>>>>>> 0fee30c024171588bceeb30c7607b1657897f9fb
+    userName: '', highScore: [0, 3], highOffice: ['State Delegate']
   },
   tokensArray: ['oil1', 'oil1', 'oil1', 'oil2'],
   stagedToken: 'oil1',
@@ -311,7 +307,7 @@ QuidStore.completeMove = function(rowPos, colPos){
     swarm = true;
   }
   this.moveConstituents(rowPos, colPos, swarm);
-  
+
   //with swarm/move constituents, appeasement && top level token removal all handled,
   //here we check if board is filled before going on
   if (QuidStore.findTokenCoords('').length === 0){
@@ -337,7 +333,7 @@ QuidStore.nextMove = function(){
   } else {
     currentState.movesRemaining++;
   }
-  
+
   moves = currentState.movesRemaining;
   if (moves === 0){
     this.endPhase(false);
@@ -773,7 +769,7 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
   if (fromChoice){
     currentState.advMsg = 'none';
   }
-  
+
   this.handleAppeasements(phaseData.moves);
   this.emitChange();
 };
@@ -784,7 +780,7 @@ QuidStore.endPhase = function(endGame){
   var phase = currentState.phase,
       firstPart = "Don't worry, Loser. Friends take care of friends. You've got a new job now, working as ",
       phaseData = Utils.getPhaseData(phase);
-  
+
   Utils.toggleOverlay(true);
   if (currentState.nextGoal > currentState.bankBalance || endGame){
     currentState.message = firstPart + phaseData['failMsg'];
