@@ -23,9 +23,7 @@ var currentState = {
   helpDetail : false,
   message: "Welcome to your first term. If you don't want it to be your last, you better get out there and hustle for some money. The best way to do this is by finding at least one lobby that flings money at their favorite people. You've only got 180 legislative days to prove how useful you can be if you stick around. Lucky for you, the party is paying more attention to bigger elections, so I don't foresee any primary challengers to speak of. But you've got to expect ol' Bubs Oldentine will try at least once to get his seat back. Don't rule him out, though; you'd be surprised how much it costs to beat even a loser like Bubs, who tries to keep campaigning separate from governing.",
   advMsg: 'none',
-  advanceQuestion: false, //true when phase change should prompt choice of office advancement
   trigger: 160, //move # at which message will change
-  unreadMsgCount: 0,
   //special token quick refs
   megaPossCoords: [], //coordinates where megaphone can be dropped
   megaPossTokens: [], //arrays of valid tokens megaphone can become (at coordinate corresponding to megaPossCoords)
@@ -752,7 +750,6 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
 
   //change more often (tokensArray also, but not on phase change)
   currentState.message = phaseData.playMsg;
-  currentState.unreadMsgCount = currentState.unreadMsgCount + 1;
 
   //changes less often
   currentState.electedOffice = Utils.setElectedOffice(phase, currentState.electedOffice);
