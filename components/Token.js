@@ -24,9 +24,9 @@ var Token = React.createClass({
       'icon-missile': this.props.symbol === 'mil4',
       'icon-tank': this.props.symbol === 'mil5',
 
-      'icon-coin': this.props.symbol === 'fin1',
-      'icon-dollar': this.props.symbol === 'fin2',
-      'icon-money-bag': this.props.symbol === 'fin3',
+      'icon-piggybank': this.props.symbol === 'fin1',
+      'icon-safe': this.props.symbol === 'fin2',
+      'icon-vault': this.props.symbol === 'fin3',
       'icon-bank': this.props.symbol === 'fin4',
       'icon-tower': this.props.symbol === 'fin5',
 
