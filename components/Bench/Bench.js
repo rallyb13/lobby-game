@@ -16,7 +16,7 @@ var Bench = React.createClass({
       favor = token.slice(3,4) === '6';
       count = helpers[token];
       if (count > 0){
-        seats.push(<BenchSeat token={token} count={count} favor={favor} selected={this.props.poweringUp === token} key={i} />);
+        seats.push(<BenchSeat token={token} count={count} favor={favor} selected={this.props.poweringUp === token} staged={this.props.staged} key={i} />);
       }
     }
 

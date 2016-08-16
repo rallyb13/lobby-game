@@ -31,12 +31,15 @@ var BenchSeat = React.createClass({
 
   //delegates appropriate action for favor vs. appeasement selection
   useHelper: function(){
-    var token = this.props.token;
+    var token = this.props.token,
+        staged = this.props.staged;
 
     if (this.props.favor){
       this.useFavor(token);
     } else {
-      QuidStore.selectThisToken(token);
+      if (this.props.staged === 'con1' || this.props.staged.slice(0,3) !== 'con') {
+        QuidStore.selectThisToken(token);
+      }
     }
   },
 

@@ -272,16 +272,17 @@ QuidStore.completeMove = function(rowPos, colPos){
     swarm = false;
 
   //handle placement of tokens
-  if (token === 'oil6'){
-    this.oilSlick(rowPos);
-  } else if (token === 'mega'){
+  if (token === 'mega'){
     token = this.convertMega(rowPos, colPos);
   } else if (token === 'pork'){
     currentState.porkOn.push( JSON.stringify([rowPos, colPos]) );
   } else if (token.slice(0,3) === 'con' && token !== 'con1'){
     this.addAppeasement(token, rowPos, colPos);
   }
-  if (token !== 'oil6'){
+  
+  if (token === 'oil6') {
+    this.oilSlick(rowPos)
+  } else {
     token = this.handleMatches(token, rowPos, colPos);
     this.setToken(token, rowPos, colPos);
   }

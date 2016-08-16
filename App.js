@@ -54,7 +54,7 @@ var App = React.createClass ({
             <Scoreboard state={this.state} />
             <div style={this.styles.holders}>{allHolders}</div>
           </div>
-          <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange}/>
+          <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange} staged={this.state.stagedToken}/>
           <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver} moves={this.state.movesRemaining} office={this.state.electedOffice}/>
           <Overlay gameData={this.state} isGameOver={isGameOver} />
         </div>
