@@ -13,8 +13,6 @@ var App = React.createClass ({
   componentWillMount: function () {
     QuidStore.setupBoard();
     this.setState(QuidStore.getCurrentState());
-    localStorage.setItem('thisTurn', JSON.stringify( QuidStore.getCurrentState() ) )
-    localStorage.setItem('lastTurn', localStorage['thisTurn'] )
   },
 
   componentDidMount: function(){
@@ -24,12 +22,6 @@ var App = React.createClass ({
   componentWillUnmount: function(){
     QuidStore.removeChangeListener(this.onChange);
   },
-
-  //when user clicks undo, the current state is set to the last state, which was saved in localStorage
-    undoLastTurn: function(){
-        localStorage.setItem('thisTurn', localStorage['lastTurn'])
-        this.setState(JSON.parse(localStorage['lastTurn']))
-    },
 
   render(){
     var isGameOver = this.isGameOver(),
@@ -50,7 +42,7 @@ var App = React.createClass ({
         <div className="main">
           <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
           <div className="white-paper-panel">
-            <Menu username={this.state.userInfo.username} undoLastTurn={this.undoLastTurn}/>
+            <Menu username={this.state.userInfo.username} />
             <Scoreboard state={this.state} />
             <div style={this.styles.holders}>{allHolders}</div>
           </div>
@@ -66,9 +58,6 @@ var App = React.createClass ({
   //localStorage API requires stringify when working with Objects
   onChange: function() {
     this.setState(QuidStore.getCurrentState());
-    localStorage.setItem('lastTurn', localStorage['thisTurn'] )
-    localStorage.setItem('thisTurn', JSON.stringify( QuidStore.getCurrentState() ) )
-
   },
 
 

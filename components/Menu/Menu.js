@@ -2,10 +2,6 @@ import React from 'react';
 import QuidStore from '../../store';
 
 var Menu = React.createClass({
-  handleUndo() {
-    this.props.undoLastTurn()
-  },
-
   render: function(){
     var username = this.props.username,
         displayName = username === '' ? 'Login' : username;
@@ -15,6 +11,10 @@ var Menu = React.createClass({
         <li style={this.styles.listItem} onClick={this.handleUndo}>Undo</li>
       </ul>
     )
+  },
+  
+  handleUndo(){
+    QuidStore.undoTurn();
   },
 
   handleLogin() {

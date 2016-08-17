@@ -94,6 +94,15 @@ QuidStore.getCurrentState = function(){
   return currentState;
 };
 
+QuidStore.saveForUndo = function(){
+  localStorage.setItem('preMoveState', JSON.stringify( this.getCurrentState() ) )
+}
+
+QuidStore.undoTurn = function(){
+  currentState = JSON.parse(localStorage['preMoveState'])
+  this.emit(CHANGE_EVENT);
+}
+
 //
 //
 //************** STATE CHANGE HELPER FUNCTIONS
@@ -270,7 +279,9 @@ QuidStore.findTokenCoords = function(token){
 QuidStore.completeMove = function(rowPos, colPos){
   var token = currentState.stagedToken,
     swarm = false;
-
+  
+  this.saveForUndo() //first, save current state!
+  
   //handle placement of tokens
   if (token === 'mega'){
     token = this.convertMega(rowPos, colPos);
