@@ -795,7 +795,7 @@ QuidStore.endPhase = function(endGame){
 //agribusiness favor: levels up each not-top-level agribusiness token
 //handles tracking top level tokens when agr4s are advanced to agr5s
 QuidStore.fattenAgriTokens = function(){
-  let toFattenTokens = QuidStore.findTokenCoords('agr4'),
+  let toFattenTokens = this.findTokenCoords('agr4'),
       i = 3;
   
   for (let coords of toFattenTokens){
@@ -804,7 +804,7 @@ QuidStore.fattenAgriTokens = function(){
   }
   while (i > 0) {
     let j = i + 1;
-    toFattenTokens = QuidStore.findTokenCoords('agr' + i);
+    toFattenTokens = this.findTokenCoords('agr' + i);
     for (let coords of toFattenTokens){
       this.setToken('agr' + j, coords[0], coords[1]);
     }
@@ -813,7 +813,17 @@ QuidStore.fattenAgriTokens = function(){
 };
 
 QuidStore.calculateBonus = function(){
+  let pot = 50000,
+      multipliers = [0, .01, .05, .1, .25, .5],
+      factor = 1,
+      count;
   
+  for (let i = 1; i <= 5; i++){
+    count = this.findTokenCoords('fin' + i).length;
+    factor = factor + (count * multipliers[i]);
+  }
+  pot = Math.round(pot * factor);
+  this.deposit(pot);
 };
 
 export default QuidStore;
