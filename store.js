@@ -792,4 +792,28 @@ QuidStore.endPhase = function(endGame){
   }
 };
 
+//agribusiness favor: levels up each not-top-level agribusiness token
+//handles tracking top level tokens when agr4s are advanced to agr5s
+QuidStore.fattenAgriTokens = function(){
+  let toFattenTokens = QuidStore.findTokenCoords('agr4'),
+      i = 3;
+  
+  for (let coords of toFattenTokens){
+    this.setToken('agr5', coords[0], coords[1]);
+    this.addTopLevelToken('agr5', coords[0], coords[1]);
+  }
+  while (i > 0) {
+    let j = i + 1;
+    toFattenTokens = QuidStore.findTokenCoords('agr' + i);
+    for (let coords of toFattenTokens){
+      this.setToken('agr' + j, coords[0], coords[1]);
+    }
+    i--;
+  }
+};
+
+QuidStore.calculateBonus = function(){
+  
+};
+
 export default QuidStore;
