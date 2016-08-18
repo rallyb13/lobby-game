@@ -31,7 +31,6 @@ var currentState = {
   appeasements: [], //appeasement tokens on board
   levelFives: [], //all level5 tokens on board
   createFavor: [], //only has content if set about to be combined
-  freeze: 0, //number of moves con1 tokens frozen for
   helpers: {
     'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 0, 'con5': 0
   },
@@ -144,12 +143,6 @@ QuidStore.deposit = function(num){
 //helper fn to update score
 QuidStore.score = function(num){
   currentState.score = currentState.score + num;
-};
-
-//helper fn to intiate a 10-move hiatus from constituents moving on move completion
-//triggered by use of 'agr' Favor
-QuidStore.freezeCons = function(){
-  currentState.freeze = currentState.freeze + 10;
 };
 
 //helper fn to update the bench with favors upon earning/using them
@@ -439,25 +432,22 @@ QuidStore.moveConstituents = function(rowPos, colPos, swarm) {
     newCoords,
     x,
     y;
-  if (currentState.freeze === 0){
-    for (var i = 0; i < currentConsCoords.length; i++) {
-      x = currentConsCoords[i][0],
-      y = currentConsCoords[i][1];
-      if(x !== rowPos || y !== colPos){
-        emptyCoords = this.cardinalCheck('', x, y);
-        if (emptyCoords.length > 0) {
-          newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
-          newRowPos = newCoords[0];
-          newColPos = newCoords[1];
-          this.setToken('con1', newRowPos, newColPos);
-          if (!swarm) {
-            this.setToken('', x, y);
-          }
+
+  for (var i = 0; i < currentConsCoords.length; i++) {
+    x = currentConsCoords[i][0],
+    y = currentConsCoords[i][1];
+    if(x !== rowPos || y !== colPos){
+      emptyCoords = this.cardinalCheck('', x, y);
+      if (emptyCoords.length > 0) {
+        newCoords = emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
+        newRowPos = newCoords[0];
+        newColPos = newCoords[1];
+        this.setToken('con1', newRowPos, newColPos);
+        if (!swarm) {
+          this.setToken('', x, y);
         }
       }
     }
-  } else {
-    currentState.freeze--;
   }
 };
 

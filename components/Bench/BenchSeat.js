@@ -56,12 +56,12 @@ var BenchSeat = React.createClass({
     if (type === 'oil') {
       QuidStore.selectThisToken(token);
     } else if (type === 'agr'){
-      QuidStore.freezeCons();
+      QuidStore.fattenAgriTokens();
     } else if (type === 'mil'){
       cons = QuidStore.findTokenCoords('con1');
       QuidStore.clearMatches(cons);
     } else {
-      QuidStore.deposit(250000);
+      QuidStore.calculateBonus();
     }
     QuidStore.changeHelperCount(token, true);
   }

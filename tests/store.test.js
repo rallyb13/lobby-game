@@ -53,18 +53,6 @@ test('QuidStore#score', (assert) => {
   assert.end();
 });
 
-test('QuidStore#freezeCons', (assert) => {
-  QuidStore.setupBoard();
-
-  let state = QuidStore.getCurrentState();
-  let freeze = state.freeze;
-  assert.equal(state.freeze, 0);
-  QuidStore.freezeCons();
-  assert.equal(state.freeze, freeze + 10);
-
-  assert.end();
-});
-
 test('QuidStore.changeHelperCount', (assert) => {
   QuidStore.setupBoard();
   QuidStore.emitChange = sinon.spy();
