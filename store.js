@@ -98,7 +98,9 @@ QuidStore.saveForUndo = function(){
 }
 
 QuidStore.undoTurn = function(){
-  currentState = JSON.parse(localStorage['preMoveState'])
+  currentState = JSON.parse(localStorage['preMoveState']);
+  this.nextMove(); // still charged for the original move
+  this.deposit(-250); //undo costs money
   this.emit(CHANGE_EVENT);
 }
 
@@ -301,8 +303,7 @@ QuidStore.completeMove = function(rowPos, colPos){
     currentState.helperChange = false;
   }
   if (currentState.appeasements.length !==0){
-    this.checkAppeasements(false);
-    this.removeConstituents(token, rowPos, colPos);
+    this.removeConstituents();
   }
 
   //handle constituents
@@ -363,6 +364,9 @@ QuidStore.nextMove = function(){
         }
       }
     }
+  }
+  if (currentState.appeasements.length !==0){
+    this.checkAppeasements(false);
   }
 };
 
@@ -453,7 +457,7 @@ QuidStore.moveConstituents = function(rowPos, colPos, swarm) {
 
 //whenever constituents come in contact with appeasement tokens at completion of one move,
 //they disappear from the board on completion of next move
-QuidStore.removeConstituents = function(token, rowPos, colPos){
+QuidStore.removeConstituents = function(){
   var appeasements = currentState.appeasements,
     me = this,
     toClearCoords;
@@ -462,7 +466,6 @@ QuidStore.removeConstituents = function(token, rowPos, colPos){
     toClearCoords = me.cardinalCheck('con1', app[0], app[1]);
     me.clearMatches(toClearCoords);
   });
-  this.setToken(token, rowPos, colPos);
 };
 
 //places appeasement token on board for a random number of moves
