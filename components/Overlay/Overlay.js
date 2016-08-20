@@ -1,6 +1,5 @@
 import React from 'react'
 import QuidStore from '../../store'
-import Utils from '../../utils'
 import HelpTab from './HelpTab'
 import Banner from './Banner'
 import Funds from './Funds'
@@ -61,7 +60,7 @@ var Overlay = React.createClass({
 
   //calls utility function to close the modal
   closeModal: function() {
-    Utils.toggleOverlay(false);
+    QuidStore.toggleOverlay(false);
   },
 
   //finds all tabs relevant to current phase and below, creates corresponding helpTabs

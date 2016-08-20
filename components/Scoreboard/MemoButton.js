@@ -1,5 +1,5 @@
 import React from 'react';
-import Utils from '../../utils';
+import QuidStore from '../../store';
 
 var MemoButton = React.createClass({
   render: function(){
@@ -10,7 +10,7 @@ var MemoButton = React.createClass({
   },
   
   openModal: function() {
-    Utils.toggleOverlay(true);
+    QuidStore.toggleOverlay(true);
   },
   
   styles: {

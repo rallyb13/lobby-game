@@ -21,6 +21,7 @@ var currentState = {
   nextGoal: 35000,
   electedOffice: 'State Delegate',
   helpDetail : false,
+  isOverlayUp: false,
   message: "Welcome to your first term. If you don't want it to be your last, you better get out there and hustle for some money. The best way to do this is by finding at least one lobby that flings money at their favorite people. You've only got 180 legislative days to prove how useful you can be if you stick around. Lucky for you, the party is paying more attention to bigger elections, so I don't foresee any primary challengers to speak of. But you've got to expect ol' Bubs Oldentine will try at least once to get his seat back. Don't rule him out, though; you'd be surprised how much it costs to beat even a loser like Bubs, who tries to keep campaigning separate from governing.",
   advMsg: 'none',
   trigger: 160, //move # at which message will change
@@ -783,7 +784,7 @@ QuidStore.endPhase = function(endGame){
       firstPart = "Don't worry, Loser. Friends take care of friends. You've got a new job now, working as ",
       phaseData = Utils.getPhaseData(phase);
 
-  Utils.toggleOverlay(true);
+  this.toggleOverlay(true);
   if (currentState.nextGoal > currentState.bankBalance || endGame){
     currentState.message = firstPart + phaseData['failMsg'];
   } else {
@@ -827,6 +828,19 @@ QuidStore.calculateBonus = function(){
   }
   pot = Math.round(pot * factor);
   this.deposit(pot);
+};
+
+//opens/closes overlay and ensures current election is open tab in right panel when re-opened
+QuidStore.toggleOverlay = function(open){
+  if (open){
+    currentState.isOverlayUp = true;
+    currentState.helpDetail = false;
+    this.emitChange();
+    
+  } else {
+    currentState.isOverlayUp = false;
+    this.emitChange();
+  }
 };
 
 export default QuidStore;

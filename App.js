@@ -27,6 +27,7 @@ var App = React.createClass ({
     var isGameOver = this.isGameOver(),
         holders = this.state.holdTokens,
         allHolders = [],
+        overlay = this.state.isOverlayUp ? <Overlay gameData={this.state} isGameOver={isGameOver} /> : <div></div>,
         i;
 
     if (holders.length > 1){
@@ -48,7 +49,7 @@ var App = React.createClass ({
           </div>
           <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange} staged={this.state.stagedToken}/>
           <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver} moves={this.state.movesRemaining} office={this.state.electedOffice}/>
-          <Overlay gameData={this.state} isGameOver={isGameOver} />
+          {overlay}
         </div>
       </div>
     );
