@@ -99,6 +99,8 @@ QuidStore.saveForUndo = function(){
 }
 
 QuidStore.undoTurn = function(){
+  document.getElementById('undo-cost').style.display = 'none';
+  document.getElementById('undo').disabled = true;
   currentState = JSON.parse(localStorage['preMoveState']);
   this.nextMove(); // still charged for the original move
   this.deposit(-250); //undo costs money
@@ -346,8 +348,11 @@ QuidStore.nextMove = function(){
   moves = currentState.movesRemaining;
   if (moves === 0){
     this.endPhase(false);
-  }
-  else if (moves === currentState.trigger) {
+  } else if (moves === Utils.getPhaseData(currentState.phase).moves - 1) {
+    //these else ifs work together only by NEVER having a trigger that is after first move in new phase
+    document.getElementById('undo').disabled = false;
+    document.getElementById('undo-cost').style.display = 'block';
+  } else if (moves === currentState.trigger) {
     progressionData = Utils.progressGame(currentState.phase, moves);
     if (progressionData !== false){
       currentState.tokensArray = progressionData.tokens;

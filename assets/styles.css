@@ -18,6 +18,29 @@ body {
 h1 {
   text-align: center;
 }
+
+.undo-button {
+  float: right;
+  color: black;
+  font-weight: 700;
+  border: 3px inset blue;
+  border-radius: 10%;
+  background-color: aqua;
+  padding: 10px;
+  font-size: 12pt;
+}
+
+.undo-cost {
+  font-size: 8pt;
+  color: red;
+  display: block;
+}
+
+.undo-button:disabled {
+  border: 3px solid black;
+  background-color: gray;
+}
+
 .main {
   max-width: 100%;
   margin: 0 auto;

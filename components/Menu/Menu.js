@@ -8,13 +8,8 @@ var Menu = React.createClass({
     return (
       <ul style={this.styles.menu}>
         <li style={this.styles.listItem} onClick={this.handleLogin}>{displayName}</li>
-        <li style={this.styles.listItem} onClick={this.handleUndo}>Undo</li>
       </ul>
     )
-  },
-  
-  handleUndo(){
-    QuidStore.undoTurn();
   },
 
   handleLogin() {

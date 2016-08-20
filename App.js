@@ -48,6 +48,7 @@ var App = React.createClass ({
             <div style={this.styles.holders}>{allHolders}</div>
           </div>
           <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange} staged={this.state.stagedToken}/>
+          <button type='button' id='undo' className='undo-button' onClick={this.handleUndo}>UNDO<span id='undo-cost' className='undo-cost'>($250)</span></button>
           <Grid board={this.state.board} stagedToken={this.state.stagedToken} megaPossCoords={this.state.megaPossCoords} toFavor={this.state.createFavor} gameOver={isGameOver} isOverlayUp={this.state.isOverlayUp}/>
           {overlay}
         </div>
@@ -60,7 +61,11 @@ var App = React.createClass ({
   onChange: function() {
     this.setState(QuidStore.getCurrentState());
   },
-
+  
+  //
+  handleUndo(){
+    QuidStore.undoTurn();
+  },
 
   //checks that board is not full and bank balance is still positive (at end of election cycle)
   isGameOver: function(){
