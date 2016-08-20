@@ -5,9 +5,7 @@ import GridSquare from './GridSquare';
 var Grid = React.createClass({
   render: function(){
     var squares = [],
-        moves = this.props.moves,
-        office = this.props.office,
-        noMoves = office !== "President" && moves === 0,
+        noMoves = this.props.isOverlayUp,
         rowNum = this.props.board.rows,
         colNum = this.props.board.columns,
         count = 0,
@@ -19,7 +17,7 @@ var Grid = React.createClass({
       for (j=0; j < colNum; j++) {
         count++;
         token = this.props.board.grid[i][j];
-        squares.push(<GridSquare rowPos={i} colPos={j} token={token} noMoves={noMoves} eligible={this.checkDrop(i, j, token)} aboutToGo={this.checkUplift(i, j)} key={count} gameOver={this.props.gameOver} board={this.props.board} />);
+        squares.push(<GridSquare rowPos={i} colPos={j} token={token} noMoves={noMoves} eligible={this.checkDrop(i, j, token)} aboutToGo={this.checkUplift(i, j)} key={count} gameOver={this.props.gameOver} board={this.props.board}/>);
       }
     }
 
