@@ -481,8 +481,9 @@ QuidStore.removeConstituents = function(rowPos, colPos){
 //adds removal time into state object
 //this function is also used for higher level appeasement token "decay" (as each decay-state is actually considered a separate token data-wise)
 QuidStore.addAppeasement = function(token, rowPos, colPos){
-  var min = Utils.getTokenData(token, 'dMin'),
-    max = Utils.getTokenData(token, 'dMax'),
+  var tokenData = Utils.getTokenData(token),
+    min = tokenData.dMin,
+    max = tokenData.dMax,
     time = Math.floor(Math.random() * (max - min) ) + min,
     moveTrigger = currentState.movesRemaining - time,
     isInPhase = moveTrigger > 0;
@@ -693,20 +694,21 @@ QuidStore.handleMatches = function(token, rowPos, colPos, isRecursive){
 
 //called from within hanldeMatch fn, calculates appropriate score/bank balance boost
 QuidStore.handleScoreboard =function(count, token, isRecursive) {
-  var points = 0,
+  var tokenData = Utils.getTokenData(token),
+    points = 0,
     money = 0,
     bigMatchFactor = 1;
 
   if (count < 2 && isRecursive !== true) {
-    points = Utils.getTokenData(token, 'pts');
-    money = Utils.getTokenData(token, 'val');
+    points = tokenData.pts;
+    money = tokenData.val;
   } else if (count >= 2){
-    if (count !== 2 && Utils.getTokenData(token, 'nextUp') !== 'final'){
+    if (count !== 2 && tokenData.nextUp !== 'final'){
       bigMatchFactor = (count === 2) ? 1 : 1 + (count * 0.75);
     }
-    points = Utils.getTokenData(token, 'mPts');
+    points = tokenData.mPts;
     points = Math.round(points * bigMatchFactor);
-    money = Utils.getTokenData(token, 'mVal');
+    money = tokenData.mVal;
     money = Math.round(money * bigMatchFactor);
     if (isRecursive){
       points = Math.round(points * 1.3);

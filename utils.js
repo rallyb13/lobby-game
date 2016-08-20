@@ -112,7 +112,11 @@ var Utils = {
       'mega': {nextUp: 'final', pts: 0, mPts: 0, val: 0, mVal: 0 },
       'pork': {nextUp: 'final', pts: 666, mPts: 666, val: 666, mVal: 666 },
     }
-    return tokenMap[token][attribute];
+    if (typeof attribute !== 'undefined' && attribute !==null) {
+      return tokenMap[token][attribute];
+    } else {
+      return tokenMap[token]
+    }
   },
 
   //phase reference for how many moves, bank balance needed to continue, msg to open new phase, and msg used for game ending at that level
