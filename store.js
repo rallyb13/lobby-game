@@ -305,6 +305,10 @@ QuidStore.completeMove = function(rowPos, colPos){
   }
   if (currentState.appeasements.length !==0){
     this.removeConstituents();
+    //reset con1 in place after removals, so that gameboard shows token is placed
+    if (token === 'con1'){
+      this.setToken(token, rowPos, colPos);
+    }
   }
 
   //handle constituents
@@ -456,9 +460,8 @@ QuidStore.moveConstituents = function(rowPos, colPos, swarm) {
   }
 };
 
-//whenever constituents come in contact with appeasement tokens at completion of one move,
-//they disappear from the board on completion of next move
-QuidStore.removeConstituents = function(){
+//constituents disappear from the board after come in contact with appeasments
+QuidStore.removeConstituents = function(rowPos, colPos){
   var appeasements = currentState.appeasements,
     me = this,
     toClearCoords;
