@@ -5,7 +5,6 @@ import Bench from './components/Bench/Bench';
 import Grid from './components/Gameboard/Grid';
 import Scoreboard from './components/Scoreboard/Scoreboard';
 import Holder from './components/Holder';
-import Menu from './components/Menu/Menu';
 import Overlay from './components/Overlay/Overlay';
 
 var App = React.createClass ({
@@ -43,7 +42,6 @@ var App = React.createClass ({
         <div className="main">
           <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
           <div className="white-paper-panel">
-            <Menu username={this.state.userInfo.username} />
             <Scoreboard state={this.state} />
             <div style={this.styles.holders}>{allHolders}</div>
           </div>

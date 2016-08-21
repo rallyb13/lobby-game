@@ -114,7 +114,7 @@ QuidStore.undoTurn = function(){
 //
 
 QuidStore.setUser = function (name) {
-  currentState.userInfo.username = name;
+  currentState.userInfo.userName = name;
   this.emitChange();
 };
 
