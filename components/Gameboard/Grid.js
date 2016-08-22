@@ -34,7 +34,7 @@ var Grid = React.createClass({
   checkDrop: function(rowPos, colPos, token){
     var staged = this.props.stagedToken,
       isEmpty = token === '',
-      validForMega = this.props.megaPossCoords,
+      validForMega = this.props.board.megaPossCoords,
       stringCoords;
 
     if (staged === 'oil6'){
@@ -56,7 +56,7 @@ var Grid = React.createClass({
 
   //pass style change to selected GridSquares when triggered by presence of data in toFavor props
   checkUplift: function(rowPos, colPos){
-    var fives = this.props.toFavor,
+    var fives = this.props.board.createFavor,
       i;
 
     if (fives.length === 0){
