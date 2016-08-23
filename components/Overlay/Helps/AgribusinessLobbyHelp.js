@@ -17,7 +17,7 @@ var AgribusinessLobbyHelp = React.createClass({
         </div>
         <p>The Fat Food joints don&#39;t have to be placed together. Once you have enough, you&#39;ll earn a <b>Favor</b> from the Agribusiness lobby.</p>
         <img src="assets/icons/icon-greasefire.png" /> 
-        <p>Use the <b>Corn Syrup/Itis favor</b> to hold those pesky constituents in place for ten moves when you really need them to stay out of your way. Over-eating can make them lethargic.</p>
+        <p>Use the <b>Corn Syrup</b> favor to really fatten up all the agribusiness tokens you have on the board.</p>
       </div>
     )
   }

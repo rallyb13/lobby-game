@@ -35,7 +35,7 @@ var currentState = {
 
   //store config content that does not need to be passed to view
   tokensArray: ['oil1', 'oil1', 'oil1', 'oil2'],
-  trigger: 63, //move # at which message will change
+  trigger: 180, //move # at which message will change
   megaPossTokens: [], //arrays of valid tokens megaphone can become (at coordinate corresponding to megaPossCoords)
   porkOn: [], //pork tokens on board
   appeasements: [], //appeasement tokens on board
