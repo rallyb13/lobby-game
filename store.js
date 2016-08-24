@@ -9,7 +9,7 @@ var currentState = {
     createFavor: [] //only has content if set about to be combined
   },
   userInfo: {
-    userName: '', highScore: [0, 3], highOffice: ['State Delegate']
+    userName: '', highScores: [], highOffices: []
   },
   status: {
     
