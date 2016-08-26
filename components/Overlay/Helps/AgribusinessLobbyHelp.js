@@ -16,8 +16,9 @@ var AgribusinessLobbyHelp = React.createClass({
           <img src="assets/icons/icon-restaurant.png" />
         </div>
         <p>The Fat Food joints don&#39;t have to be placed together. Once you have enough, you&#39;ll earn a <b>Favor</b> from the Agribusiness lobby.</p>
-        <img src="assets/icons/icon-greasefire.png" /> 
-        <p>Use the <b>Corn Syrup</b> favor to really fatten up all the agribusiness tokens you have on the board.</p>
+        <img src="assets/icons/icon-corn-syrup.png" /> 
+        <p>Use the <b>Corn Syrup</b> favor to really fatten up your agribusiness tokens. All but the <b>Fat Food Restaurants</b> become the next most valuable token.</p>
+        <img src="assets/help-images/cornsyrup.gif" />
       </div>
     )
   }
