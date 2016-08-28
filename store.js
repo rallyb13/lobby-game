@@ -12,18 +12,16 @@ var currentState = {
     userName: '', highScores: [], highOffices: []
   },
   status: {
-    
+    movesRemaining: 180,
+    score: 0,
+    bankBalance: 0,
+    phase: 1,
+    repeat: 0, //tracks if level is repeated (when higher office declined)
+    nextGoal: 35000,
+    electedOffice: 'State Delegate',
+    message: "Welcome to your first term. If you don't want it to be your last, you better get out there and hustle for some money. The best way to do this is by finding at least one lobby that flings money at their favorite people. You've only got 180 legislative days to prove how useful you can be if you stick around. Lucky for you, the party is paying more attention to bigger elections, so I don't foresee any primary challengers to speak of. But you've got to expect ol' Bubs Oldentine will try at least once to get his seat back. Don't rule him out, though; you'd be surprised how much it costs to beat even a loser like Bubs, who tries to keep campaigning separate from governing.",
+    advMsg: 'none'
   },
-  movesRemaining: 180,
-  score: 0,
-  bankBalance: 0,
-  phase: 1,
-  repeat: 0, //tracks if level is repeated (when higher office declined)
-  nextGoal: 35000,
-  electedOffice: 'State Delegate',
-  message: "Welcome to your first term. If you don't want it to be your last, you better get out there and hustle for some money. The best way to do this is by finding at least one lobby that flings money at their favorite people. You've only got 180 legislative days to prove how useful you can be if you stick around. Lucky for you, the party is paying more attention to bigger elections, so I don't foresee any primary challengers to speak of. But you've got to expect ol' Bubs Oldentine will try at least once to get his seat back. Don't rule him out, though; you'd be surprised how much it costs to beat even a loser like Bubs, who tries to keep campaigning separate from governing.",
-  advMsg: 'none',
-
   helpers: {
     'oil6': 0, 'agr6': 0, 'mil6': 0, 'fin6': 0, 'con2': 1, 'con3': 0, 'con5': 0
   },
@@ -33,9 +31,9 @@ var currentState = {
   helpDetail : false,
   isOverlayUp: false,
 
-  //store config content that does not need to be passed to view
+  //store config content that does not need to be passed to view components
   tokensArray: ['oil1', 'oil1', 'oil1', 'oil2'],
-  trigger: 180, //move # at which message will change
+  trigger: 180, //move # at which tokensArray changes
   megaPossTokens: [], //arrays of valid tokens megaphone can become (at coordinate corresponding to megaPossCoords)
   porkOn: [], //pork tokens on board
   appeasements: [], //appeasement tokens on board
@@ -146,12 +144,12 @@ QuidStore.selectThisToken = function(token){
 
 //helper fn to update bank bankBalance
 QuidStore.deposit = function(num){
-  currentState.bankBalance = currentState.bankBalance + num;
+  currentState.status.bankBalance = currentState.status.bankBalance + num;
 };
 
 //helper fn to update score
 QuidStore.score = function(num){
-  currentState.score = currentState.score + num;
+  currentState.status.score = currentState.status.score + num;
 };
 
 //helper fn to update the bench with favors upon earning/using them
@@ -168,9 +166,9 @@ QuidStore.changeHelperCount = function(token, removal){
 //helper fn to handle special case of NOT advancing game phase when player opts not to run for higher office
 QuidStore.rerunPhase = function(doAdd){
   if (doAdd){
-    currentState.repeat++;
+    currentState.status.repeat++;
   } else {
-    currentState.repeat = 0;
+    currentState.status.repeat = 0;
   }
 };
 
@@ -318,7 +316,7 @@ QuidStore.completeMove = function(rowPos, colPos){
   }
 
   //handle constituents
-  if (currentState.appeasements.length + 3 < currentState.levelFives.length && currentState.movesRemaining % 7 === 1){
+  if (currentState.appeasements.length + 3 < currentState.levelFives.length && currentState.status.movesRemaining % 7 === 1){
     swarm = true;
   }
   this.moveConstituents(rowPos, colPos, swarm);
@@ -326,7 +324,7 @@ QuidStore.completeMove = function(rowPos, colPos){
   //with swarm/move constituents, appeasement && top level token removal all handled,
   //here we check if board is filled before going on
   if (QuidStore.findTokenCoords('').length === 0){
-    currentState.advMsg = 'board';
+    currentState.status.advMsg = 'board';
     this.endPhase(true);
   } else {
     this.setNextToken();
@@ -343,21 +341,21 @@ QuidStore.completeMove = function(rowPos, colPos){
 QuidStore.nextMove = function(){
   var moves, progressionData, moveChange;
 
-  if (currentState.phase <= 32){
-    currentState.movesRemaining--;
+  if (currentState.status.phase <= 32){
+    currentState.status.movesRemaining--;
   } else {
-    currentState.movesRemaining++;
+    currentState.status.movesRemaining++;
   }
 
-  moves = currentState.movesRemaining;
+  moves = currentState.status.movesRemaining;
   if (moves === 0){
     this.endPhase(false);
-  } else if (moves === Utils.getPhaseData(currentState.phase).moves - 1) {
+  } else if (moves === Utils.getPhaseData(currentState.status.phase).moves - 1) {
     //these else ifs work together only by NEVER having a trigger that is after first move in new phase
     document.getElementById('undo').disabled = false;
     document.getElementById('undo-cost').style.display = 'block';
   } else if (moves === currentState.trigger) {
-    progressionData = Utils.progressGame(currentState.phase, moves);
+    progressionData = Utils.progressGame(currentState.status.phase, moves);
     if (progressionData !== false){
       currentState.tokensArray = progressionData.tokens;
       currentState.trigger = progressionData.nextTrigger;
@@ -372,7 +370,7 @@ QuidStore.nextMove = function(){
       }
       moveChange = progressionData.moveChange;
       if (typeof moveChange !== 'undefined'){
-        currentState.movesRemaining = currentState.movesRemaining + moveChange;
+        currentState.status.movesRemaining = currentState.status.movesRemaining + moveChange;
         if (moveChange < 0 && currentState.appeasements.length > 0){
           this.checkAppeasements(true);
         }
@@ -489,7 +487,7 @@ QuidStore.addAppeasement = function(token, rowPos, colPos){
     min = tokenData.dMin,
     max = tokenData.dMax,
     time = Math.floor(Math.random() * (max - min) ) + min,
-    moveTrigger = currentState.movesRemaining - time,
+    moveTrigger = currentState.status.movesRemaining - time,
     isInPhase = moveTrigger > 0;
 
   currentState.appeasements.push( [rowPos, colPos, token, moveTrigger, isInPhase] );
@@ -498,7 +496,7 @@ QuidStore.addAppeasement = function(token, rowPos, colPos){
 //when appeasement tokens are in use, this checks removal times and calls for removal as appropriate
 QuidStore.checkAppeasements = function(special){
   var appeasements = currentState.appeasements,
-    move = currentState.movesRemaining,
+    move = currentState.status.movesRemaining,
     isTarget,
     i;
 
@@ -624,7 +622,7 @@ QuidStore.removeTopLevelTokens = function(){
   currentState.board.createFavor = [];
   currentState.helpers[favor]++;
   currentState.helperChange = favor;
-  currentState.score = currentState.score + 555;
+  currentState.status.score = currentState.status.score + 555;
 }
 
 //returns token megaphone (wild card) should be (always one that triggers a matching action)
@@ -753,9 +751,9 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
     phaseData,
     coords;
 
-  this.deposit(-currentState.nextGoal);
-  currentState.phase = currentState.phase + phaseShift;
-  phase = currentState.phase;
+  this.deposit(-currentState.status.nextGoal);
+  currentState.status.phase = currentState.status.phase + phaseShift;
+  phase = currentState.status.phase;
   phaseData = Utils.getPhaseData(phase);
 
   if (phase === 8){
@@ -765,15 +763,15 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
   }
 
   //change every election
-  currentState.movesRemaining = phaseData.moves;
-  currentState.nextGoal = phaseData.goal;
+  currentState.status.movesRemaining = phaseData.moves;
+  currentState.status.nextGoal = phaseData.goal;
 
   //change more often (tokensArray also, but not on phase change)
-  currentState.message = phaseData.playMsg;
+  currentState.status.message = phaseData.playMsg;
 
   //changes less often
-  currentState.electedOffice = Utils.setElectedOffice(phase, currentState.electedOffice);
-  coords = Utils.handleBoardChange(currentState.electedOffice);
+  currentState.status.electedOffice = Utils.setElectedOffice(phase, currentState.status.electedOffice);
+  coords = Utils.handleBoardChange(currentState.status.electedOffice);
   if (currentState.board.rows !== coords[0]){
     currentState.board.rows = coords[0];
     currentState.board.grid.push([]);
@@ -784,7 +782,7 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
     this.handleNewSquares();
   }
   if (fromChoice){
-    currentState.advMsg = 'none';
+    currentState.status.advMsg = 'none';
   }
 
   this.handleAppeasements(phaseData.moves);
@@ -794,18 +792,18 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
 //called at end of phase OR when there are no more spaces--pops overlay up and handles all needed for conclusion of phase &/or game
 //endGame is true if fn is called from full board (mid-phase), false if called at last move of phase (but will then check for lost election)
 QuidStore.endPhase = function(endGame){
-  var phase = currentState.phase,
+  var phase = currentState.status.phase,
       firstPart = "Don't worry, Loser. Friends take care of friends. You've got a new job now, working as ",
       phaseData = Utils.getPhaseData(phase);
 
   this.toggleOverlay(true);
-  if (currentState.nextGoal > currentState.bankBalance || endGame){
-    currentState.message = firstPart + phaseData['failMsg'];
+  if (currentState.status.nextGoal > currentState.status.bankBalance || endGame){
+    currentState.status.message = firstPart + phaseData['failMsg'];
   } else {
-    currentState.message = phaseData['winMsg'];
-    currentState.advMsg = Utils.setElectionChoice(phase);
+    currentState.status.message = phaseData['winMsg'];
+    currentState.status.advMsg = Utils.setElectionChoice(phase);
     if (phase === 19){
-      currentState.advMsg = currentState.advMsg[currentState.repeat % 3];
+      currentState.status.advMsg = currentState.status.advMsg[currentState.status.repeat % 3];
     }
   }
 };

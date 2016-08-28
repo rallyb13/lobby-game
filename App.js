@@ -26,7 +26,9 @@ var App = React.createClass ({
     var isGameOver = this.isGameOver(),
         holders = this.state.holdTokens,
         allHolders = [],
-        overlay = this.state.isOverlayUp ? <Overlay gameData={this.state} isGameOver={isGameOver} /> : <div></div>,
+        overlay = this.state.isOverlayUp ?
+          <Overlay gameData={this.state.status} isGameOver={isGameOver} helpDetail={this.state.helpDetail} userInfo={this.state.userInfo} />
+          : <div></div>,
         i;
 
     if (holders.length > 1){
@@ -42,7 +44,7 @@ var App = React.createClass ({
         <div className="main">
           <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
           <div className="white-paper-panel">
-            <Scoreboard state={this.state} />
+            <Scoreboard status={this.state.status} userInfo={this.state.userInfo} stagedToken={this.state.stagedToken}/>
             <div style={this.styles.holders}>{allHolders}</div>
           </div>
           <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange} staged={this.state.stagedToken}/>
@@ -67,7 +69,7 @@ var App = React.createClass ({
 
   //checks that board is not full and bank balance is still positive (at end of election cycle)
   isGameOver: function(){
-    var advMsg = this.state.advMsg;
+    var advMsg = this.state.status.advMsg;
     
     if (advMsg === 'bank' || advMsg === 'board'){
       return advMsg;

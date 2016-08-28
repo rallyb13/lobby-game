@@ -21,7 +21,7 @@ var Overlay = React.createClass({
         moves = this.props.gameData.movesRemaining,
         message = this.props.gameData.message,
         advMsg = this.props.gameData.advMsg,
-        helpSelection = this.props.gameData.helpDetail,
+        helpSelection = this.props.helpDetail,
         helpDetailEl = helpSelection ? this.getHelpComponent(helpSelection) : <div></div>,
         displayCase = moves === 0 || advMsg !== 'none',
         close = displayCase ? <p></p> : <h3 className='closeButton' onClick={this.closeModal}>X</h3>,
@@ -41,7 +41,7 @@ var Overlay = React.createClass({
             <div className="mainPanel helpWrapper">
               <div id='currentElection'>
                 <div id='stats'>
-                  <HighScores info={this.props.gameData.userInfo} currentScore={this.props.gameData.score} currentOffice={this.props.gameData.electedOffice} />
+                  <HighScores info={this.props.userInfo} currentScore={this.props.gameData.score} currentOffice={this.props.gameData.electedOffice} />
                   <Funds balance={this.props.gameData.bankBalance} goal={this.props.gameData.nextGoal} />
                 </div>
                 <p style={{fontSize: '1.5em'}}>{message}</p>

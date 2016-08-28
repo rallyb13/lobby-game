@@ -10,9 +10,9 @@ import QuidStore from '../../store'
 
 var Scoreboard = React.createClass({
   render: function(){
-    var negativeBal = this.props.state.bankBalance < this.props.state.nextGoal,
-      moveCount = this.props.state.movesRemaining,
-      username = this.props.state.userInfo.userName,
+    var negativeBal = this.props.status.bankBalance < this.props.status.nextGoal,
+      moveCount = this.props.status.movesRemaining,
+      username = this.props.userInfo.userName,
       displayName = username === '' ? 'Login' : username,
       textColor = (negativeBal && moveCount <= 20 && moveCount > 0) ? 'red' : 'black';
 
@@ -21,13 +21,13 @@ var Scoreboard = React.createClass({
         <h3 style={this.styles.heading}>White Paper</h3>
         <h4 onClick={this.handleLogin}>{displayName}</h4>
         <div style={this.styles.bodyBoard}>
-          <Staging stagedToken={this.props.state.stagedToken} />
+          <Staging stagedToken={this.props.stagedToken} />
           <MemoButton/>
-          <Score score={this.props.state.score} />
-          <Bank bankBalance={this.props.state.bankBalance} textColor={textColor} />
-          <Office electedOffice={this.props.state.electedOffice} />
-          <MoveCounter movesRemaining={this.props.state.movesRemaining} phase={this.props.state.phase} textColor={textColor} />
-          <NextGoal nextGoal={this.props.state.nextGoal} textColor={textColor} />
+          <Score score={this.props.status.score} />
+          <Bank bankBalance={this.props.status.bankBalance} textColor={textColor} />
+          <Office electedOffice={this.props.status.electedOffice} />
+          <MoveCounter movesRemaining={this.props.status.movesRemaining} phase={this.props.status.phase} textColor={textColor} />
+          <NextGoal nextGoal={this.props.status.nextGoal} textColor={textColor} />
           
         </div>
       </div>
