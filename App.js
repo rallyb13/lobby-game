@@ -1,6 +1,7 @@
 import React from 'react';
 import QuidStore from './store';
 import Utils from './utils';
+import Firebase from 'firebase';
 import Bench from './components/Bench/Bench';
 import Grid from './components/Gameboard/Grid';
 import Scoreboard from './components/Scoreboard/Scoreboard';
@@ -10,9 +11,13 @@ import Overlay from './components/Overlay/Overlay';
 var App = React.createClass ({
   //creates current board with randomly selected starting tokens and sets game-starting state object
   componentWillMount: function () {
+    this.firebaseRef = new Firebase("https://quid-2c79a.firebaseio.com/database/state");
+    this.firebaseRef.on("child_changed", function(dataSnapshot) {
+    this.items.push(dataSnapshot.val());
+});
     QuidStore.setupBoard();
     this.setState(QuidStore.getCurrentState());
-  },
+},
 
   componentDidMount: function(){
     QuidStore.addChangeListener(this.onChange);
@@ -61,7 +66,7 @@ var App = React.createClass ({
   onChange: function() {
     this.setState(QuidStore.getCurrentState());
   },
-  
+
   //
   handleUndo(){
     QuidStore.undoTurn();
@@ -70,7 +75,7 @@ var App = React.createClass ({
   //checks that board is not full and bank balance is still positive (at end of election cycle)
   isGameOver: function(){
     var advMsg = this.state.status.advMsg;
-    
+
     if (advMsg === 'bank' || advMsg === 'board'){
       return advMsg;
     } else {

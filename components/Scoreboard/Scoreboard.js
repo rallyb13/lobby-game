@@ -28,7 +28,7 @@ var Scoreboard = React.createClass({
           <Office electedOffice={this.props.status.electedOffice} />
           <MoveCounter movesRemaining={this.props.status.movesRemaining} phase={this.props.status.phase} textColor={textColor} />
           <NextGoal nextGoal={this.props.status.nextGoal} textColor={textColor} />
-          
+
         </div>
       </div>
     );
@@ -52,6 +52,11 @@ var Scoreboard = React.createClass({
       // The firebase.auth.AuthCredential type that was used.
       var credential = error.credential;
     });
+    function writeUserData(userId, name) {
+      firebase.database().ref('users/' + userId).set({
+        username: name
+      });
+    }
   },
 
   styles: {
