@@ -9,7 +9,8 @@ var currentState = {
     createFavor: [] //only has content if set about to be combined
   },
   userInfo: {
-    userName: '', highScores: [], highOffices: []
+    userName: '', highScores: [], highOffices: [],
+    userId: ''
   },
   status: {
     movesRemaining: 180,
@@ -82,6 +83,13 @@ QuidStore.setupBoard = function () {
 //Emit change to notify top level App.js of state change
 QuidStore.emitChange = function() {
   this.emit(CHANGE_EVENT);
+
+  function writeStoreData(userId, store) {
+      firebase.database().ref('users/' + userId).set({
+        currentState
+      });
+  }
+  writeStoreData(currentState.userInfo.userId, currentState);
 };
 
 QuidStore.addChangeListener = function(callback) {
@@ -115,8 +123,9 @@ QuidStore.undoTurn = function(){
 //
 //
 
-QuidStore.setUser = function (name) {
-  currentState.userInfo.userName = name;
+QuidStore.setUser = function (user) {
+  currentState.userInfo.userName = user.displayName;
+  currentState.userInfo.userId = user.uid;
   this.emitChange();
 };
 
@@ -279,9 +288,9 @@ QuidStore.findTokenCoords = function(token){
 QuidStore.completeMove = function(rowPos, colPos){
   var token = currentState.stagedToken,
     swarm = false;
-  
+
   this.saveForUndo() //first, save current state!
-  
+
   //handle placement of tokens
   if (token === 'mega'){
     token = this.convertMega(rowPos, colPos);
@@ -290,7 +299,7 @@ QuidStore.completeMove = function(rowPos, colPos){
   } else if (token.slice(0,3) === 'con' && token !== 'con1'){
     this.addAppeasement(token, rowPos, colPos);
   }
-  
+
   if (token === 'oil6') {
     this.oilSlick(rowPos)
   } else {
@@ -813,7 +822,7 @@ QuidStore.endPhase = function(endGame){
 QuidStore.fattenAgriTokens = function(){
   let toFattenTokens = this.findTokenCoords('agr4'),
       i = 3;
-  
+
   for (let coords of toFattenTokens){
     this.setToken('agr5', coords[0], coords[1]);
     this.addTopLevelToken('agr5', coords[0], coords[1]);
@@ -833,7 +842,7 @@ QuidStore.calculateBonus = function(){
       multipliers = [0, .01, .05, .1, .25, .5],
       factor = 1,
       count;
-  
+
   for (let i = 1; i <= 5; i++){
     count = this.findTokenCoords('fin' + i).length;
     factor = factor + (count * multipliers[i]);
@@ -848,7 +857,7 @@ QuidStore.toggleOverlay = function(open){
     currentState.isOverlayUp = true;
     currentState.helpDetail = false;
     this.emitChange();
-    
+
   } else {
     currentState.isOverlayUp = false;
     this.emitChange();

@@ -11,10 +11,6 @@ import Overlay from './components/Overlay/Overlay';
 var App = React.createClass ({
   //creates current board with randomly selected starting tokens and sets game-starting state object
   componentWillMount: function () {
-    this.firebaseRef = new Firebase("https://quid-2c79a.firebaseio.com/database/state");
-    this.firebaseRef.on("child_changed", function(dataSnapshot) {
-    this.items.push(dataSnapshot.val());
-});
     QuidStore.setupBoard();
     this.setState(QuidStore.getCurrentState());
 },
