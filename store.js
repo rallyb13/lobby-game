@@ -2,7 +2,7 @@ import Utils from './utils';
 var EventEmitter = require('events').EventEmitter;
 var QuidStore = new EventEmitter();
 var CHANGE_EVENT = 'change';
-var currentState = {
+var initialState = {
   board: {
     rows: 6, columns: 6, grid: [],
     megaPossCoords: [], //coordinates where megaphone can be dropped
@@ -39,6 +39,7 @@ var currentState = {
   appeasements: [], //appeasement tokens on board
   levelFives: [] //all level5 tokens on board
 };
+var currentState = JSON.parse(JSON.stringify(initialState));
 
 //sets board at beginning of game, with randomly-set tokens included (SINGLE USE--not used for board resize)
 QuidStore.setupBoard = function () {
@@ -853,6 +854,50 @@ QuidStore.toggleOverlay = function(open){
     currentState.isOverlayUp = false;
     this.emitChange();
   }
+};
+
+QuidStore.calculateHighs = function(isEndGame) {
+  let bestScores = currentState.userInfo.highScores
+  let bestOffices = currentState.userInfo.highOffices
+  let offices = ['President', 'US Senator (Senior)', 'US Senator (Junior)', 'US Representative', 'State Senator', 'State Delegate']
+  let toSortScores = []
+  let sortedScores = []
+  let sortedOffices = []
+  let checkOffice = ''
+      
+  while (sortedScores.length <= 5 && offices.length !== 0) {
+    checkOffice = offices.shift(0)
+    if (currentState.status.electedOffice === checkOffice){
+      sortedOffices.push(currentState.status.electedOffice)
+      toSortScores.push(currentState.status.score)
+    }
+    for (let i = 0; i < bestOffices.length; i++) {
+      if (bestOffices[i] === checkOffice && sortedOffices.length <= 5){
+        sortedOffices.push(checkOffice)
+        toSortScores.push(bestScores[i])
+      }
+    }
+    if (toSortScores.length !== 0) {
+      toSortScores.sort(this.sortNumbers)
+      sortedScores = sortedScores.concat(toSortScores)
+      toSortScores = []
+    }
+  }
+  
+  if (isEndGame) {
+    currentState.userInfo.highScores = sortedScores
+    currentState.userInfo.highOffices = sortedOffices
+  } else {
+    return { 'sortedScores': sortedScores, 'sortedOffices': sortedOffices}
+  }
+},
+
+QuidStore.sortNumbers = function(a, b){
+  return b - a
+}
+
+QuidStore.restartGame = function(){
+  this.calculateHighs(true)
 };
 
 export default QuidStore;
