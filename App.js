@@ -1,6 +1,7 @@
 import React from 'react';
 import QuidStore from './store';
 import Utils from './utils';
+import Firebase from 'firebase';
 import Bench from './components/Bench/Bench';
 import Grid from './components/Gameboard/Grid';
 import Scoreboard from './components/Scoreboard/Scoreboard';
@@ -12,7 +13,7 @@ var App = React.createClass ({
   componentWillMount: function () {
     QuidStore.setupBoard();
     this.setState(QuidStore.getCurrentState());
-  },
+},
 
   componentDidMount: function(){
     QuidStore.addChangeListener(this.onChange);
@@ -61,7 +62,7 @@ var App = React.createClass ({
   onChange: function() {
     this.setState(QuidStore.getCurrentState());
   },
-  
+
   //
   handleUndo(){
     QuidStore.undoTurn();
@@ -70,7 +71,7 @@ var App = React.createClass ({
   //checks that board is not full and bank balance is still positive (at end of election cycle)
   isGameOver: function(){
     var advMsg = this.state.status.advMsg;
-    
+
     if (advMsg === 'bank' || advMsg === 'board'){
       return advMsg;
     } else {

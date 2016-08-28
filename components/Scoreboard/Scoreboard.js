@@ -28,13 +28,18 @@ var Scoreboard = React.createClass({
           <Office electedOffice={this.props.status.electedOffice} />
           <MoveCounter movesRemaining={this.props.status.movesRemaining} phase={this.props.status.phase} textColor={textColor} />
           <NextGoal nextGoal={this.props.status.nextGoal} textColor={textColor} />
-          
+
         </div>
       </div>
     );
   },
 
   handleLogin() {
+    function writeUserData(userId, name) {
+        firebase.database().ref('users/' + userId).set({
+          username: name
+        });
+    }
     var provider = new firebase.auth.GoogleAuthProvider();
 
     firebase.auth().signInWithPopup(provider).then(function(result) {
@@ -42,7 +47,8 @@ var Scoreboard = React.createClass({
       var token = result.credential.accessToken;
       // The signed-in user info.
       var user = result.user;
-      QuidStore.setUser(user.displayName);
+      QuidStore.setUser(user);
+      writeUserData(user.uid, user.displayName);
     }).catch(function(error) {
       // Handle Errors here.
       var errorCode = error.code;
