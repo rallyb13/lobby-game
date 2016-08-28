@@ -110,6 +110,15 @@ QuidStore.undoTurn = function(){
   this.emit(CHANGE_EVENT);
 }
 
+QuidStore.restartGame = function(){
+  let newStateObj = initialState
+  this.calculateHighs(true)
+  newStateObj.userInfo = currentState.userInfo
+  currentState = newStateObj
+  this.setupBoard()
+  this.emitChange()
+};
+
 //
 //
 //************** STATE CHANGE HELPER FUNCTIONS
@@ -890,14 +899,10 @@ QuidStore.calculateHighs = function(isEndGame) {
   } else {
     return { 'sortedScores': sortedScores, 'sortedOffices': sortedOffices}
   }
-},
+};
 
 QuidStore.sortNumbers = function(a, b){
   return b - a
-}
-
-QuidStore.restartGame = function(){
-  this.calculateHighs(true)
 };
 
 export default QuidStore;

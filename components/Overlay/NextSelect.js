@@ -28,8 +28,6 @@ var NextSelect = React.createClass({
   //resets state object and starts new game
   restart: function() {
     QuidStore.restartGame();
-    document.clear();
-    location.reload();
   },
 
   continue: function() {
