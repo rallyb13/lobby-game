@@ -41,7 +41,7 @@ var Overlay = React.createClass({
             <div className="mainPanel helpWrapper">
               <div id='currentElection'>
                 <div id='stats'>
-                  <HighScores info={this.props.userInfo} currentScore={this.props.gameData.score} currentOffice={this.props.gameData.electedOffice} />
+                  <HighScores />
                   <Funds balance={this.props.gameData.bankBalance} goal={this.props.gameData.nextGoal} />
                 </div>
                 <p style={{fontSize: '1.5em'}}>{message}</p>
