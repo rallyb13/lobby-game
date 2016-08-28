@@ -23,6 +23,7 @@ var Token = React.createClass({
       'icon-AR-15': this.props.symbol === 'mil3',
       'icon-missile': this.props.symbol === 'mil4',
       'icon-tank': this.props.symbol === 'mil5',
+      'icon-draft': this.props.symbol === 'mil6',
 
       'icon-credit-cards': this.props.symbol === 'fin1',
       'icon-mortgage': this.props.symbol === 'fin2',
@@ -38,7 +39,8 @@ var Token = React.createClass({
       'icon-bridge1': this.props.symbol === 'con5',
       'icon-bridge2': this.props.symbol === 'con6',
       'icon-bridge3': this.props.symbol === 'con7',
-      'icon-megaphone': this.props.symbol === 'mega'
+      'icon-megaphone': this.props.symbol === 'mega',
+      'icon-pork': this.props.symbol === 'pork'
     }),
     backgroundType = this.props.symbol !== '' ? 'url(../assets/icons/' + symbolClass + '.png) no-repeat top/contain' : 'inherit';
 
