@@ -90,7 +90,9 @@ QuidStore.emitChange = function() {
         currentState
       });
   }
-  writeStoreData(currentState.userInfo.userId, currentState);
+  if (currentState.userInfo,userId != '') {
+     writeStoreData(currentState.userInfo.userId, currentState);
+  }
 };
 
 QuidStore.addChangeListener = function(callback) {
