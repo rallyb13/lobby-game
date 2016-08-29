@@ -63,7 +63,6 @@ var App = React.createClass ({
     this.setState(QuidStore.getCurrentState());
   },
 
-  //
   handleUndo(){
     QuidStore.undoTurn();
   },

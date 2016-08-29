@@ -84,14 +84,15 @@ QuidStore.setupBoard = function () {
 //Emit change to notify top level App.js of state change
 QuidStore.emitChange = function() {
   this.emit(CHANGE_EVENT);
-
-  function writeStoreData(userId, store) {
+  let uid = currentState.userInfo.userId
+    function writeStoreData(userId) {
       firebase.database().ref('users/' + userId).set({
         currentState
       });
-  }
-  if (currentState.userInfo.userId != '') {
-     writeStoreData(currentState.userInfo.userId, currentState);
+    }
+
+  if (uid != '') {
+     writeStoreData(uid, currentState);
   }
 };
 
@@ -117,7 +118,7 @@ QuidStore.undoTurn = function(){
   currentState = JSON.parse(localStorage['preMoveState']);
   this.nextMove(); // still charged for the original move
   this.deposit(-250); //undo costs money
-  this.emit(CHANGE_EVENT);
+  this.emitChange();
 }
 
 QuidStore.restartGame = function(){
