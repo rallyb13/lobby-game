@@ -819,13 +819,16 @@ QuidStore.endPhase = function(endGame){
       phaseData = Utils.getPhaseData(phase);
 
   this.toggleOverlay(true);
-  if (currentState.status.nextGoal > currentState.status.bankBalance || endGame){
-    currentState.status.message = firstPart + phaseData['failMsg'];
-  } else {
+  if (currentState.status.nextGoal <= currentState.status.bankBalance && !endGame){
     currentState.status.message = phaseData['winMsg'];
     currentState.status.advMsg = Utils.setElectionChoice(phase);
     if (phase === 19){
       currentState.status.advMsg = currentState.status.advMsg[currentState.status.repeat % 3];
+    }
+  } else {
+    currentState.status.message = firstPart + phaseData['failMsg'];
+    if (currentState.status.advMsg === 'none'){
+      currentState.status.advMsg = 'bank'
     }
   }
 };
