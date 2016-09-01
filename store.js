@@ -34,7 +34,7 @@ var initialState = {
 
   //store config content that does not need to be passed to view components
   tokensArray: ['oil1', 'oil1', 'oil1', 'oil2'],
-  trigger: 180, //move # at which tokensArray changes
+  trigger: 160, //move # at which tokensArray changes
   megaPossTokens: [], //arrays of valid tokens megaphone can become (at coordinate corresponding to megaPossCoords)
   porkOn: [], //pork tokens on board
   appeasements: [], //appeasement tokens on board
