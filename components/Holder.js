@@ -24,9 +24,9 @@ var Holder = React.createClass({
 
   styles: {
     holdArea: {
-      backgroundColor: 'maroon',
+      backgroundColor: '#D2E4C4',
       width: '77.5px',
-      border: '1px solid red',
+      border: '1px solid #246EB9',
       float: 'left',
       margin: '5px'
     }

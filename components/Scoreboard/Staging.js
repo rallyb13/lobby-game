@@ -16,7 +16,7 @@ var Staging = React.createClass({
 			{ style: {
 					backgroundColor: Utils.handleColors(tokenGroup, 'bColor'),
 					padding: '0 5px 0 10px',
-					border: '5px double #000',
+					border: '5px double #00100B',
 					display: 'flex',
 					flex: '0 0 auto',
 					alignItems: 'center'

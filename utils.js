@@ -57,17 +57,17 @@ var Utils = {
   //token category reference for color & background color (and special selected case)
   handleColors: function(tokenGroup, attribute, selected){
     var colorMap = {
-      'oil': {bColor: 'gray'},
-      'agr': {bColor: 'yellow'},
-      'mil': {bColor: 'red'},
-      'fin': {bColor: 'green'},
-      '': {bColor: '#A4BD99'},
-      'meg': {bColor: '#A4BD99'},
-      'con': {bColor: 'blue'},
+      'oil': {bColor: '#818479'},
+      'agr': {bColor: '#DAFF7D'},
+      'mil': {bColor: '#DB5461'},
+      'fin': {bColor: '#4CB944'},
+      '': {bColor: '#D2E4C4'},
+      'meg': {bColor: '#D2E4C4'},
+      'con': {bColor: '#246EB9'},
       'por': {bColor: 'pink'},
     }
     if (selected === true) {
-      return 'magenta';
+      return '#7D80DA';
     } else {
       return colorMap[tokenGroup][attribute];
     }

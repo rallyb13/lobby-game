@@ -62,7 +62,7 @@ var Scoreboard = React.createClass({
 
   styles: {
      scoreboard: {
-      border: '1px solid #000',
+      border: '1px solid #818479',
       background: 'url(assets/crumpled_looseleaf.jpg)',
       backgroundPosition: 'center',
       backgroundSize: '100%',
@@ -72,7 +72,7 @@ var Scoreboard = React.createClass({
       position: 'relative'
     },
     heading: {
-      borderBottom: '1px solid black',
+      borderBottom: '1px solid #818479',
       textAlign: 'center'
     },
     bodyBoard: {
