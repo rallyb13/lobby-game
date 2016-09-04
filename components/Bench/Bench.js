@@ -21,23 +21,10 @@ var Bench = React.createClass({
     }
 
     return (
-      <div style={this.styles.bench}>
+      <div className='bench'>
         {seats}
       </div>
     );
-  },
-
-  styles: {
-    bench: {
-      color: 'white',
-      backgroundColor: '#A57548',
-      height: '70px',
-      float: 'left',
-      marginLeft: '5px',
-      width: '500px',
-      display: 'block',
-      position: 'relative'
-    }
   }
 });
 
