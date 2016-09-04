@@ -7,15 +7,15 @@ var NextSelect = React.createClass({
       displayButton;
 
     if (this.props.gameOver) {
-      displayButton = <button onClick={this.restart}> Restart </button>;
+      displayButton = <button className='choice-button' onClick={this.restart}> Restart </button>;
     } else if (advMsg !== 'none'){
       displayButton = <div>
           <div>{advMsg}</div>
-          <button style={this.styles.buttons} onClick={this.acceptAdvance} > Higher Office! </button>
-          <button style={this.styles.buttons} onClick={this.refuseAdvance} > Am Comfy Here </button>
+          <button className='choice-button' onClick={this.acceptAdvance} > Higher Office! </button>
+          <button className='choice-button' onClick={this.refuseAdvance} > Am Comfy Here </button>
         </div>;
       } else {
-        displayButton = <button onClick={this.continue}> Keep Running </button>;
+        displayButton = <button className='choice-button' onClick={this.continue}> Keep Running </button>;
       }
 
     return(
@@ -72,12 +72,6 @@ var NextSelect = React.createClass({
     QuidStore.changePhase(adjustment, true); //should be able to add to repeat without bringing it through as props
     //this will probably need to close modal
     //or we'll need a trigger for EVERY phase to go on that prompts phase change
-  },
-
-  styles: {
-    buttons: {
-      margin: '1% 2% 0 0'
-    }
   }
 });
 

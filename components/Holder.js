@@ -5,7 +5,7 @@ import QuidStore from '../store';
 var Holder = React.createClass({
   render: function(){
     return(
-      <div style={this.styles.holdArea} onClick={this.toggleTokens}>
+      <div className='hold-area' onClick={this.toggleTokens}>
         <Token symbol={this.props.token}/>
       </div>
     );
@@ -19,16 +19,6 @@ var Holder = React.createClass({
       QuidStore.holdTokenHere(this.props.position);
     } else {
       QuidStore.useHeldToken(this.props.position, token);
-    }
-  },
-
-  styles: {
-    holdArea: {
-      backgroundColor: '#D2E4C4',
-      width: '77.5px',
-      border: '1px solid #246EB9',
-      float: 'left',
-      margin: '5px'
     }
   }
 });

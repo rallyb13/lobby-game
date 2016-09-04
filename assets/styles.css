@@ -61,7 +61,7 @@ h1 {
   margin: 0 auto;
 }
 
-/************ WHITE PAPER ***********/
+/************ WHITE PAPER & HOLDS ***********/
 .white-paper-panel {
   float: left;
 }
@@ -109,6 +109,14 @@ h1 {
 }
 .eligible:hover {
   background: #FAFAFF !important;
+}
+
+.hold-area {
+  background-color: #A57548;
+  width: 77.5px;
+  border: 1px solid #246EB9;
+  float: left;
+  margin: 5px;
 }
 
 /************ OVERLAY ***********/
@@ -188,6 +196,11 @@ h1 {
   position: absolute;
   top: 0px;
   right: 10px;
+}
+
+.choice-button {
+  /*TODO: AMP THIS*/
+  margin: 1% 2% 0 0;
 }
 
 .funds {
