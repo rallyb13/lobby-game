@@ -60,9 +60,38 @@ h1 {
   max-width: 100%;
   margin: 0 auto;
 }
+
+/************ WHITE PAPER ***********/
 .white-paper-panel {
   float: left;
 }
+
+.scoreboard {
+ border: 1px solid #818479;
+ background: url(crumpled_looseleaf.jpg);
+ background-position: center;
+ background-size: 100%;
+ background-color: #DFDFDB;
+ height: 50%;
+ display: block;
+ position: relative;
+}
+
+.paper-heading {
+ border-bottom: 1px solid #818479;
+ text-align: center;
+}
+
+.paper-body {
+ padding: 0 10px;
+}
+
+.chief-button {
+  font-size: 1.5em;
+  margin-top: 10px;
+}
+
+/************ GAMEBOARD ***********/
 .game-grid {
   background-color: #D2E4C4;
   height: 100%;

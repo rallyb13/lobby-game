@@ -17,10 +17,10 @@ var Scoreboard = React.createClass({
       textColor = (negativeBal && moveCount <= 20 && moveCount > 0) ? 'red' : 'black';
 
     return (
-      <div style={this.styles.scoreboard}>
-        <h3 style={this.styles.heading}>White Paper</h3>
+      <div className='scoreboard'>
+        <h3 className='paper-heading'>White Paper</h3>
         <h4 onClick={this.handleLogin}>{displayName}</h4>
-        <div style={this.styles.bodyBoard}>
+        <div className='paper-body'>
           <Staging stagedToken={this.props.stagedToken} />
           <MemoButton/>
           <Score score={this.props.status.score} />
@@ -28,7 +28,6 @@ var Scoreboard = React.createClass({
           <Office electedOffice={this.props.status.electedOffice} />
           <MoveCounter movesRemaining={this.props.status.movesRemaining} phase={this.props.status.phase} textColor={textColor} />
           <NextGoal nextGoal={this.props.status.nextGoal} textColor={textColor} />
-
         </div>
       </div>
     );
@@ -58,28 +57,7 @@ var Scoreboard = React.createClass({
       // The firebase.auth.AuthCredential type that was used.
       var credential = error.credential;
     });
-  },
-
-  styles: {
-     scoreboard: {
-      border: '1px solid #818479',
-      background: 'url(assets/crumpled_looseleaf.jpg)',
-      backgroundPosition: 'center',
-      backgroundSize: '100%',
-      backgroundColor: '#DFDFDB',
-      height: '50%',
-      display: 'block',
-      position: 'relative'
-    },
-    heading: {
-      borderBottom: '1px solid #818479',
-      textAlign: 'center'
-    },
-    bodyBoard: {
-      padding: '0 10px',
-    }
   }
-
 });
 
 export default Scoreboard
