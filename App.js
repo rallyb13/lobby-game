@@ -43,10 +43,10 @@ var App = React.createClass ({
     return (
       <div>
         <div className="main">
-          <h1 style={this.styles.gameTitle}>Quid: The Game of Outrageous Political Shenanigans</h1>
+          <h1 className='game-title'>Quid: The Game of Outrageous Political Shenanigans</h1>
           <div className="white-paper-panel">
             <Scoreboard status={this.state.status} userInfo={this.state.userInfo} stagedToken={this.state.stagedToken}/>
-            <div style={this.styles.holders}>{allHolders}</div>
+            <div className='hold-area'>{allHolders}</div>
           </div>
           <Bench helpers={this.state.helpers} poweringUp={this.state.helperChange} staged={this.state.stagedToken}/>
           <button type='button' id='undo' className='undo-button' onClick={this.handleUndo}>UNDO<span id='undo-cost' className='undo-cost'>($250)</span></button>
@@ -75,17 +75,6 @@ var App = React.createClass ({
       return advMsg;
     } else {
       return false;
-    }
-  },
-
-  styles: {
-    gameTitle: {
-        color: '#000',
-        padding: '10px, 25px'
-    },
-    holders: {
-      display: 'inline-block',
-      float: 'left'
     }
   }
 });

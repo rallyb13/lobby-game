@@ -34,6 +34,11 @@ h1 {
   text-align: center;
 }
 
+.game-title {
+  color: #000;
+  padding: 10px, 25px;
+}
+
 .undo-button {
   float: right;
   color: #00100B;
@@ -91,6 +96,19 @@ h1 {
   margin-top: 10px;
 }
 
+.hold-area {
+  display: inline-block;
+  float: left;
+}
+
+.holder {
+  background-color: #A57548;
+  width: 77.5px;
+  border: 1px solid #246EB9;
+  float: left;
+  margin: 5px;
+}
+
 /************ GAMEBOARD ***********/
 .game-grid {
   background-color: #D2E4C4;
@@ -109,14 +127,6 @@ h1 {
 }
 .eligible:hover {
   background: #FAFAFF !important;
-}
-
-.hold-area {
-  background-color: #A57548;
-  width: 77.5px;
-  border: 1px solid #246EB9;
-  float: left;
-  margin: 5px;
 }
 
 /************ OVERLAY ***********/

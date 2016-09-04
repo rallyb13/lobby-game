@@ -5,7 +5,7 @@ import QuidStore from '../store';
 var Holder = React.createClass({
   render: function(){
     return(
-      <div className='hold-area' onClick={this.toggleTokens}>
+      <div className='holder' onClick={this.toggleTokens}>
         <Token symbol={this.props.token}/>
       </div>
     );
