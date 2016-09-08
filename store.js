@@ -206,9 +206,7 @@ QuidStore.oilSlick = function(rowNum){
   let toClearToks = currentState.board.grid[rowNum];
   let appeases = currentState.appeasements;
   for (let i = 0; i < toClearToks.length; i++ ) {
-    if (toClearToks[i] === '') {
-      break;
-    } else if (toClearToks[i].slice(0,3) === 'con' && toClearToks[i].slice(3,4) != 1){
+    if (toClearToks[i].slice(0,3) === 'con' && toClearToks[i].slice(3,4) != 1){
       for (let j = 0; j < appeases.length; j++){
         if (appeases[j][0] === rowNum && appeases[j][1] === i) {
           this.removeAppeasement(j, rowNum, i, 'con2');
@@ -216,14 +214,14 @@ QuidStore.oilSlick = function(rowNum){
         }
       }
     } else if (toClearToks[i].slice(3,4) == 5){
-      //handle 5th level removal
+      let coords = JSON.stringify([rowNum, i]);
+      let index = currentState.levelFives.indexOf(coords);
+      currentState.levelFives.splice(index, 1);
+      this.setToken('', rowNum, i);
     } else {
       this.setToken('', rowNum, i);
     }
   }
-  // for (var i = 0; i < currentState.board.columns; i++){
-  //   this.setToken('', rowNum, i);
-  // }
 };
 
 //helper to communicate selected tab to overlay so that it can reference correct tab in props
