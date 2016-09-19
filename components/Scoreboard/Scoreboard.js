@@ -19,8 +19,8 @@ var Scoreboard = React.createClass({
     return (
       <div className='scoreboard'>
         <h3 className='paper-heading'>White Paper</h3>
-        <h4 onClick={this.handleLogin}>{displayName}</h4>
         <div className='paper-body'>
+          <h4 onClick={this.handleLogin}>{displayName}</h4>
           <Staging stagedToken={this.props.stagedToken} />
           <MemoButton/>
           <Score score={this.props.status.score} />

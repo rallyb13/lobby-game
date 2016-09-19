@@ -904,7 +904,7 @@ QuidStore.calculateHighs = function(isEndGame) {
   let sortedScores = []
   let sortedOffices = []
   let checkOffice = ''
-      
+
   while (sortedScores.length <= 5 && offices.length !== 0) {
     checkOffice = offices.shift(0)
     if (currentState.status.electedOffice === checkOffice){
@@ -923,7 +923,7 @@ QuidStore.calculateHighs = function(isEndGame) {
       toSortScores = []
     }
   }
-  
+
   if (isEndGame) {
     currentState.userInfo.highScores = sortedScores
     currentState.userInfo.highOffices = sortedOffices
