@@ -5,10 +5,12 @@ var MemoButton = React.createClass({
   render: function(){
 
     return (
-      <button onClick={this.openModal} className='chief-button' >Chief of Staff</button>
+      <div className="center">
+        <button onClick={this.openModal} className='chief-button' >HELP MENU</button>
+      </div>
     );
   },
-  
+
   openModal: function() {
     QuidStore.toggleOverlay(true);
   }

@@ -34,6 +34,10 @@ h1 {
   text-align: center;
 }
 
+.center {
+  text-align: center;
+}
+
 .main {
   max-width: 100%;
   margin: 0 auto;
@@ -106,7 +110,17 @@ h1 {
 
 .chief-button {
   font-size: 1.5em;
+  font-weight: bolder;
   margin-top: 10px;
+  color: #FFF;
+  text-align: center;
+  background-color: red;
+  border: 3px solid #000;
+  border-radius: 4px;
+}
+
+.chief-button:hover {
+  background-color: #CC0000;
 }
 
 .hold-area {
@@ -129,6 +143,7 @@ h1 {
   width: 100%;
   display: inline-block;
   margin: 5px 0 20px 5px;
+  border: 5px solid #000;
 }
 .grid-square {
   display: inline-block;
@@ -261,7 +276,7 @@ h1 {
     width: 30%;
   }
   .game-grid {
-    width: 69%;
+    width: 68%;
   }
   .modalWrapper {
       flex-direction: row;
