@@ -397,14 +397,8 @@ QuidStore.nextMove = function(){
     if (progressionData !== false){
       currentState.tokensArray = progressionData.tokens;
       currentState.trigger = progressionData.nextTrigger;
-      if (progressionData.special === 'hold'){
-        currentState.holdTokens.push('');
-      } else if (progressionData.special === 'appeasement'){
-        if (currentState.helpers['con3'] === 0){
-          currentState.helpers['con3'] = 1;
-        } else {
-          currentState.helpers['con5'] = 1;
-        }
+      if (progressionData.special !== null && typeof progressionData.special !== 'undefined'){
+        this.handleSpecial(progressionData)
       }
       moveChange = progressionData.moveChange;
       if (typeof moveChange !== 'undefined'){
@@ -417,6 +411,21 @@ QuidStore.nextMove = function(){
   }
   if (currentState.appeasements.length !==0){
     this.checkAppeasements(false);
+  }
+};
+
+QuidStore.handleSpecial = function(data){
+  switch(data.special){
+    case 'hold':
+      currentState.holdTokens.push('');
+      break;
+    case 'appeasement':
+      if (currentState.helpers['con3'] === 0){
+        currentState.helpers['con3'] = 1;
+      } else {
+        currentState.helpers['con5'] = 1;
+      }
+      break;
   }
 };
 
