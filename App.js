@@ -11,12 +11,28 @@ import Overlay from './components/Overlay/Overlay';
 var App = React.createClass ({
   //creates current board with randomly selected starting tokens and sets game-starting state object
   componentWillMount: function () {
-    QuidStore.setupBoard();
-    this.setState(QuidStore.getCurrentState());
+
+     QuidStore.setupBoard()
+    //  .then(function(currentState){
+         this.setState(QuidStore.getCurrentState());
+    //  }, function(error) {
+    //     console.log(error);
+    // });
 },
+    componentWillReceiveProps: function() {
+        if (document.cookie != '') {
+            this.setState(QuidStore.getFromDb());
+        }
+    },
 
   componentDidMount: function(){
-    QuidStore.addChangeListener(this.onChange);
+      QuidStore.addChangeListener(this.onChange);
+      if (document.cookie != '') {
+          QuidStore.getFromDb(this.currentState);
+      } else {
+          QuidStore.addStartingTokens(this.cur);
+      }
+
   },
 
   componentWillUnmount: function(){

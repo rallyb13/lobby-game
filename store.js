@@ -44,36 +44,67 @@ var currentState = JSON.parse(JSON.stringify(initialState));
 
 //sets board at beginning of game, with randomly-set tokens included (SINGLE USE--not used for board resize)
 QuidStore.setupBoard = function () {
-  var rows = currentState.board.rows,
-    columns = currentState.board.columns,
-    startingTokens = ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'con1', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
-    token;
+    // var cookieValue = document.cookie.replace(/(?:(?:^|.*;\s*)userId\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+    // if (document.cookie == '') {
+    //     console.log('in if!')
+        var rows = currentState.board.rows,
+          columns = currentState.board.columns;
 
-  for (var i=0; i < rows; i++) {
-    var row = [];
-    for (var j=0; j < columns; j++) {
-      row.push('');
-    }
-    currentState.board.grid.push(row);
-  }
+        for (var i=0; i < rows; i++) {
+          var row = [];
+          for (var j=0; j < columns; j++) {
+            row.push('');
+          }
+          currentState.board.grid.push(row);
+        }
 
-  // go though starting tokens and put the values on the board
-  for (var i=0; i < startingTokens.length; i++) {
-    var x = Math.floor(Math.random() * rows),
-      y = Math.floor(Math.random() * columns);
-      this.setToken(startingTokens[i], x, y);
-  }
 
-  //eliminate pre-matched tokens
-  for (var i=0; i < rows; i++){
-    for (var j = 0; j < columns; j++){
-      token = this.getToken(i, j);
-      if (token !== '' && this.cardinalCheck(token, i, j).length >= 2){
-        this.setToken('', i, j);
-      }
-    }
-  }
+    // } else {
+    //     var userId = cookieValue;
+    //     return firebase.database().ref('users/' + userId).once('value').then(function(snapshot) {
+    //       currentState = JSON.parse(JSON.stringify(snapshot.val()));
+    //       console.log(currentState)
+    //     });
+    // }
 };
+
+QuidStore.getFromDb = function() {
+    var cookieValue = document.cookie.replace(/(?:(?:^|.*;\s*)userId\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+    var userId = cookieValue;
+
+    return firebase.database().ref('users/' + userId).once('value').then(function(snapshot) {
+      currentState = JSON.parse(JSON.stringify(snapshot.val()));
+      console.log(currentState);
+      QuidStore.emit(CHANGE_EVENT);
+
+    })
+    return currentState;
+};
+
+QuidStore.addStartingTokens = function() {
+    var rows = currentState.board.rows,
+      columns = currentState.board.columns,
+      startingTokens = ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'con1', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
+      token;
+
+      // go though starting tokens and put the values on the board
+      for (var i=0; i < startingTokens.length; i++) {
+        var x = Math.floor(Math.random() * rows),
+          y = Math.floor(Math.random() * columns);
+          this.setToken(startingTokens[i], x, y);
+      }
+
+      //eliminate pre-matched tokens
+      for (var i=0; i < rows; i++){
+        for (var j = 0; j < columns; j++){
+          token = this.getToken(i, j);
+          if (token !== '' && this.cardinalCheck(token, i, j).length >= 2){
+            this.setToken('', i, j);
+          }
+        }
+      }
+      this.emitChange();
+}
 
 //
 //
@@ -139,6 +170,7 @@ QuidStore.restartGame = function(){
 QuidStore.setUser = function (user) {
   currentState.userInfo.userName = user.displayName;
   currentState.userInfo.userId = user.uid;
+  document.cookie = 'userId=' + user.uid;
   this.emitChange();
 };
 
