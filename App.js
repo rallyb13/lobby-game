@@ -1,7 +1,7 @@
 import React from 'react';
 import QuidStore from './store';
 import Utils from './utils';
-import Firebase from 'firebase';
+// import Firebase from 'firebase';
 import Bench from './components/Bench/Bench';
 import Grid from './components/Gameboard/Grid';
 import Scoreboard from './components/Scoreboard/Scoreboard';
@@ -43,7 +43,8 @@ var App = React.createClass ({
     return (
       <div>
         <div className="main">
-          <h1 className='game-title'>Quid: The Game of Outrageous Political Shenanigans</h1>
+          <h1 className='game-title'><strong>QUID</strong></h1>
+          <h2 className='center sub-title'>The Game of Outrageous Political Shenanigans</h2>
           <div className="white-paper-panel">
             <Scoreboard status={this.state.status} userInfo={this.state.userInfo} stagedToken={this.state.stagedToken}/>
             <div className='hold-area'>{allHolders}</div>

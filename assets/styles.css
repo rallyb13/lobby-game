@@ -34,6 +34,10 @@ h1 {
   text-align: center;
 }
 
+h5 {
+  font-size: 1.1em;
+}
+
 .center {
   text-align: center;
 }
@@ -46,7 +50,12 @@ h1 {
 /************ HEADER, BENCH, && UNDO ***********/
 .game-title {
   color: #000;
+  font-size: 50px;
   padding: 10px, 25px;
+}
+
+.sub-title {
+  margin-top: -30px;
 }
 
 .bench {
@@ -90,7 +99,7 @@ h1 {
 
 .scoreboard {
  border: 1px solid #818479;
- background: url(crumpled_looseleaf.jpg);
+ background: url(crumpled_paper.jpg);
  background-position: center;
  background-size: 100%;
  background-color: #DFDFDB;
