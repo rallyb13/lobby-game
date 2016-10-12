@@ -59,14 +59,21 @@ h5 {
 }
 
 .bench {
-  color: white;
-  background-color: #A57548;
   height: 70px;
-  float: left;
-  margin-left: 5px;
   width: 500px;
-  display: block;
-  position: relative;
+}
+
+.bench-container {
+    color: white;
+    background-color: rgba(165, 117, 72, .5);
+    float: left;
+    margin-left: 5px;
+}
+
+.labels {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px;
 }
 
 .undo-button {

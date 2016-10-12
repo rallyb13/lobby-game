@@ -21,8 +21,13 @@ var Bench = React.createClass({
     }
 
     return (
-      <div className='bench'>
-        {seats}
+     <div className='bench-container'>
+        <div className='labels'>
+            <span>Favors</span><span>Appeasments</span>
+        </div>
+          <div className='bench'>
+            {seats}
+          </div>
       </div>
     );
   }
