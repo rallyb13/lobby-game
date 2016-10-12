@@ -426,6 +426,9 @@ QuidStore.handleSpecial = function(data){
         currentState.helpers['con5'] = 1;
       }
       break;
+    case 'election':
+      currentState.status.advMsg = data.msg;
+      this.toggleOverlay(true);
   }
 };
 
@@ -897,12 +900,10 @@ QuidStore.toggleOverlay = function(open){
   if (open){
     currentState.isOverlayUp = true;
     currentState.helpDetail = false;
-    this.emitChange();
-
   } else {
     currentState.isOverlayUp = false;
-    this.emitChange();
   }
+  this.emitChange();
 };
 
 QuidStore.calculateHighs = function(isEndGame) {

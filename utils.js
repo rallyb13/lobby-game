@@ -331,8 +331,16 @@ var Utils = {
           10: {
             299: {
               tokens: ['oil1', 'oil2', 'oil3', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'agr2', 'agr2', 'agr2', 'agr2', 'agr3', 'con1', 'con1', 'con1', 'mega'],
-              nextTrigger: 120,
+              nextTrigger: 180,
               special: "hold"
+            }
+          },
+          13: {
+            180: {
+              tokens: ['oil1', 'oil1', 'oil2', 'oil2', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'agr2', 'agr2', 'agr2', 'agr3', 'con1', 'con1', 'con1', 'pork'],
+              msg: "You're halfway through your term, so if you want to move up to the US House of Representatives you've got another chance right now to time things so you finish out your term and jump right over.",
+              nextTrigger: 120, //TODO: triggers for repeatable rounds need to be the same as the next rounds
+              special: "election"
             }
           },
           16: {

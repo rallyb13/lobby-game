@@ -43,8 +43,10 @@ var NextSelect = React.createClass({
     if (phase === 5 || phase === 12){
       adjustment = 1;
     } else if (phase === 6 || phase === 13) {
-      adjustment = 0;
-      QuidStore.rerunPhase(true);
+      if (this.props.moves !== 180){
+        adjustment = 0;
+        QuidStore.rerunPhase(true);
+      }
     } else if (phase === 19){
       adjustment = -1
       QuidStore.rerunPhase(true);
