@@ -351,9 +351,11 @@ var Utils = {
           },
           27: {
             461: {
-              tokens: ['oil1', 'agr1', 'fin1', 'fin1', 'mil1', 'mil1', 'mega', 'mega', 'con1'],
+              tokens: ['oil1', 'agr1', 'fin1', 'fin1', 'mil1', 'mil1', 'mega', 'mega', 'con1'], //TODO: should be big tokens just for that brief window
               nextTrigger: 459,
-              moveChange: 40
+              msg: "The president has called a special session to address the deficit crisis. Nice work ignoring the need to pass a budget until the last minute. I wonder what you can sneak in when there's just too much at stake for certain legislation to not pass...",
+              special: 'event',
+              moveChange: 23
             },
             459: {
               tokens: ['oil1', 'agr1', 'mil1', 'mil2', 'mil2', 'fin1', 'fin2', 'fin2', 'fin3', 'mega', 'pork', 'con1', 'con1'],
@@ -364,7 +366,9 @@ var Utils = {
             155: {
               tokens: ['oil1', 'oil2', 'agr1', 'agr2', 'mil1', 'mil2', 'mil2', 'mil3', 'fin1', 'fin1', 'fin2', 'fin2', 'fin3', 'fin3', 'fin4', 'con1', 'con1', 'con1', 'mega', 'mega', 'pork', 'pork'],
               nextTrigger: 777, //TODO: this will change!
-              moveChange: -23
+              msg: 'Government shutdown! Forget all those people out of work. You need to worry about how you have less working days to get your TRUE constituents what they want. You just WEEKS!',
+              special: 'event',
+              moveChange: -41
             }
           }
         };

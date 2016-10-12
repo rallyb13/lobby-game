@@ -377,7 +377,7 @@ QuidStore.completeMove = function(rowPos, colPos){
 //checks for next trigger (of msg & token selection changes) && for end of countdown (which triggers phase change)
 //also has special logic for late-in-game surprise changes to move counter (and handles appeasement tokens on board at the time)
 QuidStore.nextMove = function(){
-  var moves, progressionData, moveChange;
+  var moves, progressionData;
 
   if (currentState.status.phase <= 32){
     currentState.status.movesRemaining--;
@@ -400,13 +400,6 @@ QuidStore.nextMove = function(){
       if (progressionData.special !== null && typeof progressionData.special !== 'undefined'){
         this.handleSpecial(progressionData)
       }
-      moveChange = progressionData.moveChange;
-      if (typeof moveChange !== 'undefined'){
-        currentState.status.movesRemaining = currentState.status.movesRemaining + moveChange;
-        if (moveChange < 0 && currentState.appeasements.length > 0){
-          this.checkAppeasements(true);
-        }
-      }
     }
   }
   if (currentState.appeasements.length !==0){
@@ -425,6 +418,14 @@ QuidStore.handleSpecial = function(data){
       } else {
         currentState.helpers['con5'] = 1;
       }
+      break;
+    case 'event':
+      currentState.status.message = data.msg;
+      currentState.status.movesRemaining = currentState.status.movesRemaining + data.moveChange;
+      if (data.moveChange < 0 && currentState.appeasements.length > 0){
+        this.checkAppeasements(true);
+      }
+      this.toggleOverlay(true);
       break;
   }
 };
@@ -897,12 +898,10 @@ QuidStore.toggleOverlay = function(open){
   if (open){
     currentState.isOverlayUp = true;
     currentState.helpDetail = false;
-    this.emitChange();
-
   } else {
     currentState.isOverlayUp = false;
-    this.emitChange();
   }
+  this.emitChange();
 };
 
 QuidStore.calculateHighs = function(isEndGame) {
