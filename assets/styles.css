@@ -34,6 +34,10 @@ h1 {
   text-align: center;
 }
 
+h5 {
+  font-size: 1.1em;
+}
+
 .center {
   text-align: center;
 }
@@ -46,18 +50,30 @@ h1 {
 /************ HEADER, BENCH, && UNDO ***********/
 .game-title {
   color: #000;
+  font-size: 50px;
   padding: 10px, 25px;
 }
 
+.sub-title {
+  margin-top: -30px;
+}
+
 .bench {
-  color: white;
-  background-color: #A57548;
   height: 70px;
-  float: left;
-  margin-left: 5px;
   width: 500px;
-  display: block;
-  position: relative;
+}
+
+.bench-container {
+    color: white;
+    background-color: rgba(165, 117, 72, .5);
+    float: left;
+    margin-left: 5px;
+}
+
+.labels {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px;
 }
 
 .undo-button {
@@ -90,7 +106,7 @@ h1 {
 
 .scoreboard {
  border: 1px solid #818479;
- background: url(crumpled_looseleaf.jpg);
+ background: url(crumpled_paper.jpg);
  background-position: center;
  background-size: 100%;
  background-color: #DFDFDB;

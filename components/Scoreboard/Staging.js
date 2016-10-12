@@ -10,7 +10,7 @@ var Staging = React.createClass({
 		return React.cloneElement(
 			<div>
 			<div>
-				<p>Your Next Piece: </p> </div>
+				<p><strong>Your Next Piece: </strong></p> </div>
 				<div style={{width:'50%'}}> <Token symbol={this.props.stagedToken}/> </div>
 			</div>,
 			{ style: {
