@@ -31,8 +31,13 @@ var NextSelect = React.createClass({
   },
 
   continue: function() {
+    if (this.props.phase === 19 && this.props.repeat % 3 === 2){
+      QuidStore.rerunPhase(true);
+      QuidStore.changePhase(-1, true);
+    } else {
+      QuidStore.changePhase(1, false);
+    }
     QuidStore.toggleOverlay(false);
-    QuidStore.changePhase(1, false);
   },
   
   //handles choice of NOT running for next elected office, adjusting phase as needed
@@ -65,13 +70,11 @@ var NextSelect = React.createClass({
       adjustment = 1;
       QuidStore.rerunPhase(false);
     } else if (phase === 19){
-      adjustment = repeat === 0 ? 1 : 3;
+      adjustment = repeat % 3 === 0 ? 1 : 3;
       QuidStore.rerunPhase(false);
     }
     QuidStore.toggleOverlay(false);
     QuidStore.changePhase(adjustment, true); //should be able to add to repeat without bringing it through as props
-    //this will probably need to close modal
-    //or we'll need a trigger for EVERY phase to go on that prompts phase change
   }
 });
 
