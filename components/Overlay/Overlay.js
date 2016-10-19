@@ -5,6 +5,7 @@ import Banner from './Banner'
 import Funds from './Funds'
 import NextSelect from './NextSelect'
 import HighScores from './HighScores'
+import Welcome from './Welcome'
 
 import OilLobbyHelp from './Helps/OilLobbyHelp'
 import ConstituentsHelp from './Helps/ConstituentsHelp'
@@ -34,10 +35,12 @@ var Overlay = React.createClass({
         {close}
         <Banner isGameOver={this.props.isGameOver} moves={moves} office={this.props.gameData.electedOffice}/>
         <div className="modalWrapper">
+            
             <div className="leftPanel">
               <img src='../../assets/icons/chief-of-staff.png' alt='Chief of Staff'></img>
               <div>{helpTabs}</div>
             </div>
+
             <div className="mainPanel helpWrapper">
               <div id='currentElection'>
                 <div id='stats'>
@@ -50,7 +53,11 @@ var Overlay = React.createClass({
               <div id='helpDisplay'>
                 {helpDetailEl}
               </div>
+              <div id='welcomeScreen'>
+                <Welcome />
+              </div>
             </div>
+
         </div>
       </div>
     )

@@ -16,6 +16,8 @@ var App = React.createClass ({
 },
 
   componentDidMount: function(){
+    console.log('THE COMPONENT FUCKING MOUNTED');
+    this.setWelcome(); //TODO: get this to actually trigger
     QuidStore.addChangeListener(this.onChange);
   },
 
@@ -66,6 +68,11 @@ var App = React.createClass ({
 
   handleUndo(){
     QuidStore.undoTurn();
+  },
+  
+  setWelcome(){
+    document.getElementById('welcomeScreen').style.display = 'block';
+    document.getElementById('currentElection').style.display = 'none';
   },
 
   //checks that board is not full and bank balance is still positive (at end of election cycle)

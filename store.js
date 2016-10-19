@@ -30,7 +30,7 @@ var initialState = {
   stagedToken: 'oil1',
   holdTokens: [''],
   helpDetail : false,
-  isOverlayUp: false,
+  isOverlayUp: true,
 
   //store config content that does not need to be passed to view components
   tokensArray: ['oil1', 'oil1', 'oil1', 'oil2'],
@@ -45,9 +45,7 @@ var currentState = JSON.parse(JSON.stringify(initialState));
 //sets board at beginning of game, with randomly-set tokens included (SINGLE USE--not used for board resize)
 QuidStore.setupBoard = function () {
   var rows = currentState.board.rows,
-    columns = currentState.board.columns,
-    startingTokens = ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'con1', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
-    token;
+    columns = currentState.board.columns;
 
   for (var i=0; i < rows; i++) {
     var row = [];
@@ -56,7 +54,14 @@ QuidStore.setupBoard = function () {
     }
     currentState.board.grid.push(row);
   }
+};
 
+QuidStore.populateBoard = function(){
+  var rows = currentState.board.rows,
+    columns = currentState.board.columns,
+    startingTokens = ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'con1', 'oil2', 'oil3', 'oil1', 'oil1', 'oil2'],
+    token;
+  
   // go though starting tokens and put the values on the board
   for (var i=0; i < startingTokens.length; i++) {
     var x = Math.floor(Math.random() * rows),
@@ -73,6 +78,7 @@ QuidStore.setupBoard = function () {
       }
     }
   }
+  this.emitChange();
 };
 
 //
