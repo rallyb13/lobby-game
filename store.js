@@ -56,6 +56,7 @@ QuidStore.setupBoard = function () {
   }
 };
 
+//if no prior state or new game, adds random set of tokens to start with
 QuidStore.populateBoard = function(){
   var rows = currentState.board.rows,
     columns = currentState.board.columns,
@@ -79,6 +80,33 @@ QuidStore.populateBoard = function(){
     }
   }
   this.emitChange();
+};
+
+QuidStore.handleLogin = function(){
+  function writeUserData(userId, name) {
+      firebase.database().ref('users/' + userId).set({
+        username: name
+      });
+  }
+  var provider = new firebase.auth.GoogleAuthProvider();
+
+  firebase.auth().signInWithPopup(provider).then(function(result) {
+    // This gives you a Google Access Token. You can use it to access the Google API.
+    var token = result.credential.accessToken;
+    // The signed-in user info.
+    var user = result.user;
+    QuidStore.setUser(user);
+    writeUserData(user.uid, user.displayName);
+  }).catch(function(error) {
+    // Handle Errors here.
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    console.log(errorMessage);
+    // The email of the user's account used.
+    var email = error.email;
+    // The firebase.auth.AuthCredential type that was used.
+    var credential = error.credential;
+  });
 };
 
 //

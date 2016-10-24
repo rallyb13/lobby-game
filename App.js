@@ -16,8 +16,7 @@ var App = React.createClass ({
 },
 
   componentDidMount: function(){
-    console.log('THE COMPONENT FUCKING MOUNTED');
-    this.setWelcome(); //TODO: get this to actually trigger
+    this.setWelcome();
     QuidStore.addChangeListener(this.onChange);
   },
 

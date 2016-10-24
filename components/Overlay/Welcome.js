@@ -18,7 +18,7 @@ var Welcome = React.createClass({
   },
   
   onLogin: function(){
-    //TODO: login process && get state from firebase
+    QuidStore.handleLogin()
     document.getElementById('welcomeScreen').style.display = 'none';
     QuidStore.toggleOverlay(false);
   }
