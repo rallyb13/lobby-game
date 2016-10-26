@@ -1,7 +1,7 @@
 import React from 'react';
 import QuidStore from './store';
 import Utils from './utils';
-// import Firebase from 'firebase';
+import Firebase from 'firebase';
 import Bench from './components/Bench/Bench';
 import Grid from './components/Gameboard/Grid';
 import Scoreboard from './components/Scoreboard/Scoreboard';
@@ -72,6 +72,8 @@ var App = React.createClass ({
   setWelcome(){
     document.getElementById('welcomeScreen').style.display = 'block';
     document.getElementById('currentElection').style.display = 'none';
+    document.getElementById('closeButton').style.display = 'none';
+    document.getElementById('helpTabs').style.display = 'none';
   },
 
   //checks that board is not full and bank balance is still positive (at end of election cycle)

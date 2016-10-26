@@ -25,7 +25,7 @@ var Overlay = React.createClass({
         helpSelection = this.props.helpDetail,
         helpDetailEl = helpSelection ? this.getHelpComponent(helpSelection) : <div></div>,
         displayCase = moves === 0 || advMsg !== 'none',
-        close = displayCase ? <p></p> : <h3 className='closeButton' onClick={this.closeModal}>X</h3>,
+        close = displayCase ? <p></p> : <h3 className='closeButton' id='closeButton' onClick={this.closeModal}>X</h3>,
         nextBit = displayCase ?
             <NextSelect gameOver={this.props.isGameOver} advMsg={advMsg} moves={moves} phase={this.props.gameData.phase} repeat={this.props.gameData.repeat} /> :
             <div></div>;
@@ -38,7 +38,9 @@ var Overlay = React.createClass({
             
             <div className="leftPanel">
               <img src='../../assets/icons/chief-of-staff.png' alt='Chief of Staff'></img>
-              <div>{helpTabs}</div>
+              <div id='helpTabs'>
+                {helpTabs}
+              </div>
             </div>
 
             <div className="mainPanel helpWrapper">

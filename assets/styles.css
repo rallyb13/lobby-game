@@ -207,6 +207,10 @@ h5 {
     flex: 1 0;
 }
 
+#welcomeScreen {
+    display: none;
+}
+
 .helpWrapper {
     margin: 0 10vw;
 }
