@@ -3,6 +3,14 @@
 
 var Utils = {
 
+  // handle CSS for stripped-down overlay for login cases
+  setWelcome: function(){
+    document.getElementById('welcomeScreen').style.display = 'block';
+    document.getElementById('currentElection').style.display = 'none';
+    document.getElementById('closeButton').style.display = 'none';
+    document.getElementById('helpTabs').style.display = 'none';
+  },
+
   //phase ref specifically for elected office changes
   setElectedOffice: function(phase, currentOffice) {
     var electedOfficeMap = {

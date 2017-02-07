@@ -44,6 +44,7 @@ var initialState = {
 };
 var currentState = JSON.parse(JSON.stringify(initialState));
 var loginHandled = false;
+var firebaseData = {};
 
 //sets board at beginning of game, with randomly-set tokens included (SINGLE USE--not used for board resize)
 QuidStore.setupBoard = function () {
@@ -108,8 +109,6 @@ QuidStore.handleLogin = function(isMidgame){
     priorState.once('value').then(function(snapshot){
       priorScore = snapshot.child('currentState').child('status').child('score').val();
       data = snapshot.child('currentState').val();
-      console.log('score: ' + priorScore);
-      console.log(data);
       if (priorScore <= 0 && isMidgame === true) {
         // write current game to database
         writeUserData(user.uid, currentState);
@@ -118,13 +117,13 @@ QuidStore.handleLogin = function(isMidgame){
         QuidStore.populateBoard();
         QuidStore.emitChange(); // handles writing to database
       } else if (isMidgame === true){
-        console.log('correct IF case');
-        // conflict of prior game & current: pop choice modal
+        // conflict of prior & current games: give choice
+        firebaseData = data;
+        QuidStore.toggleOverlay(true);
+        Utils.setWelcome();
       } else {
         // read/retreive old game
-        currentState = data;
-        QuidStore.handleEmptyArrays();
-        QuidStore.emitChange(); // to update board
+        QuidStore.retrievePriorGame(data)
       }
     });
     // writeUserData(user.uid, user.displayName);
@@ -140,12 +139,19 @@ QuidStore.handleLogin = function(isMidgame){
   })
 };
 
+// use data from firebase to re-create currentState object
+QuidStore.retrievePriorGame = function(data) {
+    currentState = data === false ? firebaseData : data;
+    QuidStore.handleEmptyArrays();
+    QuidStore.emitChange(); // needed to update board
+};
+
 // TODO: for big refactor, move a lot of board-check logic to Grid component, use local state
 // once those arrays are out of currentState, remove them from this ugly/temporary fix
 QuidStore.handleEmptyArrays = function() {
   var otherKeys = ['megaPossTokens', 'porkOn', 'appeasements', 'levelFives'];
-  if (typeof currentState.board.megaPossTokens === 'undefined') {
-    currentState.board.megaPossTokens = []
+  if (typeof currentState.board.megaPossCoords === 'undefined') {
+    currentState.board.megaPossCoords = []
   }
   if (typeof currentState.board.createFavor === 'undefined') {
     currentState.board.createFavor = []
@@ -193,6 +199,10 @@ QuidStore.removeChangeListener = function(callback) {
 
 QuidStore.getCurrentState = function(){
   return currentState;
+};
+
+QuidStore.getFirebaseData = function(){
+  return firebaseData;
 };
 
 QuidStore.saveForUndo = function(){
@@ -983,7 +993,7 @@ QuidStore.calculateBonus = function(){
 
 //opens/closes overlay and ensures current election is open tab in right panel when re-opened
 QuidStore.toggleOverlay = function(open){
-  if (open){
+  if (open) {
     currentState.isOverlayUp = true;
     currentState.helpDetail = false;
   } else {
