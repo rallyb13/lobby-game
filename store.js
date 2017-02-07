@@ -9,7 +9,9 @@ var initialState = {
     createFavor: [] //only has content if set about to be combined
   },
   userInfo: {
-    userName: '', highScores: [], highOffices: [],
+    userName: '',
+    highScores: [],
+    highOffices: [],
     userId: ''
   },
   status: {
@@ -41,6 +43,7 @@ var initialState = {
   levelFives: [] //all level5 tokens on board
 };
 var currentState = JSON.parse(JSON.stringify(initialState));
+var loginHandled = false;
 
 //sets board at beginning of game, with randomly-set tokens included (SINGLE USE--not used for board resize)
 QuidStore.setupBoard = function () {
@@ -82,10 +85,13 @@ QuidStore.populateBoard = function(){
   this.emitChange();
 };
 
-QuidStore.handleLogin = function(){
+// uses google to login, checks if user had previous game
+// isMidgame is true if user began playing first, then logged in
+// uses existence of prior game and if current game has started to determine read vs. write (vs. choice)
+QuidStore.handleLogin = function(isMidgame){
   function writeUserData(userId, name) {
       firebase.database().ref('users/' + userId).set({
-        username: name
+        currentState
       });
   }
   var provider = new firebase.auth.GoogleAuthProvider();
@@ -95,8 +101,33 @@ QuidStore.handleLogin = function(){
     var token = result.credential.accessToken;
     // The signed-in user info.
     var user = result.user;
+    var priorScore = 0;
+    var data = {};
     QuidStore.setUser(user);
-    writeUserData(user.uid, user.displayName);
+    var priorState = firebase.database().ref('users/' + user.uid)
+    priorState.once('value').then(function(snapshot){
+      priorScore = snapshot.child('currentState').child('status').child('score').val();
+      data = snapshot.child('currentState').val();
+      console.log('score: ' + priorScore);
+      console.log(data);
+      if (priorScore <= 0 && isMidgame === true) {
+        // write current game to database
+        writeUserData(user.uid, currentState);
+      } else if (priorScore <= 0 && isMidgame === false){
+        // no old/new games: just start new one
+        QuidStore.populateBoard();
+        QuidStore.emitChange(); // handles writing to database
+      } else if (isMidgame === true){
+        console.log('correct IF case');
+        // conflict of prior game & current: pop choice modal
+      } else {
+        // read/retreive old game
+        currentState = data;
+        QuidStore.handleEmptyArrays();
+        QuidStore.emitChange(); // to update board
+      }
+    });
+    // writeUserData(user.uid, user.displayName);
   }).catch(function(error) {
     // Handle Errors here.
     var errorCode = error.code;
@@ -106,7 +137,30 @@ QuidStore.handleLogin = function(){
     var email = error.email;
     // The firebase.auth.AuthCredential type that was used.
     var credential = error.credential;
-  });
+  })
+};
+
+// TODO: for big refactor, move a lot of board-check logic to Grid component, use local state
+// once those arrays are out of currentState, remove them from this ugly/temporary fix
+QuidStore.handleEmptyArrays = function() {
+  var otherKeys = ['megaPossTokens', 'porkOn', 'appeasements', 'levelFives'];
+  if (typeof currentState.board.megaPossTokens === 'undefined') {
+    currentState.board.megaPossTokens = []
+  }
+  if (typeof currentState.board.createFavor === 'undefined') {
+    currentState.board.createFavor = []
+  }
+  if (typeof currentState.userInfo.highScores === 'undefined') {
+    currentState.userInfo.highScores = []
+  }
+  if (typeof currentState.userInfo.highOffices === 'undefined') {
+    currentState.userInfo.highOffices = []
+  }
+  for(let item of otherKeys) {
+    if (typeof currentState[item] === 'undefined') {
+      currentState[item] = [];
+    }
+  }
 };
 
 //
@@ -119,13 +173,12 @@ QuidStore.handleLogin = function(){
 QuidStore.emitChange = function() {
   this.emit(CHANGE_EVENT);
   let uid = currentState.userInfo.userId
-    function writeStoreData(userId) {
+    function writeStoreData(userId, currentState) {
       firebase.database().ref('users/' + userId).set({
         currentState
       });
     }
-
-  if (uid != '') {
+  if (loginHandled === true) {
      writeStoreData(uid, currentState);
   }
 };
@@ -174,6 +227,7 @@ QuidStore.setUser = function (user) {
   currentState.userInfo.userName = user.displayName;
   currentState.userInfo.userId = user.uid;
   this.emitChange();
+  loginHandled = true;
 };
 
 

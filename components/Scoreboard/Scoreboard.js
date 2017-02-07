@@ -34,7 +34,7 @@ var Scoreboard = React.createClass({
   },
 
   handleLogin() {
-    QuidStore.handleLogin();
+    QuidStore.handleLogin(true);
   }
 });
 

@@ -18,12 +18,11 @@ var Welcome = React.createClass({
   },
   
   onLogin: function(){
-    QuidStore.handleLogin()
+    QuidStore.handleLogin(false);
     document.getElementById('welcomeScreen').style.display = 'none';
     QuidStore.toggleOverlay(false);
   }
-  
-  //TODO: hide overlay X-close for this first choice
+
 })
 
 export default Welcome
