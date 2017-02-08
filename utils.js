@@ -184,7 +184,7 @@ var Utils = {
       14: { playMsg: "Your race to become a US Rep begins with a primary showdown against incumbent Aimee 'Deadeye' Dixon. Do what you can in the State Senate for the gun lobby if you want to hit national office. Thanks to gerrymandering, it's really only the primary that matters, so don't hold back.",
         failMsg: "a consultant. A couple jobs, actually: one with the oil lobby, another with agribusiness. Each pays $150K/yr, and you can do both. All you need to do is offer your opinion or advice once in a while.",
         winMsg: "You shot down 'Deadeye' and won the primary! Now, with help from the defense industry, you can shock and awe the voters into giving you the seat.",
-        moves: 130, goal: 125000 },
+        moves: 130, goal: 35000 },
       15: { playMsg: "Sure enough, the other team doesn't even expect to give you a significant challenge. The best they can do, for a national office, is former Mayor Charlie Hayleyus.",
         failMsg: "a special executive. It's a position AgriVat just created. It'll pay $225K/yr, plus bonuses.",
         winMsg: "Mission Accomplished, Representative! Uh-oh, but 'Deadeye' Dixon says she'll be back for her seat.",
@@ -264,69 +264,100 @@ var Utils = {
     return phaseMap[phase];
   },
 
+  constructTokenArray: function(rawData){
+    let tokens = []
+    for (let tok in rawData) {
+      while(rawData[tok] > 0) {
+        tokens.push(tok)
+        rawData[tok]--
+      }
+    }
+    return tokens
+  },
+
   //mid-phase reference to change message and token set (from which staged tokens are randomly drawn) and trigger for next mid-phase change
   progressGame: function(phase, moves) {
     var data,
       progressionMap = {
           1: {
             160: {
-              tokens: ['oil1', 'oil1', 'oil2'],
+              tokens: {'oil1': 2, 'oil2': 1},
               nextTrigger: 140
             },
             140: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'con1'],
+              tokens: {'oil1': 6, 'oil2': 3, 'oil3': 1, 'con1': 1},
               nextTrigger: 115
             },
             115: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1'],
+              tokens: {'oil1': 5, 'oil2': 2, 'oil3': 1, 'con1': 1},
               nextTrigger: 82
             },
             82: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1'],
+              tokens: {'oil1': 5, 'oil2': 2, 'oil3': 1, 'con1': 2},
               nextTrigger: 44
             },
             44: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1'],
+              tokens: {'oil1': 6, 'oil2': 3, 'oil3': 1, 'oil4': 1, 'con1': 2},
               nextTrigger: 115
             }
           },
           2: {
             115: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1'],
+              tokens: {'oil1': 3, 'oil2': 2, 'oil3': 1, 'con1': 1},
               nextTrigger: 98
             },
             98: {
-              tokens: ['oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1'],
+              tokens: {'oil1': 2, 'oil2': 2, 'oil3': 1, 'con1': 2},
               nextTrigger: 63
             },
             63: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil3', 'con1', 'con1', 'mega'],
+              tokens: {'oil1': 3, 'oil2': 2, 'oil3': 1, 'con1': 2, 'mega': 1},
               nextTrigger: 17
             },
             17: {
-              tokens: ['oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
+              tokens: {'oil1': 2, 'oil2': 3, 'oil3': 2, 'oil4': 1, 'con1': 2, 'mega': 1},
               nextTrigger: 33
             }
           },
           3: {
             33: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
+              tokens: {'oil1': 5, 'oil2': 3, 'oil3': 1, 'oil4': 1, 'con1': 2, 'mega': 1},
               nextTrigger: 130,
               special: "hold"
             }
           },
           4: {
             130: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil2', 'oil2', 'oil3', 'oil3', 'con1', 'con1', 'con1', 'mega'],
+              tokens: {'oil1': 8, 'oil2': 5, 'oil3': 1, 'con1': 3, 'mega': 1},
               nextTrigger: 56
             },
             56: {
-              tokens: ['oil1', 'oil1', 'oil1', 'oil1', 'oil2', 'oil2', 'oil2', 'oil3', 'oil4', 'con1', 'con1', 'mega'],
-              nextTrigger: 230 //TODO: keep changing from here
+              tokens: {'oil1': 4, 'oil2': 3, 'oil3': 1, 'oil4': 1, 'con1': 2, 'mega': 1},
+              nextTrigger: 175 //since 6 can be skipped, this target should work for both 6 & 7
+            }
+          },
+          6: {
+            175: {
+              tokens: {'oil1': 13, 'oil2': 8, 'oil3': 2, 'con1': 3, 'mega': 1},
+              nextTrigger: 175
+            }
+          },
+          7: {
+            175: {
+              tokens: {'oil1': 11, 'oil2': 5, 'oil3': 2, 'con1': 2, 'mega': 1, 'agr1': 1},
+              nextTrigger: 101
+            },
+            101: {
+              tokens: {'oil1': 7, 'oil2': 5, 'oil3': 2, 'con1': 3, 'mega': 1, 'agr1': 2},
+              nextTrigger: 15
+            },
+            15: {
+              tokens: {'oil1': 5, 'oil2': 3, 'oil1': 1, 'con1': 2, 'agr1': 2, 'agr2': 1},
+              nextTrigger: 282
             }
           },
           8: {
-            230: {
+            282: {
               tokens: ['oil1', 'oil2', 'oil2', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'con1', 'con1', 'mega'],
               nextTrigger: 172,
               special: "appeasement"

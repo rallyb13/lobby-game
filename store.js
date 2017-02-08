@@ -493,7 +493,7 @@ QuidStore.nextMove = function(){
   } else if (moves === currentState.trigger) {
     progressionData = Utils.progressGame(currentState.status.phase, moves);
     if (progressionData !== false){
-      currentState.tokensArray = progressionData.tokens;
+      currentState.tokensArray = Utils.constructTokenArray(progressionData.tokens);
       currentState.trigger = progressionData.nextTrigger;
       if (progressionData.special !== null && typeof progressionData.special !== 'undefined'){
         this.handleSpecial(progressionData)
