@@ -7,10 +7,10 @@ var Welcome = React.createClass({
         noData = Object.keys(data).length === 0, // if no data, basic welcome
       headline = noData ? <h5>Would You Like To Login?</h5>
         : <h5>You Already Had a Saved Game! Which One Do You Want?</h5>,
-      button1 = noData ? <button onClick={this.onNewGame}>NO THANKS, JUST WANNA PLAY</button>
-        : <button onClick={this.onSaveCurrent}>CONTINUE CURRENT GAME</button>,
-      button2 = noData ? <button onClick={this.onLogin}>YES, I CAN LOG IN WITH GOOGLE</button>
-        : <button onClick={this.onGetOldGame}>GIVE ME MY OLD GAME</button>
+      button1 = noData ? <button className='loginOption' onClick={this.onNewGame}>No Thanks</button>
+        : <button className='loginOption' onClick={this.onSaveCurrent}>Continue Current Game</button>,
+      button2 = noData ? <button className='loginOption' onClick={this.onLogin}>Yes, with Google</button>
+        : <button className='loginOption' onClick={this.onGetOldGame}>Gimme my Old Game</button>
 
     return(
       <div>
