@@ -297,7 +297,7 @@ var Utils = {
               nextTrigger: 44
             },
             44: {
-              tokens: {'oil1': 6, 'oil2': 3, 'oil3': 1, 'oil4': 1, 'con1': 2},
+              tokens: {'oil1': 8, 'oil2': 4, 'oil3': 2, 'oil4': 1, 'con1': 2},
               nextTrigger: 115
             }
           },
@@ -358,29 +358,79 @@ var Utils = {
           },
           8: {
             282: {
-              tokens: ['oil1', 'oil2', 'oil2', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'con1', 'con1', 'mega'],
+              tokens: {'oil1': 1, 'oil2': 2, 'agr1': 4, 'agr2': 1, 'con1': 2, 'mega': 1},
               nextTrigger: 172,
               special: "appeasement"
             },
             172: {
-              tokens: ['oil1', 'oil2', 'oil2', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'con1', 'con1', 'mega', 'pork'],
-              nextTrigger: 299
+              tokens: {'oil1': 6, 'oil2': 8, 'agr1': 13, 'agr2': 7, 'con1': 4, 'mega': 2, 'pork': 1},
+              nextTrigger: 46
+            }
+            46: {
+              tokens: {'oil1': 3, 'oil2': 4, 'oil3': 1, 'agr1': 7, 'agr2': 3, 'agr3': 1, 'con1': 2, 'mega': 1},
+              nextTrigger: 10
             }
           },
           10: {
             299: {
-              tokens: ['oil1', 'oil2', 'oil3', 'agr1', 'agr1', 'agr1', 'agr1', 'agr2', 'agr2', 'agr2', 'agr2', 'agr2', 'agr3', 'con1', 'con1', 'con1', 'mega'],
-              nextTrigger: 120,
+              tokens: {'oil1': 3, 'oil2': 2, 'oil3': 1, 'agr1': 11, 'agr2': 6, 'agr3': 2, 'con1': 3, 'mega': 2, 'pork': 1},
+              nextTrigger: 62,
               special: "hold"
+            },
+            62: {
+              tokens: {'oil1': 2, 'oil2': 1, 'agr1': 5, 'agr2': 3, 'agr3': 1, 'con1': 2, 'mega': 1},
+              nextTrigger: 333
+            }
+          },
+          12: {
+            333: {
+              tokens: {'oil1': 9, 'oil2': 13, 'oil3': 3, 'agr1': 15, 'agr2': 9, 'agr3': 3, 'con1': 4, 'mega': 2, 'pork': 1},
+              nextTrigger: 42
+            },
+            42: {
+              tokens: {'oil1': 5, 'oil2': 4, 'oil3': 1, 'agr1': 7, 'agr2': 5, 'agr3': 1, 'con1': 2, 'mega': 1, 'mil1': 2},
+              nextTrigger: 129 //for both 13 && 14
+            }
+          },
+          13: {
+            129: {
+              tokens: {'oil1': 5, 'oil2': 3, 'agr1': 7, 'agr2': 4, 'agr3': 2, 'mil1': 4, 'mil2': 2, 'con1': 4, 'mega': 1, 'pork': 1},
+              nextTrigger: 129
+            }
+          },
+          14: {
+            129: {
+              tokens: {'oil1': 3, 'oil2': 2, 'agr1': 4, 'agr2': 3, 'agr3': 1, 'mil1': 5, 'mil2': 3, 'mil3': 1, 'con1': 2, 'mega': 1},
+              nextTrigger: 3
+            },
+            3: {
+              tokens: {'oil1': 4, 'oil2': 2, 'oil3': 1, 'agr1': 6, 'agr2': 3, 'agr3': 1, 'mil1': 9, 'mil2': 4, 'mil3': 2, 'con1': 3, 'pork': 1},
+              nextTrigger: 120
             }
           },
           16: {
             120: {
-              tokens: ['oil1', 'oil2', 'oil3', 'agr1', 'agr1', 'agr2', 'agr2', 'agr2', 'agr3', 'mil1', 'mil1', 'mil1', 'mil1', 'mil1', 'mil2', 'mil2', 'mil2', 'con1', 'con1', 'con1', 'mega', 'mega'],
-              nextTrigger: 555,
+              tokens: {'oil1': 2, 'oil2': 2, 'oil3': 1, 'agr1': 3, 'agr2': 2, 'agr3': 1, 'mil1': 7, 'mil2': 5, 'con1': 2, 'mega': 1},
+              nextTrigger: 25,
               special: "appeasement"
+            },
+            25: {
+              tokens: {'oil1': 3, 'oil2': 4, 'oil3': 1, 'agr1': 4, 'agr2': 5, 'agr3': 1, 'mil1': 11, 'mil2': 7, 'mil3': 3, 'con1': 4, 'mega': 2, 'pork': 1},
+              nextTrigger: 151
             }
           },
+          18: {
+            151: {
+              tokens: {},
+              nextTrigger: 7
+            },
+            7: {
+              tokens: {},
+              nextTrigger: 32
+            }
+          },
+          19: {},
+          
           24: {
             555: {
               tokens: ['agr2', 'agr3', 'mil1', 'mil1', 'mil2', 'mil2', 'mil3', 'fin1', 'fin1', 'fin1', 'fin1', 'fin1', 'fin2', 'fin2', 'con1', 'con1', 'con1', 'mega', 'pork', 'pork'],
