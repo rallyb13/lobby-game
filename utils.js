@@ -365,7 +365,7 @@ var Utils = {
             172: {
               tokens: {'oil1': 6, 'oil2': 8, 'agr1': 13, 'agr2': 7, 'con1': 4, 'mega': 2, 'pork': 1},
               nextTrigger: 46
-            }
+            },
             46: {
               tokens: {'oil1': 3, 'oil2': 4, 'oil3': 1, 'agr1': 7, 'agr2': 3, 'agr3': 1, 'con1': 2, 'mega': 1},
               nextTrigger: 10
@@ -430,7 +430,7 @@ var Utils = {
             }
           },
           19: {},
-          
+
           24: {
             555: {
               tokens: ['agr2', 'agr3', 'mil1', 'mil1', 'mil2', 'mil2', 'mil3', 'fin1', 'fin1', 'fin1', 'fin1', 'fin1', 'fin2', 'fin2', 'con1', 'con1', 'con1', 'mega', 'pork', 'pork'],
