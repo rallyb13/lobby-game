@@ -211,7 +211,8 @@ h5 {
     display: none;
 }
 
-.loginOption {
+.loginOption,
+.choice-button {
   margin: 1% 2% 0 0;
   padding: 2%;
   background-color: #4CB944;
@@ -264,11 +265,6 @@ h5 {
   position: absolute;
   top: 0px;
   right: 10px;
-}
-
-.choice-button {
-  /*TODO: AMP THIS*/
-  margin: 1% 2% 0 0;
 }
 
 .funds {
