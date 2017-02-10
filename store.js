@@ -4,7 +4,7 @@ var QuidStore = new EventEmitter();
 var CHANGE_EVENT = 'change';
 var initialState = {
   board: {
-    rows: 6, columns: 6, grid: [],
+    rows: 6, columns: 7, grid: [],
     megaPossCoords: [], //coordinates where megaphone can be dropped
     createFavor: [] //only has content if set about to be combined
   },
@@ -15,10 +15,10 @@ var initialState = {
     userId: ''
   },
   status: {
-    movesRemaining: 180,
+    movesRemaining: 300,
     score: 0,
     bankBalance: 0,
-    phase: 1,
+    phase: 10,
     repeat: 0, //tracks if level is repeated (when higher office declined)
     nextGoal: 35000,
     electedOffice: 'State Delegate',
@@ -36,7 +36,7 @@ var initialState = {
 
   //store config content that does not need to be passed to view components
   tokensArray: ['oil1', 'oil1', 'oil1', 'oil2'],
-  trigger: 160, //move # at which tokensArray changes
+  trigger: 299, //move # at which tokensArray changes
   megaPossTokens: [], //arrays of valid tokens megaphone can become (at coordinate corresponding to megaPossCoords)
   porkOn: [], //pork tokens on board
   appeasements: [], //appeasement tokens on board
@@ -851,18 +851,22 @@ QuidStore.handleScoreboard =function(count, token, isRecursive) {
     money = 0,
     bigMatchFactor = 1;
 
-  if (count < 2 && isRecursive !== true) {
-    points = tokenData.pts;
-    money = tokenData.val;
+  if (count < 2) {
+    if (isRecursive === true) {
+      return false;
+    } else {
+      points = tokenData.pts;
+      money = tokenData.val;
+    }
   } else if (count >= 2){
     if (count !== 2 && tokenData.nextUp !== 'final'){
-      bigMatchFactor = (count === 2) ? 1 : 1 + (count * 0.75);
+      bigMatchFactor += (count - 2) * .25;
     }
     points = tokenData.mPts;
     points = Math.round(points * bigMatchFactor);
     money = tokenData.mVal;
     money = Math.round(money * bigMatchFactor);
-    if (isRecursive){
+    if (isRecursive === true){
       points = Math.round(points * 1.3);
       money = Math.round(money * 1.25);
     }
