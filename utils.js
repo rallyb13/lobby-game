@@ -365,7 +365,7 @@ var Utils = {
             172: {
               tokens: {'oil1': 6, 'oil2': 8, 'agr1': 13, 'agr2': 7, 'con1': 4, 'mega': 2, 'pork': 1},
               nextTrigger: 46
-            }
+            },
             46: {
               tokens: {'oil1': 3, 'oil2': 4, 'oil3': 1, 'agr1': 7, 'agr2': 3, 'agr3': 1, 'con1': 2, 'mega': 1},
               nextTrigger: 10
@@ -421,44 +421,184 @@ var Utils = {
           },
           18: {
             151: {
-              tokens: {},
+              tokens: {'oil1': 2, 'oil2': 3, 'agr1': 3, 'agr2': 3, 'agr3': 1, 'mil1': 5, 'mil2': 4, 'mil3': 1, 'con1': 2, 'mega': 1},
               nextTrigger: 7
             },
             7: {
-              tokens: {},
+              tokens: {'oil1': 5, 'oil2': 4, 'oil3': 1, 'agr1': 6, 'agr2': 4, 'mil1': 8, 'mil2': 5, 'mil3': 2, 'con1': 4, 'mega': 1, 'pork': 1},
               nextTrigger: 32
             }
           },
-          19: {},
-          
+          19: {
+            32: {
+              tokens: {'oil1': 2, 'oil2': 1, 'agr1': 3, 'agr2': 2, 'mil1': 4, 'mil2': 2, 'mil3': 1, 'con1': 2},
+              nextTrigger: 151 // corresponds to reset back to 18, entry into 20 OR 22
+            }
+          },
+          20: {
+            151: {
+              tokens: {'oil1': 1, 'oil2': 1, 'agr1': 2, 'agr2': 2, 'agr3': 1, 'mil1': 3, 'mil2': 2, 'mil3': 2, 'con1': 2, 'mega': 1, 'pork': 1, 'fin1': 2},
+              nextTrigger: 7
+            },
+            7: {
+              tokens: {
+                'oil1': 1, 'oil2': 2, 'oil3': 1, 'agr1': 2, 'agr2': 2, 'agr3': 1,
+                'mil1': 3, 'mil2': 2, 'mil3': 2, 'fin1': 2, 'fin2': 1,
+                'con1': 2, 'mega': 1, 'pork': 1
+              },
+              nextTrigger: 600
+            }
+          },
+          22: {
+            151: {
+              tokens: {
+                'oil1': 1, 'oil2': 2, 'oil3': 1, 'agr1': 3, 'agr2': 1,
+                'mil1': 4, 'mil2': 3, 'mil3': 2, 'fin1': 4, 'fin2': 3,
+                'con1': 2, 'mega': 1, 'pork': 1
+              },
+              nextTrigger: 600
+            }
+          },
           24: {
-            555: {
-              tokens: ['agr2', 'agr3', 'mil1', 'mil1', 'mil2', 'mil2', 'mil3', 'fin1', 'fin1', 'fin1', 'fin1', 'fin1', 'fin2', 'fin2', 'con1', 'con1', 'con1', 'mega', 'pork', 'pork'],
-              nextTrigger: 461,
+            600: {
+              tokens: {
+                'oil1': 2, 'oil2': 3, 'agr1': 5, 'agr2': 3,
+                'mil1': 8, 'mil2': 6, 'mil3': 4, 'fin1': 11, 'fin2': 7, 'fin3': 2,
+                'con1': 4, 'mega': 2, 'pork': 1
+              },
+              nextTrigger: 333,
               special: "hold"
+            },
+            333: {
+              tokens: {
+                'oil1': 2, 'oil2': 2, 'oil3': 1, 'agr1': 4, 'agr2': 3, 'arg3': 1,
+                'mil1': 5, 'mil2': 4, 'mil3': 3, 'fin1': 8, 'fin2': 5, 'fin3': 2,
+                'con1': 3, 'mega': 2, 'pork': 1
+              },
+              nextTrigger: 673
+            }
+          },
+          26: {
+            673: {
+              tokens: {
+                'oil1': 3, 'oil2': 2, 'agr1': 3, 'agr2': 2,
+                'mil1': 4, 'mil2': 3, 'mil3': 1, 'fin1': 7, 'fin2': 5, 'fin3': 2,
+                'con1': 2, 'mega': 1
+              },
+              nextTrigger: 489
+            },
+            489: {
+              tokens: {
+                'oil1': 3, 'oil2': 2, 'oil3': 1, 'agr1': 3, 'agr2': 2, 'agr3': 1,
+                'mil1': 4, 'mil2': 2, 'mil3': 2, 'fin1': 6, 'fin2': 4, 'fin3': 2,
+                'con1': 2, 'mega': 1, 'pork': 1
+              },
+              nextTrigger: 116
+            },
+            116: {
+              tokens: { // nearly equalized ratio here, slight favor to latter sets
+                'oil1': 3, 'oil2': 2, 'oil3': 1, 'agr1': 3, 'agr2': 2, 'agr3': 1,
+                'mil1': 4, 'mil2': 2, 'mil3': 1, 'fin1': 5, 'fin2': 3, 'fin3': 2,
+                'con1': 3, 'mega': 1, 'pork': 2
+              },
+              nextTrigger: 461
             }
           },
           27: {
             461: {
-              tokens: ['oil1', 'agr1', 'fin1', 'fin1', 'mil1', 'mil1', 'mega', 'mega', 'con1'], //TODO: should be big tokens just for that brief window
+              tokens: { // big tokens for brief window
+                'oil2': 1, 'oil3': 2, 'oil4': 1, 'agr2': 1, 'agr3': 2, 'agr4': 1,
+                'mil2': 1, 'mil3': 2, 'mil4': 2, 'fin1': 1, 'fin2': 2, 'fin3': 3, 'fin4': 2,
+                'con1': 1, 'mega': 3, 'pork': 2
+              },
               nextTrigger: 459,
               msg: "The president has called a special session to address the deficit crisis. Nice work ignoring the need to pass a budget until the last minute. I wonder what you can sneak in when there's just too much at stake for certain legislation to not pass...",
               special: 'event',
               moveChange: 23
             },
             459: {
-              tokens: ['oil1', 'agr1', 'mil1', 'mil2', 'mil2', 'fin1', 'fin2', 'fin2', 'fin3', 'mega', 'pork', 'con1', 'con1'],
-              nextTrigger: 155 //TODO: this will change!
+              tokens: { // oil-heavier
+                'oil1': 7, 'oil2': 3, 'oil3': 2, 'agr1': 3, 'agr2': 2, 'agr3': 1,
+                'mil1': 3, 'mil2': 2, 'fin1': 4, 'fin2': 3, 'fin3': 1,
+                'con1': 3, 'mega': 1, 'pork': 1
+              },
+              nextTrigger: 246
+            },
+            246: {
+              tokens: { // mil-heavier
+                'oil1': 4, 'oil2': 2, 'oil3': 1, 'agr1': 3, 'agr2': 2,
+                'mil1': 7, 'mil2': 4, 'mil3': 2, 'fin1': 4, 'fin2': 2, 'fin3': 1,
+                'con1': 2, 'mega': 1, 'pork': 1
+              },
+              nextTrigger: 33
+            },
+            33: {
+              tokens: { // agr-heavier
+                'oil1': 4, 'oil2': 2, 'oil3': 1, 'agr1': 9, 'agr2': 5, 'agr3': 2,
+                'mil1': 4, 'mil2': 2, 'mil3': 1, 'fin1': 4, 'fin2': 2, 'fin3': 1,
+                'con1': 4, 'mega': 2, 'pork': 1
+              },
+              nextTrigger: 555
+            }
+          },
+          29: {
+            555: {
+              tokens: { // fin-heavier
+                'oil1': 4, 'oil2': 2, 'agr1': 5, 'agr2': 2, 'agr3': 1,
+                'mil1': 4, 'mil2': 2, 'mil3': 1, 'fin1': 11, 'fin2': 6, 'fin3': 2,
+                'con1': 3, 'mega': 1, 'pork': 2
+              },
+              nextTrigger: 230
+            },
+            230: {
+              tokens: { // equalized again, but higher levels creeping up
+                'oil1': 3, 'oil2': 3, 'oil3': 2, 'agr1': 4, 'agr2': 3, 'agr3': 2,
+                'mil1': 5, 'mil2': 4, 'mil3': 2, 'fin1': 8, 'fin2': 5, 'fin3': 3,
+                'con1': 3, 'mega': 3, 'pork': 1
+              },
+              nextTrigger: 567,
+              msg: "It's election day for other people! Your state's constituents have spoken: they just tossed out the chump ahead of you in seniority. You've never felt power like this before, and you got it just by sticking around!",
+              special: 'office'
             }
           },
           30: {
+            567: {
+              tokens: {
+                'oil1': 5, 'oil2': 3, 'oil3': 1, 'agr1': 5, 'agr2': 3, 'agr3': 1,
+                'mil1': 6, 'mil2': 3, 'mil3': 1, 'fin1': 7, 'fin2': 4, 'fin3': 1,
+                'con1': 3, 'mega': 2, 'pork': 2
+              },
+              nextTrigger: 155
+            },
             155: {
-              tokens: ['oil1', 'oil2', 'agr1', 'agr2', 'mil1', 'mil2', 'mil2', 'mil3', 'fin1', 'fin1', 'fin2', 'fin2', 'fin3', 'fin3', 'fin4', 'con1', 'con1', 'con1', 'mega', 'mega', 'pork', 'pork'],
-              nextTrigger: 777, //TODO: this will change!
-              msg: 'Government shutdown! Forget all those people out of work. You need to worry about how you have less working days to get your TRUE constituents what they want. You just WEEKS!',
+              tokens: {
+                'oil1': 4, 'oil2': 2, 'agr1': 4, 'agr2': 2,
+                'mil1': 5, 'mil2': 3, 'mil3': 1, 'fin1': 8, 'fin2': 5, 'fin3': 2,
+                'con1': 4, 'mega': 2, 'pork': 1
+              },
+              nextTrigger: 321,
+              msg: 'Government shutdown! Forget all those people out of work. You need to worry about how you have less working days to get your TRUE constituents what they want. You just lost WEEKS!',
               special: 'event',
               moveChange: -41
             }
+          },
+          32: {
+            321: {
+              tokens: {
+                'oil1': 2, 'oil2': 2, 'oil3': 1, 'agr1': 4, 'agr2': 2, 'agr3': 1,
+                'mil1': 5, 'mil2': 3, 'mil3': 1, 'fin1': 7, 'fin2': 5, 'fin3': 2,
+                'con1': 3, 'mega': 2, 'pork': 1
+              },
+              nextTrigger: 333
+            }
+          },
+          33: {
+            tokens: { // TODO: add xxx4 tokens (rare) in earlier series?
+              'oil1': 20, 'oil2': 7, 'oil3': 3, 'oil4': 1, 'agr1': 21, 'agr2': 7, 'agr3': 3, 'agr4': 1,
+              'mil1': 23, 'mil2': 8, 'mil3': 3, 'mil4': 1, 'fin1': 25, 'fin2': 9, 'fin3': 4, 'fin4': 1,
+              'con1': 9, 'mega': 5, 'pork': 4
+            },
+            nextTrigger: 0
           }
         };
     data = progressionMap[phase][moves];

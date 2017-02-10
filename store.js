@@ -517,6 +517,10 @@ QuidStore.handleSpecial = function(data){
         currentState.helpers['con5'] = 1;
       }
       break;
+    case 'office':
+      currentState.status.message = data.msg;
+      currentState.status.electedOffice = 'US Senator (Senior)';
+      break;
     case 'event':
       currentState.status.message = data.msg;
       currentState.status.movesRemaining = currentState.status.movesRemaining + data.moveChange;
