@@ -4,7 +4,7 @@ var QuidStore = new EventEmitter();
 var CHANGE_EVENT = 'change';
 var initialState = {
   board: {
-    rows: 6, columns: 7, grid: [],
+    rows: 6, columns: 6, grid: [],
     megaPossCoords: [], //coordinates where megaphone can be dropped
     createFavor: [] //only has content if set about to be combined
   },
@@ -15,10 +15,10 @@ var initialState = {
     userId: ''
   },
   status: {
-    movesRemaining: 300,
+    movesRemaining: 180,
     score: 0,
     bankBalance: 0,
-    phase: 10,
+    phase: 1,
     repeat: 0, //tracks if level is repeated (when higher office declined)
     nextGoal: 35000,
     electedOffice: 'State Delegate',
@@ -36,7 +36,7 @@ var initialState = {
 
   //store config content that does not need to be passed to view components
   tokensArray: ['oil1', 'oil1', 'oil1', 'oil2'],
-  trigger: 299, //move # at which tokensArray changes
+  trigger: 160, //move # at which tokensArray changes
   megaPossTokens: [], //arrays of valid tokens megaphone can become (at coordinate corresponding to megaPossCoords)
   porkOn: [], //pork tokens on board
   appeasements: [], //appeasement tokens on board
@@ -224,6 +224,8 @@ QuidStore.restartGame = function(){
   newStateObj.userInfo = currentState.userInfo
   currentState = newStateObj
   this.setupBoard()
+  this.populateBoard()
+  this.toggleOverlay(false)
   this.emitChange()
 };
 

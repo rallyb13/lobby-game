@@ -80,7 +80,7 @@ var Overlay = React.createClass({
       'Hold Spaces': 3,
       'Agribusiness Lobby': 7,
       'Pork': 8,
-      'Military-Industrial Lobby': 15,
+      'Military-Industrial Lobby': 12,
       'Financial Lobby': 20
     },
     tabs = [];
