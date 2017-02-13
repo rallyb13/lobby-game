@@ -514,9 +514,9 @@ QuidStore.handleSpecial = function(data){
       break;
     case 'appeasement':
       if (currentState.helpers['con3'] === 0){
-        currentState.helpers['con3'] = 1;
+        this.changeHelperCount('con3', false)
       } else {
-        currentState.helpers['con5'] = 1;
+        this.changeHelperCount('con5', false)
       }
       break;
     case 'office':
@@ -912,12 +912,6 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
   phase = currentState.status.phase;
   phaseData = Utils.getPhaseData(phase);
 
-  if (phase === 8){
-    this.changeHelperCount('con3', false);
-  } else if (phase === 16){
-    this.changeHelperCount('con5', false);
-  }
-
   //change every election
   currentState.status.movesRemaining = phaseData.moves;
   currentState.status.nextGoal = phaseData.goal;
@@ -1039,12 +1033,13 @@ QuidStore.calculateHighs = function(isEndGame) {
       toSortScores = []
     }
   }
-
+// TODO: always record set, but track locally which score is current and pull that first!
+// TODO: add fn to allow whole set of history to be compared against old data
   if (isEndGame) {
     currentState.userInfo.highScores = sortedScores
     currentState.userInfo.highOffices = sortedOffices
   } else {
-    return { 'sortedScores': sortedScores, 'sortedOffices': sortedOffices}
+    return { 'sortedScores': sortedScores, 'sortedOffices': sortedOffices }
   }
 };
 
