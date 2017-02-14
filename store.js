@@ -45,6 +45,8 @@ var initialState = {
 var currentState = JSON.parse(JSON.stringify(initialState));
 var loginHandled = false;
 var firebaseData = {};
+var recordedScoreIndex = 5; // consider non-recorded score as 6th array item left behind
+var isReturnPlayer = false;
 
 //sets board at beginning of game, with randomly-set tokens included (SINGLE USE--not used for board resize)
 QuidStore.setupBoard = function () {
@@ -271,7 +273,9 @@ QuidStore.deposit = function(num){
 
 //helper fn to update score
 QuidStore.score = function(num){
-  currentState.status.score = currentState.status.score + num;
+  let newScore = currentState.status.score + num
+  currentState.status.score = newScore;
+  this.updateHighs(newScore);
 };
 
 //helper fn to update the bench with favors upon earning/using them
@@ -1006,42 +1010,167 @@ QuidStore.toggleOverlay = function(open){
   this.emitChange();
 };
 
-QuidStore.calculateHighs = function(isEndGame) {
-  let bestScores = currentState.userInfo.highScores
-  let bestOffices = currentState.userInfo.highOffices
-  let offices = ['President', 'US Senator (Senior)', 'US Senator (Junior)', 'US Representative', 'State Senator', 'State Delegate']
-  let toSortScores = []
-  let sortedScores = []
-  let sortedOffices = []
-  let checkOffice = ''
-
-  while (sortedScores.length <= 5 && offices.length !== 0) {
-    checkOffice = offices.shift(0)
-    if (currentState.status.electedOffice === checkOffice){
-      sortedOffices.push(currentState.status.electedOffice)
-      toSortScores.push(currentState.status.score)
+// at login or office advancement, adjust high score record and track index of current within arrays
+QuidStore.setupHighs = function(offices, scores, newOffice, newScore) {
+  let titles = ['President', 'US Senator (Senior)', 'US Senator (Junior)', 'US Representative', 'State Senator', 'State Delegate']
+  let newOfficeIndex = titles.indexOf(newOffice)
+  let sameOfficeScores = []
+  let oldOfficeIndex
+  let newIndexToRecord = null
+  let specialIndex = null
+  
+  // office advancement will not pass in newScore
+  if (newScore === null) {
+    offices.splice(this.recordedScoreIndex, 1)
+    newScore = scores.splice(this.recordedScoreIndex, 1)[0] // 0th value because array returned
+  }
+  
+  // compare newOffice by index to other offices
+  for (let i=0; i<offices.length; i++) {
+    oldOfficeIndex = titles.indexOf[offices[i]]
+    if (oldOfficeIndex === newOfficeIndex) {
+      sameOfficeScores.push(scores[i])
+      specialIndex = specialIndex === null ? i : specialIndex // will capture only the first index
+    } else if (oldOfficeIndex > newOfficeIndex) {
+      newIndexToRecord = i // this gets exact index to insert new score into (when lower ranked offices show up)
+      break
     }
-    for (let i = 0; i < bestOffices.length; i++) {
-      if (bestOffices[i] === checkOffice && sortedOffices.length <= 5){
-        sortedOffices.push(checkOffice)
-        toSortScores.push(bestScores[i])
+  }
+  
+  // for when competing high scores at the same office
+  if (sameOfficeScores > 0) {
+    sameOfficeScores.push(newScore)
+    sameOfficeScores.sort(this.sortNumbers)
+    newIndexToRecord = specialIndex + sameOfficeScores.indexOf(newScore)
+  }
+  
+  // for when new office is the lowest value office
+  if (newIndexToRecord === null) {
+    newIndexToRecord = offices.length
+  }
+
+  // set index and place score/office into array
+  this.recordedScoreIndex = newIndexToRecord
+  this.resetHighs(scores, offices, newScore)
+};
+
+// continually record high score
+QuidStore.updateHighs = function(newScore) {
+  let scores = currentState.userInfo.highScores
+  let offices = currentState.userInfo.highOffices
+
+  if (this.isReturnPlayer === false) {
+    // if no competing scores, just keep record updated
+    currentState.userInfo.highScores = [newScore]
+    currentState.userInfo.highOffices = [currentState.status.electedOffice]
+  } else {
+    // first: remove last adjustment by stored index
+    if (this.recordedScoreIndex !== 5) {
+      scores.splice(this.recordedScoreIndex, 1)
+      offices.splice(this.recordedScoreIndex, 1)
+    }
+    
+    // next: check for new index within same elected office
+    while (this.recordedScoreIndex !== 0
+    && currentState.status.electedOffice === offices[this.recordedScoreIndex - 1]) {
+      if (scores[this.recordedScoreIndex - 1] < newScore) {
+        this.recordedScoreIndex--
       }
     }
-    if (toSortScores.length !== 0) {
-      toSortScores.sort(this.sortNumbers)
-      sortedScores = sortedScores.concat(toSortScores)
-      toSortScores = []
-    }
-  }
-// TODO: always record set, but track locally which score is current and pull that first!
-// TODO: add fn to allow whole set of history to be compared against old data
-  if (isEndGame) {
-    currentState.userInfo.highScores = sortedScores
-    currentState.userInfo.highOffices = sortedOffices
-  } else {
-    return { 'sortedScores': sortedScores, 'sortedOffices': sortedOffices }
+    // finally, reinsert current score/office
+    this.resetHighs(scores, offices, newScore)
   }
 };
+
+//insert current score/office by index (and remove old last score if necessary)
+QuidStore.resetHighs = function(scores, offices, newScore) {
+  scores.splice(this.recordedScoreIndex, 0, newScore)
+  offices.splice(this.recordedScoreIndex, 0, currentState.status.electedOffice)
+  if(scores.length === 6) {
+    scores.pop()
+    offices.pop()
+  }
+  currentState.userInfo.highScores = scores
+  currentState.userInfo.highOffices = offices
+};
+// // for now we only record high scores on overlay opening (includes game over)
+// // TODO: ultimately, always check against office/score and keep high score continually recorded
+// QuidStore.calcHighs = function(nowScore, nowOffice, thenScores, thenOffices) {
+//   let offices = ['President', 'US Senator (Senior)', 'US Senator (Junior)', 'US Representative', 'State Senator', 'State Delegate']
+//   let toSortScores = []
+//   let sortedScores = []
+//   let sortedOffices = []
+//   let checkOffice = ''
+//   let doRecordIndex = false
+// 
+//   // pull out current score from last time it was recorded
+//   if (this.recordedScoreIndex !== -1) {
+//     // remove score/office at index
+//   }
+//   
+//   // work from highest office until all five slots filled
+//   while (sortedScores.length <= 5 && offices.length !== 0) {
+//     checkOffice = offices.shift(0)
+//     if (nowOffice === checkOffice){
+//       sortedOffices.push(nowOffice)
+//       toSortScores.push(nowScore)
+//       recordIndex = true
+//     }
+//     
+//     for (let i = 0; i < thenOffices.length; i++) {
+//       if (thenOffices[i] === checkOffice && sortedOffices.length <= 5){ //TODO: but what if current score same office lower score?
+//         sortedOffices.push(checkOffice)
+//         toSortScores.push(thenScores[i])
+//       }
+//     }
+// 
+//     if (toSortScores.length !== 0) {
+//       toSortScores.sort(this.sortNumbers)
+//       sortedScores = sortedScores.concat(toSortScores)
+//       toSortScores = []
+//       // if doRecordIndex is true, record index of current score for later removal
+//     }
+//   }
+//   currentState.userInfo.highScores = sortedScores
+//   currentState.userInfo.highOffices = sortedOffices
+// };
+// 
+// 
+// QuidStore.calculateHighs = function(isEndGame) {
+//   let bestScores = currentState.userInfo.highScores
+//   let bestOffices = currentState.userInfo.highOffices
+//   let offices = ['President', 'US Senator (Senior)', 'US Senator (Junior)', 'US Representative', 'State Senator', 'State Delegate']
+//   let toSortScores = []
+//   let sortedScores = []
+//   let sortedOffices = []
+//   let checkOffice = ''
+// 
+//   while (sortedScores.length <= 5 && offices.length !== 0) {
+//     checkOffice = offices.shift(0)
+//     if (currentState.status.electedOffice === checkOffice){
+//       sortedOffices.push(currentState.status.electedOffice)
+//       toSortScores.push(currentState.status.score)
+//     }
+//     for (let i = 0; i < bestOffices.length; i++) {
+//       if (bestOffices[i] === checkOffice && sortedOffices.length <= 5){
+//         sortedOffices.push(checkOffice)
+//         toSortScores.push(bestScores[i])
+//       }
+//     }
+//     if (toSortScores.length !== 0) {
+//       toSortScores.sort(this.sortNumbers)
+//       sortedScores = sortedScores.concat(toSortScores)
+//       toSortScores = []
+//     }
+//   }
+// 
+//   if (isEndGame) {
+//     currentState.userInfo.highScores = sortedScores
+//     currentState.userInfo.highOffices = sortedOffices
+//   } else {
+//     return { 'sortedScores': sortedScores, 'sortedOffices': sortedOffices }
+//   }
+// };
 
 QuidStore.sortNumbers = function(a, b){
   return b - a
