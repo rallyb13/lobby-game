@@ -17,9 +17,8 @@ var HighScores = React.createClass({
   
   // TODO: refactor to pull from userInfo
   createListItems: function() {
-    let highs = QuidStore.calculateHighs(false)
-    let scores = highs['sortedScores']
-    let offices = highs['sortedOffices']
+    let scores = this.props.scores
+    let offices = this.props.offices
     let listItems = []
     
     for (let j = 0; j < scores.length; j++){
