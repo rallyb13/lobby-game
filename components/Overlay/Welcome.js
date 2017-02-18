@@ -32,11 +32,13 @@ var Welcome = React.createClass({
   },
   
   onSaveCurrent: function(){
+    QuidStore.preserveHighScoreRecord();
     QuidStore.emitChange(); // now that logged in, will write game data to database
     this.cleanupModal();
   },
   
   onGetOldGame: function(){
+    QuidStore.preserveHighScoreRecord();
     QuidStore.retrievePriorGame(false);
     this.cleanupModal();
   },

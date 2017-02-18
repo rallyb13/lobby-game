@@ -145,7 +145,7 @@ QuidStore.handleLogin = function(isMidgame){
 QuidStore.retrievePriorGame = function(data) {
     currentState = data === false ? firebaseData : data
     QuidStore.handleEmptyArrays(); //TODO: check scope regarding QuidStore vs. this
-    QuidStore.setupHighs(data.userInfo.highOffices, data.userInfo.highScores, currentState.status.electedOffice, currentState.status.score)
+    QuidStore.setupHighs(currentState.userInfo.highOffices, currentState.userInfo.highScores, currentState.status.electedOffice, currentState.status.score)
     QuidStore.emitChange(); // needed to update board
 };
 
@@ -470,6 +470,7 @@ QuidStore.completeMove = function(rowPos, colPos){
     currentState.status.advMsg = 'board';
     this.endPhase(true);
   } else {
+
     this.setNextToken();
     if (token.slice(3,4) === '5'){
       this.addTopLevelToken(token, rowPos, colPos);
@@ -1084,6 +1085,8 @@ QuidStore.updateHighs = function(newScore) {
     && currentState.status.electedOffice === offices[recordedScoreIndex - 1]) {
       if (scores[recordedScoreIndex - 1] < newScore) {
         recordedScoreIndex--
+      } else {
+        break
       }
     }
     // finally, reinsert current score/office
@@ -1101,6 +1104,12 @@ QuidStore.resetHighs = function(scores, offices, newScore) {
   }
   currentState.userInfo.highScores = scores
   currentState.userInfo.highOffices = offices
+};
+
+// handle the high score record when two games exist at login and one is being deleted
+QuidStore.preserveHighScoreRecord = function() {
+  this.setupHighs(firebaseData.userInfo.highOffices, firebaseData.userInfo.highScores, currentState.status.electedOffice, currentState.status.score)
+  this.resetHighs(firebaseData.userInfo.highScores, firebaseData.userInfo.highOffices, currentState.status.score)
 };
 
 export default QuidStore;
