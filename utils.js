@@ -294,9 +294,9 @@ var Utils = {
             },
             82: {
               tokens: {'oil1': 5, 'oil2': 2, 'oil3': 1, 'con1': 2},
-              nextTrigger: 44
+              nextTrigger: 14
             },
-            44: {
+            14: {
               tokens: {'oil1': 11, 'oil2': 7, 'oil3': 4, 'oil4': 1, 'con1': 2},
               nextTrigger: 135
             }
