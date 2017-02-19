@@ -267,7 +267,8 @@ h5 {
   right: 10px;
 }
 
-.funds {
+.funds,
+.highScores {
   border: 5px #818479 solid;
   background-color: #D2E4C4;
   padding: 1% 2.5%;
@@ -275,8 +276,14 @@ h5 {
   margin-right: 10px;
 }
 
-.funds h3 {
+.funds h3,
+.highScores h3 {
   margin: 0;
+}
+
+.highScores ol{
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .calculation {
@@ -291,6 +298,10 @@ h5 {
 .midNum {
   padding-bottom: 1px;
   text-decoration: underline;
+}
+
+.highRecord {
+  font-size: 1.5em;
 }
 
 /* for larger screens */

@@ -7,8 +7,9 @@ var HighScores = React.createClass({
     let highs = this.createListItems();
         
     return(
-      <div>
-        <ol>High Scores
+      <div className='highScores'>
+        <h3>High Scores:</h3>
+        <ol>
           {highs}
         </ol>
       </div>
@@ -22,7 +23,7 @@ var HighScores = React.createClass({
     let listItems = []
     
     for (let j = 0; j < scores.length; j++){
-      listItems.push(<li key={j}> {offices[j]} : {Utils.formatNum(scores[j])} </li>)
+      listItems.push(<li className="highRecord" key={j}> {offices[j]} : {Utils.formatNum(scores[j])} </li>)
     }
     return listItems
   }
