@@ -222,10 +222,11 @@ QuidStore.undoTurn = function(){
 }
 
 QuidStore.restartGame = function(){
-  let newStateObj = initialState
-  this.calculateHighs(true)
-  newStateObj.userInfo = currentState.userInfo
-  currentState = newStateObj
+  this.setupHighs(currentState.userInfo.highOffices, currentState.userInfo.highScores, 'State Delegate', 0)
+  this.resetHighs(currentState.userInfo.highScores, currentState.userInfo.highOffices, 0)
+  initialState.userInfo = currentState.userInfo
+  currentState = JSON.parse(JSON.stringify(initialState));
+
   this.setupBoard()
   this.populateBoard()
   this.toggleOverlay(false)
@@ -911,7 +912,8 @@ QuidStore.handlePork = function(matches, rowPos, colPos){
 QuidStore.changePhase = function(phaseShift, fromChoice){
   var phase,
     phaseData,
-    coords;
+    dimensions,
+    office;
 
   this.deposit(-currentState.status.nextGoal);
   currentState.status.phase = currentState.status.phase + phaseShift;
@@ -926,16 +928,20 @@ QuidStore.changePhase = function(phaseShift, fromChoice){
   currentState.status.message = phaseData.playMsg;
 
   //changes less often
-  currentState.status.electedOffice = Utils.setElectedOffice(phase, currentState.status.electedOffice);
-  coords = Utils.handleBoardChange(currentState.status.electedOffice);
-  if (currentState.board.rows !== coords[0]){
-    currentState.board.rows = coords[0];
-    currentState.board.grid.push([]);
-    this.handleNewSquares();
-  }
-  if (currentState.board.columns !== coords[1]){
-    currentState.board.columns = coords[1];
-    this.handleNewSquares();
+  office = Utils.setElectedOffice(phase)
+  if (office !== 'no change') {
+    currentState.status.electedOffice = office
+    this.setupHighs(currentState.userInfo.highOffices, currentState.userInfo.highScores, office, null)
+    dimensions = Utils.handleBoardChange(currentState.status.electedOffice);
+    if (currentState.board.rows !== dimensions[0]){
+      currentState.board.rows = dimensions[0];
+      currentState.board.grid.push([]);
+      this.handleNewSquares();
+    }
+    if (currentState.board.columns !== dimensions[1]){
+      currentState.board.columns = dimensions[1];
+      this.handleNewSquares();
+    }
   }
   if (fromChoice){
     currentState.status.advMsg = 'none';
@@ -1020,9 +1026,11 @@ QuidStore.setupHighs = function(offices, scores, newOffice, newScore) {
   let oldOfficeIndex
   let newIndexToRecord = null
   let specialIndex = null
+  let reinsertOnElection = false
   
   // office advancement will not pass in newScore
   if (newScore === null) {
+    reinsertOnElection = true
     offices.splice(recordedScoreIndex, 1)
     newScore = scores.splice(recordedScoreIndex, 1)[0] // 0th value because array returned
   // when at start of game, check if there are any old scores (if not, don't bother with the rest)
@@ -1039,7 +1047,8 @@ QuidStore.setupHighs = function(offices, scores, newOffice, newScore) {
       sameOfficeScores.push(scores[i])
       specialIndex = specialIndex === null ? i : specialIndex // will capture only the first index
     } else if (oldOfficeIndex > newOfficeIndex) {
-      newIndexToRecord = i // this gets exact index to insert new score into (when lower ranked offices show up)
+      // take position of first lower-ranked office; overwritten below if above case was true
+      newIndexToRecord = i
       break
     }
   }
@@ -1058,6 +1067,9 @@ QuidStore.setupHighs = function(offices, scores, newOffice, newScore) {
 
   // set index for continual updating of correct score
   recordedScoreIndex = newIndexToRecord
+  if (reinsertOnElection === true) {
+    this.resetHighs(scores, offices, newScore)
+  }
 };
 
 QuidStore.sortNumbers = function(a, b){
@@ -1096,8 +1108,9 @@ QuidStore.updateHighs = function(newScore) {
 
 //insert current score/office by index (and remove old last score if necessary)
 QuidStore.resetHighs = function(scores, offices, newScore) {
+  let newOffice = newScore === 0 ? 'State Delegate' : currentState.status.electedOffice
   scores.splice(recordedScoreIndex, 0, newScore)
-  offices.splice(recordedScoreIndex, 0, currentState.status.electedOffice)
+  offices.splice(recordedScoreIndex, 0, newOffice)
   if(scores.length === 6) {
     scores.pop()
     offices.pop()

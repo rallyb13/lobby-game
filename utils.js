@@ -12,7 +12,7 @@ var Utils = {
   },
 
   //phase ref specifically for elected office changes
-  setElectedOffice: function(phase, currentOffice) {
+  setElectedOffice: function(phase) {
     var electedOfficeMap = {
           1: 'State Delegate',
           8: 'State Senator',
@@ -21,7 +21,7 @@ var Utils = {
           30: 'US Senator (Senior)'
         };
     if (typeof electedOfficeMap[phase] === 'undefined'){
-      return currentOffice;
+      return 'no change';
     } else {
       return electedOfficeMap[phase];
     }
